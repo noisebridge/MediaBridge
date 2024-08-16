@@ -1,0 +1,1 @@
+# Script to insert movies and interactions into MongoDB
