@@ -25,19 +25,21 @@ def construct_query(title, year):
             ?item wikibase:apiOutputItem mwapi:item .
         }
         ?item wdt:P31/wdt:P279* ?type .
-        VALUES ?instance_of { 
-            wd:Q11424    # Film
-            wd:Q202866   # Animated Film
-            wd:Q24862    # Documentary Film
-            wd:Q506240   # Short Film
-            wd:Q204370   # Television Film
-            wd:Q5398426  # Television Series
-            wd:Q1259759  # Television Miniseries
-            wd:Q471839   # Animated Television Series
-            wd:Q21191270 # Web Series
-            wd:Q7725310  # Reality Television Series
-            wd:Q579956   # Anthology Series
-        }
+        FILTER (?type IN (
+            wd:Q11424,    # Film
+            wd:Q5398426,  # Television Series
+            wd:Q1259759,  # Television Miniseries
+            wd:Q202866,   # Animated Film
+            wd:Q24862,    # Documentary Film
+            wd:Q506240,   # Short Film
+            wd:Q204370,   # Television Film
+            wd:Q471839,   # Animated Television Series
+            wd:Q21191270, # Web Series
+            wd:Q7725310,  # Reality Television Series
+            wd:Q579956,   # Anthology Series
+            wd:Q15416,    # Television Program
+            wd:Q28018927  # Television Special
+        )).
         OPTIONAL {
             ?item wdt:P577 ?releaseDate .
             FILTER (YEAR(?releaseDate) >= %d && YEAR(?releaseDate) <= %d) .
