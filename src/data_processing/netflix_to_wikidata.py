@@ -24,6 +24,7 @@ def construct_query(title, year):
                             mwapi:language "en" .
             ?item wikibase:apiOutputItem mwapi:item .
         }
+
         ?item wdt:P31/wdt:P279* ?type .
         FILTER (?type IN (
             wd:Q11424,    # Film
@@ -40,12 +41,15 @@ def construct_query(title, year):
             wd:Q15416,    # Television Program
             wd:Q28018927  # Television Special
         )).
+
         OPTIONAL {
             ?item wdt:P577 ?releaseDate .
             FILTER (YEAR(?releaseDate) >= %d && YEAR(?releaseDate) <= %d) .
         }
+
         ?item rdfs:label ?itemLabel .
         FILTER (lang(?itemLabel) = "en") .
+
         SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
     }
     LIMIT 1
@@ -69,7 +73,7 @@ def get_wikidata_ids(title, year):
 data = []
 missing_count = 0
 
-for index, row in netflix_data.iloc[:100].iterrows():
+for index, row in netflix_data.iloc[:500].iterrows():
     title = row['Title']
     year = int(row['Year'])
     netflix_id = row['NetflixId']
