@@ -92,7 +92,7 @@ missing_count = 0
 
 for index, row in netflix_data.iloc[:100].iterrows():
     title = row['Title']
-    year = row['Year']
+    year = int(row['Year'])
     netflix_id = row['NetflixId']
     wikidata_ids = get_wikidata_ids(title, year)
     if wikidata_ids:
