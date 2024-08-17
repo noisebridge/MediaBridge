@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 import requests
 import pandas as pd
-import re
 
 load_dotenv()
 
@@ -14,13 +13,7 @@ output_csv_path = os.path.join(base_dir, 'netflix_to_wikidata.csv')
 
 netflix_data = pd.read_csv(netflix_data_path, delimiter=',', names=['NetflixId', 'Year', 'Title'],  encoding='ISO-8859-1', on_bad_lines='skip')
 
-def sanitize_title(title):
-    title = re.sub(r'[^\w\s]', '', title)
-    title = title.lower()
-    return title
-
 def construct_query(title, year):
-    sanitized_title = sanitize_title(title)
     query = '''
     SELECT * WHERE {
         SERVICE wikibase:mwapi {
@@ -54,7 +47,7 @@ def construct_query(title, year):
         SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
     }
     LIMIT 1
-    ''' % (sanitized_title, year - 2, year + 2)
+    ''' % (title, year - 2, year + 2)
     return query
 
 def get_wikidata_ids(title, year):
