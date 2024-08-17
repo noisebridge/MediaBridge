@@ -47,6 +47,12 @@ def construct_query(title, year):
             FILTER (YEAR(?releaseDate) >= %d && YEAR(?releaseDate) <= %d) .
         }
 
+        OPTIONAL {
+            ?item wdt:P136 ?genre .
+            ?genre rdfs:label ?genreLabel .
+            FILTER (lang(?genreLabel) = "en") .
+        }
+
         ?item rdfs:label ?itemLabel .
         FILTER (lang(?itemLabel) = "en") .
 
@@ -56,7 +62,7 @@ def construct_query(title, year):
     ''' % (title, year - 2, year + 2)
     return query
 
-def get_wikidata_ids(title, year):
+def get_wikidata_data(title, year):
     query = construct_query(title, year)
     resp = requests.post('https://query.wikidata.org/sparql',
         headers={'User-Agent': user_agent},
@@ -67,8 +73,15 @@ def get_wikidata_ids(title, year):
     
     resp.raise_for_status()
     data = resp.json()
-    ids = [d['item']['value'].split('/')[-1] for d in data['results']['bindings']]
-    return ids
+
+    if not data['results']['bindings']:
+        return None, None
+
+    wikidata_id = data['results']['bindings'][0]['item']['value'].split('/')[-1]
+
+    genres = [d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d]
+
+    return wikidata_id, genres
 
 data = []
 missing_count = 0
@@ -77,12 +90,18 @@ for index, row in netflix_data.iloc[:500].iterrows():
     title = row['Title']
     year = int(row['Year'])
     netflix_id = row['NetflixId']
-    wikidata_ids = get_wikidata_ids(title, year)
-    if wikidata_ids:
-        print('found:', title, year)
-        data.append({'netflix_id': netflix_id, 'wikidata_id': wikidata_ids[0], 'title': title, 'year': year})
+    wikidata_id, genres = get_wikidata_data(title, year)
+    if wikidata_id:
+        print(f'found: {title} ({year})')
+        data.append({
+            'netflix_id': netflix_id,
+            'wikidata_id': wikidata_id,
+            'title': title,
+            'year': year,
+            'genres': ', '.join(genres) if genres else 'None'
+        })
     else:
-        print('missing:', title, year)
+        print(f'missing: {title} ({year})')
         missing_count += 1
 
 df = pd.DataFrame(data)
