@@ -32,34 +32,18 @@ def construct_query(title, year):
             ?item wikibase:apiOutputItem mwapi:item .
         }
         ?item wdt:P31/wdt:P279* ?type .
-        {
-            ?item wdt:P31/wdt:P279* ?type .
-            VALUES ?type { 
-                wd:Q11424    # Film
-                wd:Q202866   # Animated Film
-                wd:Q24862    # Documentary Film
-                wd:Q506240   # Short Film
-                wd:Q204370   # Television Film
-                wd:Q5398426  # Television Series
-            }
-
-        }
-        UNION
-        {
-            ?item wdt:P31 ?directType .
-            VALUES ?directType { 
-                wd:Q11424    # Film
-                wd:Q202866   # Animated Film
-                wd:Q24862    # Documentary Film
-                wd:Q506240   # Short Film
-                wd:Q204370   # Television Film
-                wd:Q5398426  # Television Series
-                wd:Q1259759  # Television Miniseries
-                wd:Q471839   # Animated Television Series
-                wd:Q21191270 # Web Series
-                wd:Q7725310  # Reality Television Series
-                wd:Q579956   # Anthology Series
-            }
+        VALUES ?instance_of { 
+            wd:Q11424    # Film
+            wd:Q202866   # Animated Film
+            wd:Q24862    # Documentary Film
+            wd:Q506240   # Short Film
+            wd:Q204370   # Television Film
+            wd:Q5398426  # Television Series
+            wd:Q1259759  # Television Miniseries
+            wd:Q471839   # Animated Television Series
+            wd:Q21191270 # Web Series
+            wd:Q7725310  # Reality Television Series
+            wd:Q579956   # Anthology Series
         }
         OPTIONAL {
             ?item wdt:P577 ?releaseDate .
