@@ -11,9 +11,11 @@ netflix_df.Year = netflix_df.Year.astype("Int64") # removing decimal from year
 sub_netflix_df = netflix_df.head(100) #working with subset of dataset for now
 
 #Extracting movie feature info from request
-def Wiki_feature_id(data, feature):
-    feature_id = data[feature]['value'].split('/')[-1]
-    return(feature_id)
+def wiki_feature_info(data, key):
+    if len(data['results']['bindings']) < 1 or key not in data['results']['bindings'][0]:
+        return 'NA'
+    else:
+        return data['results']['bindings'][0][key]['value'].split('/')[-1]
 
 
 #Getting list of movie IDs, genre IDs, and director IDs from request
@@ -53,28 +55,13 @@ def Wiki_query(dataset):
                         'format': 'json',
                       }
         )
-        response.raise_for_status() 
+        response.raise_for_status()
 
+        data = response.json()        
 
-        data = response.json()
-
-
-        if len(data['results']['bindings']) < 1 or 'item' not in data['results']['bindings'][0].keys():
-            wiki_movie_ids.append("NA")
-        else:
-            wiki_movie_ids.append(Wiki_feature_info(data['results']['bindings'][0], 'item'))
-
-
-        if len(data['results']['bindings']) < 1 or 'genreLabel' not in data['results']['bindings'][0].keys():
-            wiki_genres.append("NA")
-        else:
-            wiki_genres.append(Wiki_feature_info(data['results']['bindings'][0], 'genreLabel'))
-
-
-        if len(data['results']['bindings']) < 1 or 'directorLabel' not in data['results']['bindings'][0].keys():
-            wiki_directors.append("NA")
-        else:
-            wiki_directors.append(Wiki_feature_info(data['results']['bindings'][0], 'directorLabel'))
+        wiki_movie_ids.append(wiki_feature_info('item'))
+        wiki_genres.append(wiki_feature_info('genreLabel'))
+        wiki_directors.append(wiki_feature_info('directorLabel')
 
             
     return(wiki_movie_ids,wiki_genres, wiki_directors)
