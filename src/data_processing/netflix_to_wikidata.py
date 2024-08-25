@@ -5,8 +5,8 @@ import pandas as pd
 
 load_dotenv()
 
-base_dir = os.getenv('BASE_DIR')
-user_agent = os.getenv('USER_AGENT')
+base_dir = 'src/data'
+user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 netflix_data_path = os.path.join(base_dir, 'netflix_movies.txt')
 output_csv_path = os.path.join(base_dir, 'netflix_to_wikidata.csv')
