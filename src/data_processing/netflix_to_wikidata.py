@@ -25,27 +25,11 @@ def construct_query(title, year):
             ?item wikibase:apiOutputItem mwapi:item .
         }
 
-        ?item wdt:P31/wdt:P279* ?type .
-        FILTER (?type IN (
-            wd:Q11424,    # Film
-            wd:Q5398426,  # Television Series
-            wd:Q1259759,  # Television Miniseries
-            wd:Q202866,   # Animated Film
-            wd:Q24862,    # Documentary Film
-            wd:Q506240,   # Short Film
-            wd:Q204370,   # Television Film
-            wd:Q471839,   # Animated Television Series
-            wd:Q21191270, # Web Series
-            wd:Q7725310,  # Reality Television Series
-            wd:Q579956,   # Anthology Series
-            wd:Q15416,    # Television Program
-            wd:Q28018927  # Television Special
-        )).
+        ?item wdt:P31/wdt:P279* wd:Q11424 .
 
-        OPTIONAL {
-            ?item wdt:P577 ?releaseDate .
-            FILTER (YEAR(?releaseDate) >= %d && YEAR(?releaseDate) <= %d) .
-        }
+        ?item wdt:P577 ?releaseDate .
+        FILTER (YEAR(?releaseDate) >= %d && YEAR(?releaseDate) <= %d) .
+        
 
         OPTIONAL {
             ?item wdt:P136 ?genre .
@@ -86,7 +70,7 @@ def get_wikidata_data(title, year):
 data = []
 missing_count = 0
 
-for index, row in netflix_data.iloc[:500].iterrows():
+for index, row in netflix_data.iloc[:200].iterrows():
     title = row['Title']
     year = int(row['Year'])
     netflix_id = row['NetflixId']

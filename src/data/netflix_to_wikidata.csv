@@ -1,51 +1,35 @@
 netflix_id,wikidata_id,title,year,genres
-1,Q573095,Dinosaur Planet,2003,nature documentary
 5,Q10381750,The Rise and Fall of ECW,2004,None
-7,Q1152416,8 Man,1992,science fiction anime and manga
 9,Q3679168,Class of Nuke 'Em High 2,1991,science fiction film
 12,Q152011,My Favorite Brunette,1947,romantic comedy
-16,Q555995,Screamers,1996,adventure film
+16,Q555995,Screamers,1996,film based on literature
 17,Q270026,7 Seconds,2005,action film
 18,Q1754839,Immortal Beloved,1994,romance film
-19,Q1124501,By Dawn's Early Light,2000,film based on a novel
 20,Q1519550,Seeta Aur Geeta,1972,action comedy film
-21,Q7621450,Strange Relations,2002,None
 22,Q5116182,Chump Change,2000,romantic comedy
-26,Q1628562,Never Die Alone,2004,crime film
-28,Q590166,Lilo and Stitch,2002,crossover fiction
+26,Q1628562,Never Die Alone,2004,action film
 30,Q584766,Something's Gotta Give,2003,romantic comedy
 35,Q3623997,Ferngully 2: The Magical Rescue,2000,children's film
-36,Q151751,Lady Chatterley,1992,drama film
 37,Q3210185,Zatoichi's Conspiracy,1973,drama film
-39,Q3201352,Love Reinvented,2000,None
 42,Q7441717,Searching for Paradise,2002,drama film
 44,Q1212954,Spitfire Grill,1996,drama film
-46,Q965003,Rudolph the Red-Nosed Reindeer,1964,None
-47,Q1345583,The Bad and the Beautiful,1952,drama film
+47,Q1345583,The Bad and the Beautiful,1952,flashback film
 50,Q3548291,A Yank in the R.A.F.,1941,propaganda film
 52,Q7774014,The Weather Underground,2002,documentary film
 54,Q1289882,We're Not Married,1952,comedy of remarriage
-56,Q2280159,Carandiru,2004,prison film
-58,Q330612,Dragonheart,1996,buddy film
+56,Q2280159,Carandiru,2004,film based on literature
+58,Q330612,Dragonheart,1996,adventure film
 59,Q16078798,Sex and the Beauties,2003,romantic comedy
-60,Q633307,The Libertine,1969,biographical film
 63,Q3606552,Crash Dive,1943,war film
-64,Q1679822,Outside the Law,2001,drama film
-65,Q115516762,Lost in the Pershing Point Hotel,2000,None
 67,Q1575654,Vampire Journals,1997,vampire film
-68,Q607346,Invader Zim,2004,horror fiction
 71,Q2238172,Maya Lin: A Strong Clear Vision,1995,biographical film
 74,Q1969876,6ixtynin9,1999,comedy thriller
 78,Q1064530,Jingle All the Way,1996,Christmas film
-79,Q28214,The Killing,1956,mystery television series
 80,Q685716,Winter Kills,1979,film based on literature
 82,Q747912,The Frogmen,1951,war film
 83,Q1412037,Silkwood,1983,LGBT-related film
-84,Q1199301,The Powerpuff Girls Movie,2002,children's film
-85,Q214771,Elfen Lied,2005,drama anime and manga
+84,Q1199301,The Powerpuff Girls Movie,2002,family film
 86,Q2382030,Iron Monkey 2,1996,action film
-87,Q18151930,Louder Than Bombs,2002,drama film
-88,Q2135803,Record of Lodoss War: Chronicles of the Heroic Knight,1998,fantasy anime and manga
 90,Q7746905,The Lemon Drop Kid,1951,Christmas film
 93,Q7783672,They Came Back,2004,horror film
 95,Q3038403,Dona Herlinda and Her Son,1985,romance film
@@ -53,207 +37,46 @@ netflix_id,wikidata_id,title,year,genres
 99,Q16057815,A Fishy Story,1989,action comedy film
 102,Q3141131,Notre Musique,2004,drama film
 104,Q304366,The Great Race,1965,romantic comedy
-105,Q149358,Obsessed,2002,thriller film
-109,Q9169803,No Way Back,1996,crime film
+109,Q9169803,No Way Back,1996,action film
 112,Q1169110,The Eye of Vichy,1993,documentary film
-113,Q3414468,Bruce Lee: A Warrior's Journey,2000,documentary film
+113,Q3414468,Bruce Lee: A Warrior's Journey,2000,martial arts film
 117,Q547209,Silk Stockings,1957,musical film
-118,Q319783,Rambo: First Blood Part II,1985,action film
+118,Q319783,Rambo: First Blood Part II,1985,film based on literature
 121,Q1616110,Beyonce: Live at Wembley,2003,contemporary R&B
-122,Q1132912,Cube 2: Hypercube,2002,mystery film
-127,Q1370216,Fatal Beauty,1987,action film
+122,Q1132912,Cube 2: Hypercube,2002,splatter film
+127,Q1370216,Fatal Beauty,1987,comedy thriller
 128,Q1185829,Mr. Vampire,1985,action comedy film
 129,Q1166120,Darkwolf,2003,horror film
-130,Q50322672,Drowning on Dry Land,1999,None
 134,Q7577892,Spirit Lost,1996,None
 136,Q2336169,Cat and the Canary,1927,mystery film
 140,Q3879914,Lost in the Wild,1993,drama film
 141,Q3109697,Goddess of Mercy,2004,drama film
 142,Q7254100,The Tricky Master,2000,crime film
-145,Q1451544,Get Out Your Handkerchiefs,1978,drama film
+145,Q1451544,Get Out Your Handkerchiefs,1978,romantic comedy
 146,Q1723842,Cannibal Women in the Avocado Jungle of Death,1988,parody film
 147,Q2294020,Where Sleeping Dogs Lie,1992,crime film
 148,Q325575,Sweet November,2001,romance film
 151,Q11748522,Sleepover Nightmare,2005,horror film
 155,Q1196485,The Strongest Man in the World,1975,science fiction comedy
 156,Q740143,Husbands and Wives,1992,romance film
-158,Q4657561,A Killer Within,2004,drama film
+158,Q4657561,A Killer Within,2004,thriller film
 159,Q625110,Gentlemen of Fortune,1971,drama film
-160,Q728841,Gormenghast,2000,high fantasy
 161,Q589894,Ninotchka,1939,romantic comedy
 164,Q1755591,One Last Dance,2003,dance film
 165,Q7328528,Richard Pryor: Live on the Sunset Strip,1982,comedy film
-166,Q640994,Fame,1980,drama television series
 167,Q721158,The Chorus,2004,flashback film
 168,Q1282424,Smokey and the Bandit Part 3,1983,action comedy film
-171,Q147068,Funny Face,1957,romantic comedy
+171,Q147068,Funny Face,1957,musical film
 173,Q1216724,The Devil's Brigade,1968,action film
 175,Q72962,Reservoir Dogs,1992,flashback film
-178,Q1280961,Regular Guys,1996,LGBT-related film
+178,Q1280961,Regular Guys,1996,comedy film
 179,Q123303495,Bollywood Bound,2003,None
-181,Q1435036,The Last Shot,2004,comedy film
+181,Q1435036,The Last Shot,2004,crime film
 186,Q266596,Panic in the Streets,1950,film based on literature
 187,Q602600,Death to Smoochy,2002,black comedy film
-188,Q1936875,Dead Birds,2005,documentary film
 189,Q502303,Airplane II: The Sequel,1982,science fiction comedy
-190,Q1795987,Blood and Sand,1989,drama film
-191,Q219776,X2: X-Men United,2003,superhero film
-192,Q432177,The SoulTaker,2003,action anime and manga
+191,Q219776,X2: X-Men United,2003,speculative fiction film
 195,Q117707787,Chasing Freedom,2004,drama film
 197,Q1480747,Taking Lives,2004,film based on a novel
 199,Q201674,The Deer Hunter,1978,anti-war film
 200,Q367748,The Fall of the Roman Empire,1964,war film
-204,Q2513053,Venus Boyz,2002,documentary film
-206,Q7882918,Unconstitutional: The War on Our Civil Liberties,2004,documentary film
-210,Q4184393,Onmyoji,2001,Jidaigeki
-211,Q3201620,The Agronomist,2004,biographical film
-212,Q695982,Querelle,1982,film based on literature
-213,Q613403,Dinner Rush,2001,drama film
-217,Q1070350,Cherry 2000,1988,post-apocalyptic film
-220,Q8026053,Winston Churchill: The Wilderness Years,1983,drama television series
-221,Q4234991,Voyage to the Planets and Beyond,2005,documentary film
-225,Q4521572,The Cookout,2004,comedy film
-226,Q5716921,Henry: Portrait of a Serial Killer 2,1996,horror film
-228,Q3795597,Butch and Sundance: The Early Days,1979,heist film
-231,Q5237059,Marooned in Iraq,2002,drama film
-233,Q860371,Chato's Land,1971,Western film
-234,Q123287525,Animation Legend: Winsor McCay,1921,None
-235,Q1304785,Unhook the Stars,1996,romance film
-237,Q905932,Broken Blossoms,1918,romance film
-239,Q1810461,Winnie the Pooh: Springtime with Roo,2004,Christmas film
-240,Q1212587,Woman of the Year,1942,romantic comedy
-241,Q223139,North by Northwest,1959,thriller film
-242,Q1151814,Neon Genesis Evangelion: The End of Evangelion,1995,apocalyptic fiction
-244,Q1888501,Stellvia,2004,romance anime and manga
-246,Q659896,The Boston Strangler,1968,crime film
-249,Q544766,The Hunters,1958,war film
-250,Q25835,Cast a Giant Shadow,1966,drama film
-252,Q1070554,Stuart Little 2,2002,film based on literature
-255,Q1193937,The Hunchback of Notre Dame II,2001,animated film
-256,Q327332,Ghost Dog: The Way of the Samurai,2000,thriller film
-261,Q1813235,The Big Clock,1948,film based on a novel
-262,Q1609444,Herbie Rides Again,1974,comedy film
-263,Q20545989,Dragon Ball: Tournament Saga,2001,None
-269,Q218000,Parenthood,1989,LGBT-related television series
-271,Q842306,Saludos Amigos,1943,live-action animated film
-272,Q2599647,Female Yakuza Tale,1973,pornographic film
-274,Q5183279,Crazy as Hell,2002,horror film
-276,Q2394863,Cold Harvest,1998,science fiction film
-278,Q4442665,100 Days Before the Command,1990,drama film
-279,Q550298,Micki and Maude,1984,romantic comedy
-280,Q7422129,Sarah Brightman: In Concert,1998,None
-281,Q496529,The Legend,1993,fantasy television program
-283,Q1590893,If These Walls Could Talk,1996,drama film
-284,Q56346577,Sasquatch Hunters,2005,horror film
-285,Q521094,The Devil's Own,1997,crime film
-286,Q17190450,Thunderbirds Are Go,1966,None
-291,Q104898532,Chained Heat 3: Hell Mountain,2000,horror film
-295,Q340127,Ace Ventura: When Nature Calls,1995,comedy film
-296,Q3824842,In His Life: The John Lennon Story,2000,musical film
-297,Q7739284,The Hebrew Hammer,2003,Christmas film
-299,Q752313,Bridget Jones's Diary,2001,film based on a novel
-300,Q7099007,Option Zero,1997,action film
-301,Q10293894,Hard Ground,2003,adventure film
-302,Q485932,The Isle,2001,drama film
-309,Q281296,The Day of the Locust,1975,drama film
-313,Q467248,Pay It Forward,2000,film based on a novel
-317,Q6747963,Mandela and de Klerk,1997,drama film
-318,Q114479939,Beyond Suspicion,1994,None
-319,Q1065276,Straight to Hell,1987,Spaghetti Western
-320,Q29639000,Eat Your Heart Out,1997,None
-321,Q3810752,Ju-Rei: The Uncanny,2004,horror film
-322,Q1353697,Flesh Gordon,1974,sexploitation film
-323,Q4316214,Modern Vampires,1999,vampire film
-324,Q2463933,Mother's Boys,1994,drama film
-326,Q769490,The Plainsman,1937,biographical film
-327,Q93729535,Storefront Hitchcock,1997,None
-330,Q1133610,Wild Things,1998,LGBT-related film
-331,Q40115,Chasing Amy,1997,romance film
-332,Q4181307,They Crawl,2002,horror film
-334,Q1192363,The Pacifier,2005,drama film
-336,Q1259427,The Driver,1978,thriller film
-337,Q1936323,Star 80,1983,flashback film
-341,Q1749311,Tremors 4: The Legend Begins,2004,monster film
-347,Q3987649,Iceman Cometh,1989,drama film
-348,Q646031,The Last Temptation of Christ,1988,drama film
-349,Q1199715,The Swarm,1978,horror film
-351,Q1000826,Guns of the Magnificent Seven,1969,Western film
-352,Q6815682,Pick a Card,1997,comedy drama
-353,Q29871,Life or Something Like It,2002,romantic comedy
-354,Q479898,Sadomania,1981,horror film
-356,Q348111,Look at Me,2005,coming-of-age fiction
-357,Q508841,House of Sand and Fog,2003,drama film
-358,Q3138900,The Onion Field,1979,drama film
-362,Q939084,The Flintstones in Viva Rock Vegas,2000,fantasy film
-363,Q2035539,Stark Raving Mad,2002,drama film
-367,Q1663240,Spun,2003,crime film
-369,Q4028223,Playing Mona Lisa,2000,comedy film
-371,Q3778086,The Trouble with Angels,1966,coming-of-age fiction
-373,Q7785020,Third World Cop,2000,None
-374,Q1169837,The Little Girl Who Lives Down the Lane,1976,horror film
-378,Q1780723,Party Monster,2003,film based on books
-379,Q3606552,Crash Dive,1996,war film
-380,Q1412077,Live Wire,1992,action film
-381,Q517652,Out for Justice,1991,crime thriller film
-383,Q18423817,Hit Team,2001,action film
-385,Q1469426,The Santa Clause 2,2002,Christmas film
-387,Q1056376,Bizet's Carmen,1984,musical film
-388,Q4497747,Body Chemistry,1990,thriller film
-390,Q390299,The Fan,1981,film based on a novel
-393,Q1212256,The Replacement Killers,1998,action film
-395,Q1425815,Captain Blood,1935,film based on a novel
-397,Q1306530,A Night in Casablanca,1946,comedy film
-398,Q510181,In the Realm of the Senses,1976,erotic thriller
-400,Q673437,Rio Lobo,1970,Western film
-401,Q976728,Halloween 5: The Revenge of Michael Myers,1989,slasher film
-403,Q7767157,Substitute 4: Failure is Not an Option,2000,action film
-404,Q102365750,The Shaft,2001,None
-405,Q156911,Wings of Desire,1987,fantasy film
-407,Q7712116,The Abductors,1972,crime film
-408,Q1024694,Nightbreed,1990,monster film
-409,Q775709,Godzilla vs. The Sea Monster,1966,kaiju
-413,Q768931,Igby Goes Down,2002,coming-of-age fiction
-415,Q127599909,Reign in Darkness,2002,None
-418,Q903889,The Deal,2004,film based on a novel
-425,Q890343,The 10th Kingdom,2000,fantasy television series
-426,Q969270,Recess: School's Out,2001,children's film
-427,Q944115,Graveyard Shift,1990,monster film
-429,Q197011,Zeus and Roxanne,1997,children's film
-430,Q221369,Chobits,2002,drama anime and manga
-431,Q939736,Millennium Actress,2002,drama film
-432,Q3653617,Les Miserables in Concert,1996,musical film
-433,Q2060121,Untamed Heart,1993,romantic comedy
-435,Q2559937,Love Can Seriously Damage Your Health,1996,romantic comedy
-437,Q3639254,Beyblade: Fierce Battle,2005,adventure film
-438,Q752103,Bean: The Movie,1997,comedy film
-439,Q1561665,Town Without Pity,1961,drama film
-440,Q180523,Just 4 Kicks,2003,comedy film
-442,Q918367,Mississippi Burning,1988,crime film
-443,Q1142799,Rabbit-Proof Fence,2002,film based on literature
-444,Q3987694,The Inner Tour,2001,documentary film
-446,Q2625478,The Underneath,1995,neo-noir
-447,Q3222385,The Making of Fanny and Alexander,1986,documentary film
-452,Q320431,Scorched,2002,comedy film
-453,Q2316927,Simple Men,1992,comedy drama
-455,Q3658413,Cardcaptor Sakura: The Movie,1999,children's film
-457,Q928019,Kill Bill: Vol. 2,2004,girls with guns
-460,Q573710,Pink Narcissus,1971,LGBT-related film
-465,Q65081543,Coolie No.1,1995,romantic comedy
-467,Q1332634,Topper Returns,1941,ghost film
-468,Q207536,The Matrix: Revolutions,2003,science fiction action film
-471,Q238211,City Lights,1931,comedy drama
-472,Q6928780,Mr. Jealousy,1998,romantic comedy
-473,Q186572,Princess Mononoke,1997,fantasy anime
-474,Q1146711,Legend of 1900,1998,romance film
-475,Q2620813,Surf Ninjas,1993,ninja film
-478,Q941737,The Beverly Hillbillies,1962,American television sitcom
-481,Q4444158,Building the Great Pyramid,2002,documentary film
-483,Q830208,Rush Hour 2,2001,buddy cop film
-489,Q1482416,Return to Paradise,1998,thriller film
-490,Q7756265,The Passion of Ayn Rand,1999,biographical film
-491,Q372174,Torn Curtain,1966,political thriller film
-492,Q2344050,Mrs. Soffel,1984,historical film
-495,Q766020,Mission Kashmir,2000,drama film
-499,Q1475259,Under Suspicion,2000,thriller film
-501,Q458033,Three Days of the Condor,1975,political thriller film
-505,Q766463,A Thousand Acres,1997,drama film
