@@ -1,2 +1,2 @@
 .env
-./data/netflix_movies.txt
+src/data/netflix_movies.txt
