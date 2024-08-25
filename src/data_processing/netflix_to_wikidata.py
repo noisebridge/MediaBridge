@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import requests
-import pandas as pd
+import csv
 
 load_dotenv()
 
@@ -11,7 +11,18 @@ user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 netflix_data_path = os.path.join(base_dir, 'netflix_movies.txt')
 output_csv_path = os.path.join(base_dir, 'netflix_to_wikidata.csv')
 
-netflix_data = pd.read_csv(netflix_data_path, delimiter=',', names=['NetflixId', 'Year', 'Title'],  encoding='ISO-8859-1', on_bad_lines='skip')
+netflix_data = []
+
+with open(netflix_data_path, mode='r', encoding='ISO-8859-1') as file:
+    reader = csv.reader(file, delimiter=',')
+    for row in reader:
+        if len(row) == 3: 
+            netflix_data.append({
+                'NetflixId': row[0],
+                'Year': row[1],
+                'Title': row[2]
+            })
+
 
 def construct_query(title, year):
     query = '''
@@ -69,8 +80,9 @@ def get_wikidata_data(title, year):
 
 data = []
 missing_count = 0
+num_rows = 200
 
-for index, row in netflix_data.iloc[:200].iterrows():
+for row in netflix_data[:num_rows]:
     title = row['Title']
     year = int(row['Year'])
     netflix_id = row['NetflixId']
@@ -88,7 +100,11 @@ for index, row in netflix_data.iloc[:200].iterrows():
         print(f'missing: {title} ({year})')
         missing_count += 1
 
-df = pd.DataFrame(data)
-df.to_csv(output_csv_path, index=False)
+
+with open(output_csv_path, mode='w', newline='', encoding='ISO-8859-1') as file:
+    writer = csv.DictWriter(file, fieldnames=['netflix_id', 'wikidata_id', 'title', 'year', 'genres'])
+    writer.writeheader()
+    writer.writerows(data)
+
 print('missing:', missing_count)
-print('found:', df.shape[0])
+print('found:', num_rows - missing_count)

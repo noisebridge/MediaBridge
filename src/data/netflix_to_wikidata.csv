@@ -2,23 +2,23 @@ netflix_id,wikidata_id,title,year,genres
 5,Q10381750,The Rise and Fall of ECW,2004,None
 9,Q3679168,Class of Nuke 'Em High 2,1991,science fiction film
 12,Q152011,My Favorite Brunette,1947,romantic comedy
-16,Q555995,Screamers,1996,film based on literature
+16,Q555995,Screamers,1996,adventure film
 17,Q270026,7 Seconds,2005,action film
-18,Q1754839,Immortal Beloved,1994,romance film
+18,Q1754839,Immortal Beloved,1994,musical film
 20,Q1519550,Seeta Aur Geeta,1972,action comedy film
 22,Q5116182,Chump Change,2000,romantic comedy
 26,Q1628562,Never Die Alone,2004,action film
 30,Q584766,Something's Gotta Give,2003,romantic comedy
-35,Q3623997,Ferngully 2: The Magical Rescue,2000,children's film
+35,Q3623997,Ferngully 2: The Magical Rescue,2000,fantasy film
 37,Q3210185,Zatoichi's Conspiracy,1973,drama film
 42,Q7441717,Searching for Paradise,2002,drama film
 44,Q1212954,Spitfire Grill,1996,drama film
-47,Q1345583,The Bad and the Beautiful,1952,flashback film
+47,Q1345583,The Bad and the Beautiful,1952,drama film
 50,Q3548291,A Yank in the R.A.F.,1941,propaganda film
 52,Q7774014,The Weather Underground,2002,documentary film
 54,Q1289882,We're Not Married,1952,comedy of remarriage
 56,Q2280159,Carandiru,2004,film based on literature
-58,Q330612,Dragonheart,1996,adventure film
+58,Q330612,Dragonheart,1996,buddy film
 59,Q16078798,Sex and the Beauties,2003,romantic comedy
 63,Q3606552,Crash Dive,1943,war film
 67,Q1575654,Vampire Journals,1997,vampire film
@@ -39,7 +39,7 @@ netflix_id,wikidata_id,title,year,genres
 104,Q304366,The Great Race,1965,romantic comedy
 109,Q9169803,No Way Back,1996,action film
 112,Q1169110,The Eye of Vichy,1993,documentary film
-113,Q3414468,Bruce Lee: A Warrior's Journey,2000,martial arts film
+113,Q3414468,Bruce Lee: A Warrior's Journey,2000,documentary film
 117,Q547209,Silk Stockings,1957,musical film
 118,Q319783,Rambo: First Blood Part II,1985,film based on literature
 121,Q1616110,Beyonce: Live at Wembley,2003,contemporary R&B
@@ -52,24 +52,24 @@ netflix_id,wikidata_id,title,year,genres
 140,Q3879914,Lost in the Wild,1993,drama film
 141,Q3109697,Goddess of Mercy,2004,drama film
 142,Q7254100,The Tricky Master,2000,crime film
-145,Q1451544,Get Out Your Handkerchiefs,1978,romantic comedy
+145,Q1451544,Get Out Your Handkerchiefs,1978,drama film
 146,Q1723842,Cannibal Women in the Avocado Jungle of Death,1988,parody film
 147,Q2294020,Where Sleeping Dogs Lie,1992,crime film
 148,Q325575,Sweet November,2001,romance film
 151,Q11748522,Sleepover Nightmare,2005,horror film
 155,Q1196485,The Strongest Man in the World,1975,science fiction comedy
 156,Q740143,Husbands and Wives,1992,romance film
-158,Q4657561,A Killer Within,2004,thriller film
-159,Q625110,Gentlemen of Fortune,1971,drama film
+158,Q4657561,A Killer Within,2004,drama film
+159,Q625110,Gentlemen of Fortune,1971,comedy film
 161,Q589894,Ninotchka,1939,romantic comedy
 164,Q1755591,One Last Dance,2003,dance film
 165,Q7328528,Richard Pryor: Live on the Sunset Strip,1982,comedy film
 167,Q721158,The Chorus,2004,flashback film
-168,Q1282424,Smokey and the Bandit Part 3,1983,action comedy film
-171,Q147068,Funny Face,1957,musical film
+168,Q1282424,Smokey and the Bandit Part 3,1983,comedy film
+171,Q147068,Funny Face,1957,romantic comedy
 173,Q1216724,The Devil's Brigade,1968,action film
-175,Q72962,Reservoir Dogs,1992,flashback film
-178,Q1280961,Regular Guys,1996,comedy film
+175,Q72962,Reservoir Dogs,1992,heist film
+178,Q1280961,Regular Guys,1996,LGBT-related film
 179,Q123303495,Bollywood Bound,2003,None
 181,Q1435036,The Last Shot,2004,crime film
 186,Q266596,Panic in the Streets,1950,film based on literature
@@ -79,4 +79,4 @@ netflix_id,wikidata_id,title,year,genres
 195,Q117707787,Chasing Freedom,2004,drama film
 197,Q1480747,Taking Lives,2004,film based on a novel
 199,Q201674,The Deer Hunter,1978,anti-war film
-200,Q367748,The Fall of the Roman Empire,1964,war film
+200,Q367748,The Fall of the Roman Empire,1964,drama film
