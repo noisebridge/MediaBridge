@@ -30,7 +30,7 @@ def construct_query(title, year):
         SERVICE wikibase:mwapi {
             bd:serviceParam wikibase:api "EntitySearch" ;
                             wikibase:endpoint "www.wikidata.org" ;
-                            mwapi:search "%s" ;
+                            mwapi:search "%(search_term)s" ;
                             wikibase:limit 1 ;
                             mwapi:language "en" .
             ?item wikibase:apiOutputItem mwapi:item .
@@ -39,7 +39,7 @@ def construct_query(title, year):
         ?item wdt:P31/wdt:P279* wd:Q11424 .
 
         ?item wdt:P577 ?releaseDate .
-        FILTER (YEAR(?releaseDate) >= %d && YEAR(?releaseDate) <= %d) .
+        FILTER (YEAR(?releaseDate) >= %(start_year)d && YEAR(?releaseDate) <= %(end_year)d) .
         
 
         OPTIONAL {
@@ -54,7 +54,7 @@ def construct_query(title, year):
         SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
     }
     LIMIT 1
-    ''' % (title, year - 2, year + 2)
+    ''' % {"search_term": title, "start_year": year - 2, "end_year": year + 2}
     return query
 
 def get_wikidata_data(title, year):
