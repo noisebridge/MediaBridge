@@ -72,7 +72,7 @@ def get_wikidata_data(title, year):
 
     wikidata_id = data['results']['bindings'][0]['item']['value'].split('/')[-1]
 
-    genres = [d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d]
+    genres = {d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d}
 
     return wikidata_id, genres, main_subjects
 
@@ -92,7 +92,11 @@ for row in netflix_data[:num_rows]:
             'wikidata_id': wikidata_id,
             'title': title,
             'year': year,
+<<<<<<< HEAD
             'genres': genres
+=======
+            'genres': list(genres),
+>>>>>>> 306ce0d (Add only unique genres)
         })
     else:
         print(f'missing: {title} ({year})')
