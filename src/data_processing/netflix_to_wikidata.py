@@ -14,14 +14,13 @@ output_csv_path = os.path.join(base_dir, 'netflix_to_wikidata.csv')
 netflix_data = []
 
 with open(netflix_data_path, mode='r', encoding='ISO-8859-1') as file:
-    reader = csv.reader(file, delimiter=',')
-    for row in reader:
-        if len(row) == 3: 
-            netflix_data.append({
-                'NetflixId': row[0],
-                'Year': row[1],
-                'Title': row[2]
-            })
+    for line in file:
+        row = line.split(',', 2)
+        netflix_data.append({
+            'NetflixId': row[0].strip(),
+            'Year': row[1].strip(),
+            'Title': row[2].strip()
+        })
 
 
 def construct_query(title, year):
@@ -41,7 +40,6 @@ def construct_query(title, year):
         ?item wdt:P577 ?releaseDate .
         FILTER (YEAR(?releaseDate) >= %(start_year)d && YEAR(?releaseDate) <= %(end_year)d) .
         
-
         OPTIONAL {
             ?item wdt:P136 ?genre .
             ?genre rdfs:label ?genreLabel .
@@ -53,8 +51,8 @@ def construct_query(title, year):
 
         SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
     }
-    LIMIT 1
-    ''' % {"search_term": title, "start_year": year - 2, "end_year": year + 2}
+    LIMIT 10
+    ''' % {"search_term": title, "start_year": year - 1, "end_year": year + 1}
     return query
 
 def get_wikidata_data(title, year):
@@ -76,7 +74,7 @@ def get_wikidata_data(title, year):
 
     genres = [d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d]
 
-    return wikidata_id, genres
+    return wikidata_id, genres, main_subjects
 
 data = []
 missing_count = 0
@@ -94,7 +92,7 @@ for row in netflix_data[:num_rows]:
             'wikidata_id': wikidata_id,
             'title': title,
             'year': year,
-            'genres': ', '.join(genres) if genres else 'None'
+            'genres': genres
         })
     else:
         print(f'missing: {title} ({year})')
