@@ -17,11 +17,10 @@ def create_interaction_matrix(directory_path, num_users, num_movies, files):
                 user_id = int(user_id)
                 rating = int(rating)
                 
-                if rating in (4, 5):
-                    if user_id not in user_mapper:
+                if rating in (4, 5) and user_id not in user_mapper: # used AND operator instead nested IF
                         user_mapper[user_id] = current_user_index
                         current_user_index += 1
-                    user_idx = user_mapper[user_id]
+                        user_idx = user_mapper[user_id]
                     
-                    interaction_matrix[user_idx, movie_idx] = rating
-    return interaction_matrix
+                        interaction_matrix[user_idx, movie_idx] = rating
+                return interaction_matrix
