@@ -30,6 +30,8 @@ def construct_query(title, year):
             bd:serviceParam wikibase:api "EntitySearch" ;
                             wikibase:endpoint "www.wikidata.org" ;
                             mwapi:search "%(search_term)s" ;
+                            wikibase:limit 1 ;
+                            wikibase:limit 1 ;
                             mwapi:language "en" .
             ?item wikibase:apiOutputItem mwapi:item .
         }
@@ -37,7 +39,7 @@ def construct_query(title, year):
         ?item wdt:P31/wdt:P279* wd:Q11424 .
 
         ?item wdt:P577 ?releaseDate .
-        FILTER (YEAR(?releaseDate) = %(release_year)d) .
+        FILTER (YEAR(?releaseDate) >= %(start_year)d && YEAR(?releaseDate) <= %(end_year)d) .
         
         OPTIONAL {
             ?item wdt:P136 ?genre .
@@ -50,7 +52,8 @@ def construct_query(title, year):
 
         SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
     }
-    ''' % {"search_term": title, "release_year": year}
+    LIMIT 10
+    ''' % {"search_term": title, "start_year": year - 1, "end_year": year + 1}
     return query
 
 def get_wikidata_data(title, year):
@@ -70,19 +73,14 @@ def get_wikidata_data(title, year):
 
     wikidata_id = data['results']['bindings'][0]['item']['value'].split('/')[-1]
 
-    genres = {d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d}
-
-    print(data)
+    genres = [d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d]
 
     return wikidata_id, genres, main_subjects
 
 data = []
 missing_count = 0
-<<<<<<< HEAD
 num_rows = 200
-=======
-num_rows = 100
->>>>>>> 7dd5c36 (Add percentages to returned quantities, change date range to single date filter)
+num_rows = 420
 
 for row in netflix_data[:num_rows]:
     title = row['Title']
@@ -96,11 +94,7 @@ for row in netflix_data[:num_rows]:
             'wikidata_id': wikidata_id,
             'title': title,
             'year': year,
-<<<<<<< HEAD
-            'genres': genres
-=======
-            'genres': list(genres),
->>>>>>> 306ce0d (Add only unique genres)
+            'genres': genres,
         })
     else:
         print(f'missing: {title} ({year})')
@@ -112,6 +106,7 @@ with open(output_csv_path, mode='w', newline='', encoding='ISO-8859-1') as file:
     writer.writeheader()
     writer.writerows(data)
 
-print('missing:', missing_count, '(', missing_count / num_rows * 100, '%)')
-print('found:', num_rows - missing_count, '(', num_rows - missing_count / num_rows * 100, '%)')
-print('total:', num_rows)
+print('missing:', missing_count)
+print('found:', num_rows - missing_count)
+print('missing:', missing_count)
+print('found:', num_rows - missing_count)
