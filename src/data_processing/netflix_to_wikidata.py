@@ -30,7 +30,6 @@ def construct_query(title, year):
             bd:serviceParam wikibase:api "EntitySearch" ;
                             wikibase:endpoint "www.wikidata.org" ;
                             mwapi:search "%(search_term)s" ;
-                            wikibase:limit 1 ;
                             mwapi:language "en" .
             ?item wikibase:apiOutputItem mwapi:item .
         }
@@ -38,7 +37,7 @@ def construct_query(title, year):
         ?item wdt:P31/wdt:P279* wd:Q11424 .
 
         ?item wdt:P577 ?releaseDate .
-        FILTER (YEAR(?releaseDate) >= %(start_year)d && YEAR(?releaseDate) <= %(end_year)d) .
+        FILTER (YEAR(?releaseDate) = %(release_year)d) .
         
         OPTIONAL {
             ?item wdt:P136 ?genre .
@@ -51,8 +50,7 @@ def construct_query(title, year):
 
         SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
     }
-    LIMIT 10
-    ''' % {"search_term": title, "start_year": year - 1, "end_year": year + 1}
+    ''' % {"search_term": title, "release_year": year}
     return query
 
 def get_wikidata_data(title, year):
@@ -74,11 +72,17 @@ def get_wikidata_data(title, year):
 
     genres = {d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d}
 
+    print(data)
+
     return wikidata_id, genres, main_subjects
 
 data = []
 missing_count = 0
+<<<<<<< HEAD
 num_rows = 200
+=======
+num_rows = 100
+>>>>>>> 7dd5c36 (Add percentages to returned quantities, change date range to single date filter)
 
 for row in netflix_data[:num_rows]:
     title = row['Title']
@@ -108,5 +112,6 @@ with open(output_csv_path, mode='w', newline='', encoding='ISO-8859-1') as file:
     writer.writeheader()
     writer.writerows(data)
 
-print('missing:', missing_count)
-print('found:', num_rows - missing_count)
+print('missing:', missing_count, '(', missing_count / num_rows * 100, '%)')
+print('found:', num_rows - missing_count, '(', num_rows - missing_count / num_rows * 100, '%)')
+print('total:', num_rows)
