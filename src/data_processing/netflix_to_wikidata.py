@@ -36,9 +36,28 @@ def construct_query(title, year):
         }
 
         ?item wdt:P31/wdt:P279* wd:Q11424 .
+<<<<<<< HEAD
 
         ?item wdt:P577 ?releaseDate .
         FILTER (YEAR(?releaseDate) >= %(start_year)d && YEAR(?releaseDate) <= %(end_year)d) .
+=======
+        
+        {
+            # Get US release date
+            ?item p:P577 ?releaseDateStatement .
+            ?releaseDateStatement ps:P577 ?releaseDate .
+            ?releaseDateStatement pq:P291 wd:Q30 .  
+        }
+        UNION
+        {
+            # Get unspecified release date
+            ?item p:P577 ?releaseDateStatement .
+            ?releaseDateStatement ps:P577 ?releaseDate .
+            FILTER NOT EXISTS { ?releaseDateStatement pq:P291 ?country }
+        }
+       
+        FILTER (YEAR(?releaseDate) = %(release_year)d) .
+>>>>>>> c66c1bf (Update comments)
         
         OPTIONAL {
             ?item wdt:P136 ?genre .
