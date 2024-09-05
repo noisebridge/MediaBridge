@@ -31,7 +31,6 @@ def construct_query(title, year):
                             wikibase:endpoint "www.wikidata.org" ;
                             mwapi:search "%(search_term)s" ;
                             wikibase:limit 1 ;
-                            wikibase:limit 1 ;
                             mwapi:language "en" .
             ?item wikibase:apiOutputItem mwapi:item .
         }
@@ -69,7 +68,7 @@ def get_wikidata_data(title, year):
     data = resp.json()
 
     if not data['results']['bindings']:
-        return None, None
+        return None, None, None
 
     wikidata_id = data['results']['bindings'][0]['item']['value'].split('/')[-1]
 
@@ -79,14 +78,13 @@ def get_wikidata_data(title, year):
 
 data = []
 missing_count = 0
-num_rows = 200
 num_rows = 420
 
 for row in netflix_data[:num_rows]:
     title = row['Title']
     year = int(row['Year'])
     netflix_id = row['NetflixId']
-    wikidata_id, genres = get_wikidata_data(title, year)
+    wikidata_id, genres, main_subjects = get_wikidata_data(title, year)
     if wikidata_id:
         print(f'found: {title} ({year})')
         data.append({
@@ -102,11 +100,9 @@ for row in netflix_data[:num_rows]:
 
 
 with open(output_csv_path, mode='w', newline='', encoding='ISO-8859-1') as file:
-    writer = csv.DictWriter(file, fieldnames=['netflix_id', 'wikidata_id', 'title', 'year', 'genres'])
+    writer = csv.DictWriter(file, fieldnames=['netflix_id', 'wikidata_id', 'title', 'year', 'genres', 'main_subjects'])
     writer.writeheader()
     writer.writerows(data)
 
-print('missing:', missing_count)
-print('found:', num_rows - missing_count)
 print('missing:', missing_count)
 print('found:', num_rows - missing_count)
