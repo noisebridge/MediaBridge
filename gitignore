@@ -1,1 +1,1 @@
-netflix_txt = src/config/netflix_movies.txt
+netflix_txt = src/data_processing/netflix_movies.txt
