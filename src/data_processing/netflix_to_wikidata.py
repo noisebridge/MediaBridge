@@ -30,17 +30,11 @@ def construct_query(title, year):
             bd:serviceParam wikibase:api "EntitySearch" ;
                             wikibase:endpoint "www.wikidata.org" ;
                             mwapi:search "%(search_term)s" ;
-                            wikibase:limit 1 ;
                             mwapi:language "en" .
             ?item wikibase:apiOutputItem mwapi:item .
         }
 
         ?item wdt:P31/wdt:P279* wd:Q11424 .
-<<<<<<< HEAD
-
-        ?item wdt:P577 ?releaseDate .
-        FILTER (YEAR(?releaseDate) >= %(start_year)d && YEAR(?releaseDate) <= %(end_year)d) .
-=======
         
         {
             # Get US release date
@@ -57,7 +51,6 @@ def construct_query(title, year):
         }
        
         FILTER (YEAR(?releaseDate) = %(release_year)d) .
->>>>>>> c66c1bf (Update comments)
         
         OPTIONAL {
             ?item wdt:P136 ?genre .
@@ -70,8 +63,7 @@ def construct_query(title, year):
 
         SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
     }
-    LIMIT 10
-    ''' % {"search_term": title, "start_year": year - 1, "end_year": year + 1}
+    ''' % {"search_term": title, "release_year": year}
     return query
 
 def get_wikidata_data(title, year):
@@ -91,7 +83,9 @@ def get_wikidata_data(title, year):
 
     wikidata_id = data['results']['bindings'][0]['item']['value'].split('/')[-1]
 
-    genres = [d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d]
+    genres = {d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d}
+
+    print(data)
 
     return wikidata_id, genres, main_subjects
 
@@ -111,7 +105,7 @@ for row in netflix_data[:num_rows]:
             'wikidata_id': wikidata_id,
             'title': title,
             'year': year,
-            'genres': genres,
+            'genres': list(genres),
         })
     else:
         print(f'missing: {title} ({year})')
@@ -123,5 +117,6 @@ with open(output_csv_path, mode='w', newline='', encoding='ISO-8859-1') as file:
     writer.writeheader()
     writer.writerows(data)
 
-print('missing:', missing_count)
-print('found:', num_rows - missing_count)
+print('missing:', missing_count, '(', missing_count / num_rows * 100, '%)')
+print('found:', num_rows - missing_count, '(', (num_rows - missing_count) / num_rows * 100, '%)')
+print('total:', num_rows)
