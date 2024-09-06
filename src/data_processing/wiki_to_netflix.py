@@ -99,7 +99,7 @@ def Wiki_query(data_csv, user_agent):
     return(wiki_movie_ids, wiki_genres, wiki_directors)
 
 #Calling all functions
-netflix_file = read_netflix_txt("movie_titles.txt")
+netflix_file = read_netflix_txt("netflix_movies.txt")
 
 netflix_csv = 'netflix_movies.csv'
 create_netflix_csv(netflix_csv, netflix_file)
