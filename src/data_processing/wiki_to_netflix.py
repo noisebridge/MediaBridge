@@ -50,31 +50,44 @@ def Wiki_query(data_csv, user_agent):
     for row in csv_reader:
         if row[1] != "NULL":
             SPARQL = '''
-            SELECT * WHERE {
-              SERVICE wikibase:mwapi {
-                  bd:serviceParam wikibase:endpoint "www.wikidata.org";
-                      wikibase:api "EntitySearch";
-                      mwapi:search "%(Title)s";
-                      mwapi:language "en".
-              ?item wikibase:apiOutputItem mwapi:item.
-          }
-              ?item wdt:P31/wdt:P279* wd:Q11424 ;
-                  wdt:P577 ?releaseDate .
-                  SERVICE wikibase:label {
-                    ?item rdfs:label ?itemLabel .
-                    bd:serviceParam wikibase:language "en". 
-                  }
-                  
-                  OPTIONAL {?item wdt:P136 ?genre. 
-                                      ?genre rdfs:label ?genreLabel.
-                                      FILTER (lang(?genreLabel) = "en")}
-                OPTIONAL {?item wdt:P57 ?director.
-                                      ?director rdfs:label ?directorLabel.
-                                      FILTER (lang(?directorLabel) = "en")}
-                  
-                  FILTER("%(Year)d-01-01"^^xsd:dateTime <= ?releaseDate && ?releaseDate < "%(Next_year)d-01-01"^^xsd:dateTime) .
-                } LIMIT 1
-            
+    SELECT * WHERE {
+        SERVICE wikibase:mwapi {
+            bd:serviceParam wikibase:api "EntitySearch" ;
+                            wikibase:endpoint "www.wikidata.org" ;
+                            mwapi:search "%(Title)s" ;
+                            mwapi:language "en" .
+            ?item wikibase:apiOutputItem mwapi:item .
+        }
+
+        ?item wdt:P31/wdt:P279* wd:Q11424 .
+        
+        {
+            # Get US release date
+            ?item p:P577 ?releaseDateStatement .
+            ?releaseDateStatement ps:P577 ?releaseDate .
+            ?releaseDateStatement pq:P291 wd:Q30 .  
+        }
+        UNION
+        {
+            # Get unspecified release date
+            ?item p:P577 ?releaseDateStatement .
+            ?releaseDateStatement ps:P577 ?releaseDate .
+            FILTER NOT EXISTS { ?releaseDateStatement pq:P291 ?country }
+        }
+       
+        FILTER (YEAR(?releaseDate) = %(Year)d) .
+        
+        OPTIONAL {
+            ?item wdt:P136 ?genre .
+            ?genre rdfs:label ?genreLabel .
+            FILTER (lang(?genreLabel) = "en") .
+        }
+
+        ?item rdfs:label ?itemLabel .
+        FILTER (lang(?itemLabel) = "en") .
+
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+        }
         
             ''' % {'Title': row[2], 'Year': int(row[1]), 'Next_year': int(row[1]) + 1}
 
