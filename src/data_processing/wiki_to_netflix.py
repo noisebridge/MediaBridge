@@ -17,7 +17,7 @@ def create_netflix_csv(csv_name, data_list):
         csv.writer(netflix_csv).writerows(data_list)
 
 #Extracting movie info from Wiki data
-def Wiki_feature_info(data, key):
+def wiki_feature_info(data, key):
     if len(data['results']['bindings']) < 1 or key not in data['results']['bindings'][0]:
         return 'NA'
     else:
@@ -40,7 +40,7 @@ def add_movie_info_to_csv(data_csv, movies, genres, directors):
         csv_writer.writerows(data_list)  
 
 #Getting list of movie IDs, genre IDs, and director IDs from request
-def Wiki_query(data_csv, user_agent):
+def wiki_query(data_csv, user_agent):
     wiki_movie_ids = []
     wiki_genres = []
     wiki_directors = []
@@ -102,9 +102,9 @@ def Wiki_query(data_csv, user_agent):
             
             data = response.json()
             
-            wiki_movie_ids.append(Wiki_feature_info(data, 'item'))
-            wiki_genres.append(Wiki_feature_info(data, 'genreLabel'))
-            wiki_directors.append(Wiki_feature_info(data, 'directorLabel'))
+            wiki_movie_ids.append(wiki_feature_info(data, 'item'))
+            wiki_genres.append(wiki_feature_info(data, 'genreLabel'))
+            wiki_directors.append(wiki_feature_info(data, 'directorLabel'))
       
         else:
             pass
@@ -117,6 +117,6 @@ netflix_file = read_netflix_txt("netflix_movies.txt")
 netflix_csv = 'netflix_movies.csv'
 create_netflix_csv(netflix_csv, netflix_file)
 
-wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = Wiki_query(netflix_csv, user_agent)
+wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_csv, user_agent)
 
 add_movie_info_to_csv(netflix_csv, wiki_movie_ids_list, wiki_genres_list, wiki_directors_list)
