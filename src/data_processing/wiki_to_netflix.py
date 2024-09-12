@@ -48,9 +48,9 @@ def wiki_query(data_csv, user_agent):
     wiki_genres = []
     wiki_directors = []
     
-    csv_reader = list(csv.reader(open(data_csv)))
+    # csv_reader = list(csv.reader(open(data_csv)))
     
-    for row in csv_reader:
+    for row in data_csv:
         if row[1] != "NULL":
             SPARQL = '''
             SELECT * WHERE {
@@ -119,13 +119,26 @@ def wiki_query(data_csv, user_agent):
     return(wiki_movie_ids, wiki_genres, wiki_directors)
 
 #Calling all functions
+processed_data = []
+
 netflix_file = read_netflix_txt(base_dir + "netflix_movies.txt")
 
 netflix_csv = base_dir + 'netflix_movies.csv'
-create_netflix_csv(netflix_csv, netflix_file)
 
-wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_csv, user_agent)
+wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_file, user_agent)
 
-add_movie_info_to_csv(netflix_csv, wiki_movie_ids_list, wiki_genres_list, wiki_directors_list)
+
+index = 0
+for row in netflix_file:
+    title = row[0]
+    year = int(row[1])
+    netflix_id = row[2]
+    if wiki_movie_ids_list[index] == 'NA':
+        missing_count += 1
+    else:
+        processed_data.append([title, year, netflix_id, wiki_movie_ids_list[index], wiki_genres_list[index], wiki_directors_list[index]])
+    index+=1
+
+create_netflix_csv(netflix_csv, processed_data)
 
 print("Complete.")
