@@ -31,7 +31,9 @@ def add_movie_info_to_csv(data_csv, movies, genres, directors):
         csv_reader = csv.reader(csv_file)
         data_list = list(csv_reader)
         
-    for i in range(1, len(data_list)):
+    for i in range(1, len(data_list)-1):
+        print(i)
+        print(movies)
         if movies[i] and genres[i] and directors[i] == "NA":
             pass
         else:
@@ -47,9 +49,11 @@ def wiki_query(data_csv, user_agent):
     wiki_genres = []
     wiki_directors = []
     
-    csv_reader = csv.reader(open(data_csv))
+    csv_reader = list(csv.reader(open(data_csv)))
+    print(list(csv_reader))
     
     for row in csv_reader:
+        print(row)
         if row[1] != "NULL":
             SPARQL = '''
             SELECT * WHERE {
@@ -115,7 +119,7 @@ def wiki_query(data_csv, user_agent):
         else:
             pass
         
-        return(wiki_movie_ids, wiki_genres, wiki_directors)
+    return(wiki_movie_ids, wiki_genres, wiki_directors)
 
 #Calling all functions
 netflix_file = read_netflix_txt(base_dir + "netflix_movies.txt")
@@ -124,5 +128,7 @@ netflix_csv = base_dir + 'netflix_movies.csv'
 create_netflix_csv(netflix_csv, netflix_file)
 
 wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_csv, user_agent)
+print(wiki_movie_ids_list)
+print(wiki_directors_list)
 
 add_movie_info_to_csv(netflix_csv, wiki_movie_ids_list, wiki_genres_list, wiki_directors_list)
