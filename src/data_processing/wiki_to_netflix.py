@@ -3,7 +3,9 @@ import zipfile
 from pprint import pprint
 import requests
 import csv
-from credentials import user_agent
+
+
+user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 #Reading netflix text file
 def read_netflix_txt(txt_file):
