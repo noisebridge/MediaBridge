@@ -4,7 +4,7 @@ from pprint import pprint
 import requests
 import csv
 
-
+base_dir = 'src/data/'
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 #Reading netflix text file
@@ -111,13 +111,13 @@ def wiki_query(data_csv, user_agent):
       
         else:
             pass
-     
-    return(wiki_movie_ids, wiki_genres, wiki_directors)
+        
+        return(wiki_movie_ids, wiki_genres, wiki_directors)
 
 #Calling all functions
-netflix_file = read_netflix_txt("netflix_movies.txt")
+netflix_file = read_netflix_txt(base_dir + "netflix_movies.txt")
 
-netflix_csv = 'netflix_movies.csv'
+netflix_csv = base_dir + 'netflix_movies.csv'
 create_netflix_csv(netflix_csv, netflix_file)
 
 wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_csv, user_agent)
