@@ -1,15 +1,16 @@
-import pandas as pd
-from pprint import pprint
 import requests
 import csv
 
 base_dir = 'src/data/'
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
+missing_count = 0
+num_rows = 42
+
 #Reading netflix text file
 def read_netflix_txt(txt_file):
     with open(txt_file, "r", encoding = "ISO-8859-1") as netflix_data:
-        netflix_list = [line.rstrip().split(',', 2) for line in netflix_data.readlines()]
+        netflix_list = [line.rstrip().split(',', 2) for line in netflix_data.readlines()[0:num_rows]]
     return(netflix_list)
 
 #Writing netflix csv file
@@ -31,9 +32,7 @@ def add_movie_info_to_csv(data_csv, movies, genres, directors):
         csv_reader = csv.reader(csv_file)
         data_list = list(csv_reader)
         
-    for i in range(1, len(data_list)-1):
-        print(i)
-        print(movies)
+    for i in range(0, len(data_list)-1):
         if movies[i] and genres[i] and directors[i] == "NA":
             pass
         else:
@@ -50,10 +49,8 @@ def wiki_query(data_csv, user_agent):
     wiki_directors = []
     
     csv_reader = list(csv.reader(open(data_csv)))
-    print(list(csv_reader))
     
     for row in csv_reader:
-        print(row)
         if row[1] != "NULL":
             SPARQL = '''
             SELECT * WHERE {
@@ -128,7 +125,7 @@ netflix_csv = base_dir + 'netflix_movies.csv'
 create_netflix_csv(netflix_csv, netflix_file)
 
 wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_csv, user_agent)
-print(wiki_movie_ids_list)
-print(wiki_directors_list)
 
 add_movie_info_to_csv(netflix_csv, wiki_movie_ids_list, wiki_genres_list, wiki_directors_list)
+
+print("Complete.")
