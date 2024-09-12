@@ -21,7 +21,8 @@ def wiki_feature_info(data, key):
     if len(data['results']['bindings']) < 1 or key not in data['results']['bindings'][0]:
         return 'NA'
     else:
-        return(data['results']['bindings'][0][key]['value'].split('/')[-1])
+        return({d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d} if key == 'genreLabel'
+                else data['results']['bindings'][0][key]['value'].split('/')[-1])
 
 #Adding movie info to netflix csv file
 def add_movie_info_to_csv(data_csv, movies, genres, directors):
