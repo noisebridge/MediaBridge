@@ -1,5 +1,4 @@
 import pandas as pd
-import zipfile
 from pprint import pprint
 import requests
 import csv
@@ -79,20 +78,24 @@ def wiki_query(data_csv, user_agent):
                 }
             
                 FILTER (YEAR(?releaseDate) = %(Year)d) .
-                
+
+                ?item rdfs:label ?itemLabel .
+                FILTER (lang(?itemLabel) = "en") .
+
                 OPTIONAL {
                     ?item wdt:P136 ?genre .
                     ?genre rdfs:label ?genreLabel .
                     FILTER (lang(?genreLabel) = "en") .
                 }
 
-                ?item rdfs:label ?itemLabel .
-                FILTER (lang(?itemLabel) = "en") .
+                OPTIONAL {?item wdt:P57 ?director.
+                                ?director rdfs:label ?directorLabel.
+                                FILTER (lang(?directorLabel) = "en")}
 
                 SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
                 }
         
-            ''' % {'Title': row[2], 'Year': int(row[1]), 'Next_year': int(row[1]) + 1}
+            ''' % {'Title': row[2], 'Year': int(row[1])}
 
             response = requests.post('https://query.wikidata.org/sparql',
                       headers={'User-Agent': user_agent},
