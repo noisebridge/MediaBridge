@@ -136,4 +136,6 @@ for index, row in enumerate(netflix_file):
 
 create_netflix_csv(netflix_csv, processed_data)
 
-print("Complete.")
+print('missing:', missing_count, '(', missing_count / num_rows * 100, '%)')
+print('found:', num_rows - missing_count, '(', (num_rows - missing_count) / num_rows * 100, '%)')
+print('total:', num_rows)
