@@ -7,18 +7,18 @@ user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 missing_count = 0
 num_rows = 42
 
-#Reading netflix text file
+# Reading netflix text file
 def read_netflix_txt(txt_file):
     with open(txt_file, "r", encoding = "ISO-8859-1") as netflix_data:
         netflix_list = [line.rstrip().split(',', 2) for line in netflix_data.readlines()[0:num_rows]]
     return(netflix_list)
 
-#Writing netflix csv file
+# Writing netflix csv file
 def create_netflix_csv(csv_name, data_list):   
     with open(csv_name, 'w') as netflix_csv:
         csv.writer(netflix_csv).writerows(data_list)
 
-#Extracting movie info from Wiki data
+# Extracting movie info from Wiki data
 def wiki_feature_info(data, key):
     if len(data['results']['bindings']) < 1 or key not in data['results']['bindings'][0]:
         return 'NA'
@@ -26,7 +26,7 @@ def wiki_feature_info(data, key):
         return({d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d} if key == 'genreLabel'
                 else data['results']['bindings'][0][key]['value'].split('/')[-1])
 
-#Adding movie info to netflix csv file
+# Adding movie info to netflix csv file
 def add_movie_info_to_csv(data_csv, movies, genres, directors):
     with open(data_csv, 'r') as csv_file:
         csv_reader = csv.reader(csv_file)
@@ -42,7 +42,7 @@ def add_movie_info_to_csv(data_csv, movies, genres, directors):
         csv_writer = csv.writer(csv_file)
         csv_writer.writerows(data_list)  
 
-#Getting list of movie IDs, genre IDs, and director IDs from request
+# Getting list of movie IDs, genre IDs, and director IDs from request
 def wiki_query(data_csv, user_agent):
     wiki_movie_ids = []
     wiki_genres = []
@@ -118,7 +118,7 @@ def wiki_query(data_csv, user_agent):
         
     return(wiki_movie_ids, wiki_genres, wiki_directors)
 
-#Calling all functions
+# Calling all functions
 processed_data = []
 
 netflix_file = read_netflix_txt(base_dir + "netflix_movies.txt")
@@ -127,17 +127,12 @@ netflix_csv = base_dir + 'netflix_movies.csv'
 
 wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_file, user_agent)
 
-
-index = 0
-for row in netflix_file:
-    title = row[0]
-    year = int(row[1])
-    netflix_id = row[2]
+for index, row in enumerate(netflix_file):
+    title, year, netflix_id = row[0], int(row[1]), row[2]
     if wiki_movie_ids_list[index] == 'NA':
         missing_count += 1
     else:
         processed_data.append([title, year, netflix_id, wiki_movie_ids_list[index], wiki_genres_list[index], wiki_directors_list[index]])
-    index+=1
 
 create_netflix_csv(netflix_csv, processed_data)
 
