@@ -22,9 +22,9 @@ def create_netflix_csv(csv_name, data_list):
 def wiki_feature_info(data, key):
     if len(data['results']['bindings']) < 1 or key not in data['results']['bindings'][0]:
         return 'NA'
-    else:
-        return({d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d} if key == 'genreLabel'
-                else data['results']['bindings'][0][key]['value'].split('/')[-1])
+    if key == 'genreLabel':
+        return list({d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d})
+    return data['results']['bindings'][0][key]['value'].split('/')[-1]
 
 # Adding movie info to netflix csv file
 def add_movie_info_to_csv(data_csv, movies, genres, directors):
@@ -33,7 +33,7 @@ def add_movie_info_to_csv(data_csv, movies, genres, directors):
         data_list = list(csv_reader)
         
     for i in range(0, len(data_list)-1):
-        if movies[i] and genres[i] and directors[i] != "NA":
+        if movies[i] or genres[i] or directors[i] != "NA":
             data_list[i].extend((movies[i], genres[i], directors[i]))
             
     with open(data_csv, 'w') as csv_file:
