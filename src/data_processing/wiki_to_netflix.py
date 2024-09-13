@@ -33,9 +33,7 @@ def add_movie_info_to_csv(data_csv, movies, genres, directors):
         data_list = list(csv_reader)
         
     for i in range(0, len(data_list)-1):
-        if movies[i] and genres[i] and directors[i] == "NA":
-            pass
-        else:
+        if movies[i] and genres[i] and directors[i] != "NA":
             data_list[i].extend((movies[i], genres[i], directors[i]))
             
     with open(data_csv, 'w') as csv_file:
@@ -112,16 +110,13 @@ def wiki_query(data_csv, user_agent):
             wiki_movie_ids.append(wiki_feature_info(data, 'item'))
             wiki_genres.append(wiki_feature_info(data, 'genreLabel'))
             wiki_directors.append(wiki_feature_info(data, 'directorLabel'))
-      
-        else:
-            pass
         
     return(wiki_movie_ids, wiki_genres, wiki_directors)
 
 # Calling all functions
 processed_data = []
 
-netflix_file = read_netflix_txt(base_dir + "netflix_movies.txt")
+netflix_file = read_netflix_txt(base_dir + 'netflix_movies.txt')
 
 netflix_csv = base_dir + 'netflix_movies.csv'
 
