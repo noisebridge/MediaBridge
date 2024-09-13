@@ -1,7 +1,7 @@
 import requests
 import csv
 
-base_dir = 'src/data/'
+base_dir = os.path.join(os.path.dirname(__file__), '../data/')
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 missing_count = 0
