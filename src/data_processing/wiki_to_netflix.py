@@ -22,21 +22,7 @@ def wiki_feature_info(data, key):
         return 'NA'
     if key == 'genreLabel':
         return list({d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d})
-    return data['results']['bindings'][0][key]['value'].split('/')[-1]
-
-# Adding movie info to netflix csv file
-def add_movie_info_to_csv(data_csv, movies, genres, directors):
-    with open(data_csv, 'r') as csv_file:
-        csv_reader = csv.reader(csv_file)
-        data_list = list(csv_reader)
-        
-    for i in range(0, len(data_list)-1):
-        if movies[i] or genres[i] or directors[i] != "NA":
-            data_list[i].extend((movies[i], genres[i], directors[i]))
-            
-    with open(data_csv, 'w') as csv_file:
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerows(data_list)  
+    return data['results']['bindings'][0][key]['value'].split('/')[-1] 
 
 # Getting list of movie IDs, genre IDs, and director IDs from request
 def wiki_query(data_csv, user_agent):
