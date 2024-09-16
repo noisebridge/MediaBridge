@@ -5,13 +5,10 @@ import os
 base_dir = os.path.join(os.path.dirname(__file__), '../data/')
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
-missing_count = 0
-num_rows = -1
-
 # Reading netflix text file
 def read_netflix_txt(txt_file):
     with open(txt_file, "r", encoding = "ISO-8859-1") as netflix_data:
-        netflix_list = [line.rstrip().split(',', 2) for line in netflix_data.readlines()[0:num_rows]]
+        netflix_list = [line.rstrip().split(',', 2) for line in netflix_data.readlines()]
     return(netflix_list)
 
 # Writing netflix csv file
@@ -46,10 +43,9 @@ def wiki_query(data_csv, user_agent):
     wiki_movie_ids = []
     wiki_genres = []
     wiki_directors = []
-    
-    # csv_reader = list(csv.reader(open(data_csv)))
-    
+        
     for row in data_csv:
+        print(row[0], row[1], row[2])
         if row[1] != "NULL":
             SPARQL = '''
             SELECT * WHERE {
@@ -116,25 +112,26 @@ def wiki_query(data_csv, user_agent):
 
 # Calling all functions
 def process_data(test=False):
-    print(test)
-
+    missing_count = 0
     processed_data = []
 
-    netflix_file = read_netflix_txt(base_dir + 'netflix_movies.txt')
+    netflix_file = read_netflix_txt(os.path.join(base_dir, 'netflix_movies.txt'))
 
-    netflix_csv = base_dir + 'netflix_movies.csv'
+    if test:
+        netflix_file = netflix_file[:100]
 
-    wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_file, user_agent)
+    num_rows = len(netflix_file)
 
-    num_rows = 100 if test else len(wiki_movie_ids_list)
-    print(num_rows)
+    netflix_csv = os.path.join(base_dir, 'netflix_movies.csv')
+
+    wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(netflix_file, user_agent)
 
     for index, row in enumerate(netflix_file):
-        title, year, netflix_id = row[0], int(row[1]), row[2]
+        netflix_id, year, title = row[0], int(row[1]), row[2]
         if wiki_movie_ids_list[index] == 'NA':
             missing_count += 1
         else:
-            processed_data.append([title, year, netflix_id, wiki_movie_ids_list[index], wiki_genres_list[index], wiki_directors_list[index]])
+            processed_data.append([netflix_id, wiki_movie_ids_list[index], title, year, wiki_genres_list[index], wiki_directors_list[index]])
 
     create_netflix_csv(netflix_csv, processed_data)
 
