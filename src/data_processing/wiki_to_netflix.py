@@ -1,11 +1,12 @@
 import requests
 import csv
+import os
 
 base_dir = 'src/data/'
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 missing_count = 0
-num_rows = 42
+num_rows = -1
 
 # Reading netflix text file
 def read_netflix_txt(txt_file):
@@ -114,23 +115,32 @@ def wiki_query(data_csv, user_agent):
     return(wiki_movie_ids, wiki_genres, wiki_directors)
 
 # Calling all functions
-processed_data = []
+def process_data(test=False):
+    print(test)
 
-netflix_file = read_netflix_txt(base_dir + 'netflix_movies.txt')
+    processed_data = []
 
-netflix_csv = base_dir + 'netflix_movies.csv'
+    netflix_file = read_netflix_txt(base_dir + 'netflix_movies.txt')
 
-wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_file, user_agent)
+    netflix_csv = base_dir + 'netflix_movies.csv'
 
-for index, row in enumerate(netflix_file):
-    title, year, netflix_id = row[0], int(row[1]), row[2]
-    if wiki_movie_ids_list[index] == 'NA':
-        missing_count += 1
-    else:
-        processed_data.append([title, year, netflix_id, wiki_movie_ids_list[index], wiki_genres_list[index], wiki_directors_list[index]])
+    wiki_movie_ids_list, wiki_directors_list, wiki_genres_list = wiki_query(netflix_file, user_agent)
 
-create_netflix_csv(netflix_csv, processed_data)
+    num_rows = 100 if test else len(wiki_movie_ids_list)
+    print(num_rows)
 
-print('missing:', missing_count, '(', missing_count / num_rows * 100, '%)')
-print('found:', num_rows - missing_count, '(', (num_rows - missing_count) / num_rows * 100, '%)')
-print('total:', num_rows)
+    for index, row in enumerate(netflix_file):
+        title, year, netflix_id = row[0], int(row[1]), row[2]
+        if wiki_movie_ids_list[index] == 'NA':
+            missing_count += 1
+        else:
+            processed_data.append([title, year, netflix_id, wiki_movie_ids_list[index], wiki_genres_list[index], wiki_directors_list[index]])
+
+    create_netflix_csv(netflix_csv, processed_data)
+
+    print('missing:', missing_count, '(', missing_count / num_rows * 100, '%)')
+    print('found:', num_rows - missing_count, '(', (num_rows - missing_count) / num_rows * 100, '%)')
+    print('total:', num_rows)
+
+if __name__ == '__main__':
+    process_data(True)
