@@ -39,68 +39,70 @@ def wiki_query(data_csv, user_agent):
     wiki_directors = []
         
     for row in data_csv:
-        if row[1] != "NULL":
-            SPARQL = '''
-            SELECT * WHERE {
-                SERVICE wikibase:mwapi {
-                    bd:serviceParam wikibase:api "EntitySearch" ;
-                                    wikibase:endpoint "www.wikidata.org" ;
-                                    mwapi:search "%(Title)s" ;
-                                    mwapi:language "en" .
-                    ?item wikibase:apiOutputItem mwapi:item .
-                }
+        if row[1] == "NULL":
+            continue
 
-                ?item wdt:P31/wdt:P279* wd:Q11424 .
-                
-                {
-                    # Get US release date
-                    ?item p:P577 ?releaseDateStatement .
-                    ?releaseDateStatement ps:P577 ?releaseDate .
-                    ?releaseDateStatement pq:P291 wd:Q30 .  
-                }
-                UNION
-                {
-                    # Get unspecified release date
-                    ?item p:P577 ?releaseDateStatement .
-                    ?releaseDateStatement ps:P577 ?releaseDate .
-                    FILTER NOT EXISTS { ?releaseDateStatement pq:P291 ?country }
-                }
+        SPARQL = '''
+        SELECT * WHERE {
+            SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch" ;
+                                wikibase:endpoint "www.wikidata.org" ;
+                                mwapi:search "%(Title)s" ;
+                                mwapi:language "en" .
+                ?item wikibase:apiOutputItem mwapi:item .
+            }
+
+            ?item wdt:P31/wdt:P279* wd:Q11424 .
             
-                FILTER (YEAR(?releaseDate) = %(Year)d) .
-
-                ?item rdfs:label ?itemLabel .
-                FILTER (lang(?itemLabel) = "en") .
-
-                OPTIONAL {
-                    ?item wdt:P136 ?genre .
-                    ?genre rdfs:label ?genreLabel .
-                    FILTER (lang(?genreLabel) = "en") .
-                }
-
-                OPTIONAL {?item wdt:P57 ?director.
-                                ?director rdfs:label ?directorLabel.
-                                FILTER (lang(?directorLabel) = "en")}
-
-                SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
-                }
+            {
+                # Get US release date
+                ?item p:P577 ?releaseDateStatement .
+                ?releaseDateStatement ps:P577 ?releaseDate .
+                ?releaseDateStatement pq:P291 wd:Q30 .  
+            }
+            UNION
+            {
+                # Get unspecified release date
+                ?item p:P577 ?releaseDateStatement .
+                ?releaseDateStatement ps:P577 ?releaseDate .
+                FILTER NOT EXISTS { ?releaseDateStatement pq:P291 ?country }
+            }
         
-            ''' % {'Title': row[2], 'Year': int(row[1])}
+            FILTER (YEAR(?releaseDate) = %(Year)d) .
 
-            response = requests.post('https://query.wikidata.org/sparql',
-                      headers={'User-Agent': user_agent},
-                      data={
-                        'query': SPARQL,
-                        'format': 'json',
-                      }
+            ?item rdfs:label ?itemLabel .
+            FILTER (lang(?itemLabel) = "en") .
+
+            OPTIONAL {
+                ?item wdt:P136 ?genre .
+                ?genre rdfs:label ?genreLabel .
+                FILTER (lang(?genreLabel) = "en") .
+            }
+
+            OPTIONAL {?item wdt:P57 ?director.
+                            ?director rdfs:label ?directorLabel.
+                            FILTER (lang(?directorLabel) = "en")}
+
+            SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
+            }
+    
+        ''' % {'Title': row[2], 'Year': int(row[1])}
+
+        response = requests.post('https://query.wikidata.org/sparql',
+                    headers={'User-Agent': user_agent},
+                    data={
+                    'query': SPARQL,
+                    'format': 'json',
+                    }
         )
-            response.raise_for_status() 
-            
-            data = response.json()
-            
-            wiki_movie_ids.append(wiki_feature_info(data, 'item'))
-            wiki_genres.append(wiki_feature_info(data, 'genreLabel'))
-            wiki_directors.append(wiki_feature_info(data, 'directorLabel'))
+        response.raise_for_status() 
         
+        data = response.json()
+        
+        wiki_movie_ids.append(wiki_feature_info(data, 'item'))
+        wiki_genres.append(wiki_feature_info(data, 'genreLabel'))
+        wiki_directors.append(wiki_feature_info(data, 'directorLabel'))
+    
     return(wiki_movie_ids, wiki_genres, wiki_directors)
 
 # Calling all functions
@@ -129,4 +131,4 @@ def process_data(test=False):
     print('total:', num_rows)
 
 if __name__ == '__main__':
-    process_data(False)
+    process_data(True)
