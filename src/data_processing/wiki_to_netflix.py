@@ -1,15 +1,23 @@
 import requests
 import csv
 import os
+import math
 
 base_dir = os.path.join(os.path.dirname(__file__), '../data/')
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 # Reading netflix text file
-def read_netflix_txt(txt_file):
+def read_netflix_txt(txt_file, test):
+    netflix_list = []
+    num_rows = 100 if test else math.inf
+
     with open(txt_file, "r", encoding = "ISO-8859-1") as netflix_data:
-        netflix_list = [line.rstrip().split(',', 2) for line in netflix_data.readlines()]
-    return(netflix_list)
+        for i, line in enumerate(netflix_data):
+            if i >= num_rows:
+                break
+            netflix_list.append(line.rstrip().split(',', 2))
+
+    return netflix_list
 
 # Writing netflix csv file
 def create_netflix_csv(csv_name, data_list):   
@@ -31,7 +39,6 @@ def wiki_query(data_csv, user_agent):
     wiki_directors = []
         
     for row in data_csv:
-        print(row[0], row[1], row[2])
         if row[1] != "NULL":
             SPARQL = '''
             SELECT * WHERE {
@@ -101,11 +108,7 @@ def process_data(test=False):
     missing_count = 0
     processed_data = []
 
-    netflix_file = read_netflix_txt(os.path.join(base_dir, 'netflix_movies.txt'))
-
-    if test:
-        netflix_file = netflix_file[:100]
-
+    netflix_file = read_netflix_txt(os.path.join(base_dir, 'netflix_movies.txt'), test)
     num_rows = len(netflix_file)
 
     netflix_csv = os.path.join(base_dir, 'netflix_movies.csv')
@@ -126,4 +129,4 @@ def process_data(test=False):
     print('total:', num_rows)
 
 if __name__ == '__main__':
-    process_data(True)
+    process_data(False)
