@@ -27,7 +27,7 @@ def create_netflix_csv(csv_name, data_list):
 # Extracting movie info from Wiki data
 def wiki_feature_info(data, key):
     if len(data['results']['bindings']) < 1 or key not in data['results']['bindings'][0]:
-        return 'NA'
+        return 'NULL'
     if key == 'genreLabel':
         return list({d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d})
     return data['results']['bindings'][0][key]['value'].split('/')[-1] 
@@ -119,10 +119,9 @@ def process_data(test=False):
 
     for index, row in enumerate(netflix_file):
         netflix_id, year, title = row[0], int(row[1]), row[2]
-        if wiki_movie_ids_list[index] == 'NA':
+        if wiki_movie_ids_list[index] == 'NULL':
             missing_count += 1
-        else:
-            processed_data.append([netflix_id, wiki_movie_ids_list[index], title, year, wiki_genres_list[index], wiki_directors_list[index]])
+        processed_data.append([netflix_id, wiki_movie_ids_list[index], title, year, wiki_genres_list[index], wiki_directors_list[index]])
 
     create_netflix_csv(netflix_csv, processed_data)
 
