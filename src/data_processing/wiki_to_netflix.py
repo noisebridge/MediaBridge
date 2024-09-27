@@ -2,6 +2,10 @@ import requests
 import csv
 import os
 import math
+import time
+
+class WikidataServiceTimeoutException(Exception):
+    pass
 
 base_dir = os.path.join(os.path.dirname(__file__), '../data/')
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
@@ -96,15 +100,29 @@ def wiki_query(data_csv, user_agent):
 
         SPARQL = format_sparql_query(row[2], int(row[1]))
 
-        response = requests.post('https://query.wikidata.org/sparql',
-                    headers={'User-Agent': user_agent},
-                    data={
-                    'query': SPARQL,
-                    'format': 'json',
-                    }
-        )
-        response.raise_for_status() 
+        tries = 0
+        while True:
+            try:
+                response = requests.post('https://query.wikidata.org/sparql',
+                            headers={'User-Agent': user_agent},
+                            data={
+                            'query': SPARQL,
+                            'format': 'json',
+                            },
+                            timeout=20,
+                )
+                break
+            except requests.exceptions.Timeout:
+                wait_time = 2 ** tries * 5
+                time.sleep(wait_time)
+                tries += 1
+                if tries > 5:
+                    raise WikidataServiceTimeoutException(
+                        f'Tried {tries} time, could not reach Wikidata '
+                        '(movie: {row[2]} {row[1]})'
+                    )
         
+        response.raise_for_status()
         data = response.json()
         
         wiki_movie_ids.append(wiki_feature_info(data, 'item'))
