@@ -16,7 +16,7 @@ def read_netflix_txt(txt_file, test):
 
     with open(txt_file, "r", encoding = "ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
-            if i >= num_rows:
+            if num_rows is not None and i >= num_rows:
                 break
             netflix_list.append(line.rstrip().split(',', 2))
 
