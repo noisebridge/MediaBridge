@@ -9,7 +9,10 @@ user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 # Reading netflix text file
 def read_netflix_txt(txt_file, test):
     netflix_list = []
-    num_rows = 100 if test else math.inf
+
+    num_rows = None
+    if test == True:
+        num_rows = 100
 
     with open(txt_file, "r", encoding = "ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
