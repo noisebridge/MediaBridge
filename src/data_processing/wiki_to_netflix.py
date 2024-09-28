@@ -113,10 +113,10 @@ def process_data(test=False):
     missing_count = 0
     processed_data = []
 
-    netflix_file = read_netflix_txt(os.path.join(base_dir, 'netflix_movies.txt'), test)
+    netflix_file = read_netflix_txt(os.path.join(base_dir, 'movie_data.txt'), test)
     num_rows = len(netflix_file)
 
-    netflix_csv = os.path.join(base_dir, 'netflix_movies.csv')
+    netflix_csv = os.path.join(base_dir, 'movie_data.csv')
 
     wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(netflix_file, user_agent)
 
