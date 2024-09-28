@@ -35,17 +35,9 @@ def wiki_feature_info(data, key):
         return list({d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d})
     return data['results']['bindings'][0][key]['value'].split('/')[-1] 
 
-# Getting list of movie IDs, genre IDs, and director IDs from request
-def wiki_query(data_csv, user_agent):
-    wiki_movie_ids = []
-    wiki_genres = []
-    wiki_directors = []
-        
-    for row in data_csv:
-        if row[1] == "NULL":
-            continue
-
-        SPARQL = '''
+# Formatting SPARQL query for Wiki data
+def format_sparql_query(title, year):
+    QUERY = '''
         SELECT * WHERE {
             SERVICE wikibase:mwapi {
                 bd:serviceParam wikibase:api "EntitySearch" ;
@@ -89,7 +81,20 @@ def wiki_query(data_csv, user_agent):
             SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
             }
     
-        ''' % {'Title': row[2], 'Year': int(row[1])}
+        '''
+    return QUERY % {'Title': title, 'Year': year}
+
+# Getting list of movie IDs, genre IDs, and director IDs from request
+def wiki_query(data_csv, user_agent):
+    wiki_movie_ids = []
+    wiki_genres = []
+    wiki_directors = []
+        
+    for row in data_csv:
+        if row[1] == "NULL":
+            continue
+
+        SPARQL = format_sparql_query(row[2], int(row[1]))
 
         response = requests.post('https://query.wikidata.org/sparql',
                     headers={'User-Agent': user_agent},
