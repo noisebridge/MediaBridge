@@ -121,7 +121,7 @@ def wiki_query(data_csv, user_agent):
                 if tries > 5:
                     raise WikidataServiceTimeoutException(
                         f'Tried {tries} time, could not reach Wikidata '
-                        '(movie: {row[2]} {row[1]})'
+                        f'(movie: {row[2]} {row[1]})'
                     )
         
         response.raise_for_status()
