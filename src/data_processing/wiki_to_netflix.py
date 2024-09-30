@@ -158,5 +158,6 @@ def process_data(test=False):
     print('total:', num_rows)
 
 if __name__ == '__main__':
+    # Test is true if no argument is passed or if the first argument is not '--prod'.
     test = len(sys.argv) < 2 or sys.argv[1] != '--prod'
     process_data(test=test)
