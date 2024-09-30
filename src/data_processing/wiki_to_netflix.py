@@ -8,8 +8,6 @@ user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 # Reading netflix text file
 def read_netflix_txt(txt_file, test):
-    netflix_list = []
-
     num_rows = None
     if test == True:
         num_rows = 100
@@ -18,9 +16,7 @@ def read_netflix_txt(txt_file, test):
         for i, line in enumerate(netflix_data):
             if num_rows is not None and i >= num_rows:
                 break
-            netflix_list.append(line.rstrip().split(',', 2))
-
-    return netflix_list
+            yield line.rstrip().split(',', 2)
 
 # Writing netflix csv file
 def create_netflix_csv(csv_name, data_list):   
