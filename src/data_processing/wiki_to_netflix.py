@@ -4,6 +4,7 @@ import os
 import math
 import time
 from tqdm import tqdm
+import sys
 
 class WikidataServiceTimeoutException(Exception):
     pass
@@ -157,4 +158,5 @@ def process_data(test=False):
     print('total:', num_rows)
 
 if __name__ == '__main__':
-    process_data(True)
+    test = len(sys.argv) < 2 or sys.argv[1] != '--prod'
+    process_data(test=test)
