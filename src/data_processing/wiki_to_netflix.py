@@ -3,6 +3,7 @@ import csv
 import os
 import math
 import time
+from tqdm import tqdm
 
 class WikidataServiceTimeoutException(Exception):
     pass
@@ -94,7 +95,7 @@ def wiki_query(data_csv, user_agent):
     wiki_genres = []
     wiki_directors = []
         
-    for row in data_csv:
+    for row in tqdm(data_csv):
         if row[1] == "NULL":
             continue
 
