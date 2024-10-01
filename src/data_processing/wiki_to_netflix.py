@@ -111,7 +111,7 @@ def wiki_query(data_csv, user_agent):
         wiki_genres.append(wiki_feature_info(data, 'genreLabel'))
         wiki_directors.append(wiki_feature_info(data, 'directorLabel'))
     
-    return(wiki_movie_ids, wiki_genres, wiki_directors)
+    return wiki_movie_ids, wiki_genres, wiki_directors
 
 # Calling all functions
 def process_data(test=False):
