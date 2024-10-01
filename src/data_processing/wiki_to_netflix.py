@@ -4,7 +4,7 @@ import os
 import math
 from db.insert_data import connect_to_mongo, insert_into_mongo
 
-base_dir = os.path.join(os.path.dirname(__file__), '../data/')
+base_dir = os.path.join(os.path.dirname(__file__), 'data/')
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 # Reading netflix text file
@@ -116,10 +116,10 @@ def process_data(test=False):
     missing_count = 0
     processed_data = []
 
-    netflix_file = read_netflix_txt(os.path.join(base_dir, 'movie_data.txt'), test)
+    netflix_file = read_netflix_txt(os.path.join(base_dir, 'movie_titles.txt'), test)
     num_rows = len(netflix_file)
 
-    netflix_csv = os.path.join(base_dir, 'movie_data.csv')
+    netflix_csv = os.path.join(base_dir, 'movie_titles.csv')
 
     wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(netflix_file, user_agent)
 

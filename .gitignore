@@ -1,3 +1,5 @@
-src/data/movie_data.txt
-src/data/movie_data.csv
+src/data/movie_titles.txt
+src/data/movie_titles.csv
 .env
+data/
+out/
