@@ -2,6 +2,7 @@ import requests
 import csv
 import os
 import math
+from db.insert_data import connect_to_mongo, insert_into_mongo
 
 base_dir = os.path.join(os.path.dirname(__file__), '../data/')
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
@@ -111,6 +112,7 @@ def wiki_query(data_csv, user_agent):
 
 # Calling all functions
 def process_data(test=False):
+    collection = connect_to_mongo()
     missing_count = 0
     processed_data = []
 
@@ -125,7 +127,9 @@ def process_data(test=False):
         netflix_id, year, title = row[0], int(row[1]), row[2]
         if wiki_movie_ids_list[index] == 'NULL':
             missing_count += 1
-        processed_data.append([netflix_id, wiki_movie_ids_list[index], title, year, wiki_genres_list[index], wiki_directors_list[index]])
+        movie = [netflix_id, wiki_movie_ids_list[index], title, year, wiki_genres_list[index], wiki_directors_list[index]]
+        processed_data.append(movie)
+        insert_into_mongo(collection, movie)
 
     create_netflix_csv(netflix_csv, processed_data)
 
