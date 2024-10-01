@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 import requests
+from db.insert_data import insert_into_mongo
 from tqdm import tqdm
 
 from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
