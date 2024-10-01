@@ -292,6 +292,8 @@ def process_data(num_rows=None, output_missing_csv_path=None):
         f"total: {num_rows}\n",
     )
 
+    return processed_data
+
 
 if __name__ == "__main__":
     # Test is true if no argument is passed or if the first argument is not '--prod'.
