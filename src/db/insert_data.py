@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import pymongo
 from pymongo import MongoClient
+from data_processing import wiki_to_netflix
 
 load_dotenv()
 
