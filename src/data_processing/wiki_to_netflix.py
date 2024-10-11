@@ -27,7 +27,7 @@ def create_netflix_csv(csv_name, data_list):
 # Extracting movie info from Wiki data
 def wiki_feature_info(data, key):
     if len(data['results']['bindings']) < 1 or key not in data['results']['bindings'][0]:
-        return 'NULL'
+        return None
     if key == 'genreLabel':
         return list({d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d})
     return data['results']['bindings'][0][key]['value'].split('/')[-1] 
@@ -108,7 +108,7 @@ def wiki_query(data_csv, user_agent):
         wiki_genres.append(wiki_feature_info(data, 'genreLabel'))
         wiki_directors.append(wiki_feature_info(data, 'directorLabel'))
     
-    return(wiki_movie_ids, wiki_genres, wiki_directors)
+    return wiki_movie_ids, wiki_genres, wiki_directors
 
 # Calling all functions
 def process_data(test=False):
@@ -124,8 +124,8 @@ def process_data(test=False):
     wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(netflix_file, user_agent)
 
     for index, row in enumerate(netflix_file):
-        netflix_id, year, title = row[0], int(row[1]), row[2]
-        if wiki_movie_ids_list[index] == 'NULL':
+        netflix_id, year, title = row
+        if wiki_movie_ids_list[index] == None:
             missing_count += 1
         movie = [netflix_id, wiki_movie_ids_list[index], title, year, wiki_genres_list[index], wiki_directors_list[index]]
         processed_data.append(movie)
@@ -133,9 +133,9 @@ def process_data(test=False):
 
     create_netflix_csv(netflix_csv, processed_data)
 
-    print('missing:', missing_count, '(', missing_count / num_rows * 100, '%)')
-    print('found:', num_rows - missing_count, '(', (num_rows - missing_count) / num_rows * 100, '%)')
-    print('total:', num_rows)
+    print(f'missing:  {missing_count} ({missing_count / num_rows * 100}%)')
+    print(f'found: {num_rows - missing_count} ({num_rows - missing_count) / num_rows * 100}%)')
+    print(f'total: {num_rows}')
 
 if __name__ == '__main__':
     process_data(True)

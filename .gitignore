@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 src/data/movie_titles.txt
 src/data/movie_titles.csv
 .env
 data/
 out/
+=======
+data
+out
+.env
+>>>>>>> f06017267f601818d0fa0392f544df18f7526159
