@@ -125,7 +125,7 @@ def process_data(test=False):
 
     for index, row in enumerate(netflix_file):
         netflix_id, year, title = row
-        if wiki_movie_ids_list[index] == None:
+        if wiki_movie_ids_list[index] is None:
             missing_count += 1
         movie = [netflix_id, wiki_movie_ids_list[index], title, year, wiki_genres_list[index], wiki_directors_list[index]]
         processed_data.append(movie)
