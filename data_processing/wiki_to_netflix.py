@@ -88,7 +88,7 @@ def wiki_query(data_csv, user_agent):
     wiki_directors = []
         
     for row in data_csv:
-        if row[1] == "NULL":
+        if row[1] is None:
             continue
 
         SPARQL = format_sparql_query(row[2], int(row[1]))
