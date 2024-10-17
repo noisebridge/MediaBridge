@@ -114,17 +114,17 @@ def process_data(test=False):
     missing_count = 0
     processed_data = []
 
-    netflix_file = read_netflix_txt(os.path.join(data_dir, 'movie_titles.txt'), test)
+    netflix_data = read_netflix_txt(os.path.join(data_dir, 'movie_titles.txt'), test)
 
     netflix_csv = os.path.join(out_dir, 'movie_titles.csv')
 
-    wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(netflix_file, user_agent)
+    wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(netflix_data, user_agent)
 
     num_rows = len(wiki_movie_ids_list)
 
-    netflix_file = read_netflix_txt(os.path.join(data_dir, 'movie_titles.txt'), test)
+    netflix_data = read_netflix_txt(os.path.join(data_dir, 'movie_titles.txt'), test)
 
-    for index, row in enumerate(netflix_file):
+    for index, row in enumerate(netflix_data):
         netflix_id, year, title = row
         if wiki_movie_ids_list[index] is None:
             missing_count += 1
