@@ -122,8 +122,6 @@ def process_data(test=False):
 
     num_rows = len(wiki_movie_ids_list)
 
-    netflix_data = read_netflix_txt(os.path.join(data_dir, 'movie_titles.txt'), test)
-
     for index, row in enumerate(netflix_data):
         netflix_id, year, title = row
         if wiki_movie_ids_list[index] is None:
