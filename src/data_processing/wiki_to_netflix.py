@@ -4,7 +4,6 @@ import os
 
 data_dir = os.path.join(os.path.dirname(__file__), '../../data')
 out_dir = os.path.join(os.path.dirname(__file__), '../../out')
-
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 # Reading netflix text file
@@ -116,11 +115,12 @@ def process_data(test=False):
     processed_data = []
 
     netflix_data = read_netflix_txt(os.path.join(data_dir, 'movie_titles.txt'), test)
-    num_rows = len(netflix_data)
 
     netflix_csv = os.path.join(out_dir, 'movie_titles.csv')
 
     wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(netflix_data, user_agent)
+
+    num_rows = len(wiki_movie_ids_list)
 
     for index, row in enumerate(netflix_data):
         netflix_id, year, title = row
