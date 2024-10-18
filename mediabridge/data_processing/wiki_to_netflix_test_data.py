@@ -1,4 +1,4 @@
-SPARQL_QUERY ='''
+EXPECTED_SPARQL_QUERY ='''
         SELECT * WHERE {
             SERVICE wikibase:mwapi {
                 bd:serviceParam wikibase:api "EntitySearch" ;
