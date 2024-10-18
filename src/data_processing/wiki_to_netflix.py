@@ -1,7 +1,6 @@
 import requests
 import csv
 import os
-import math
 import time
 from tqdm import tqdm
 import sys
@@ -9,13 +8,13 @@ import sys
 class WikidataServiceTimeoutException(Exception):
     pass
 
-base_dir = os.path.join(os.path.dirname(__file__), '../data/')
+data_dir = os.path.join(os.path.dirname(__file__), '../../data')
+out_dir = os.path.join(os.path.dirname(__file__), '../../out')
+
 user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 
 # Reading netflix text file
 def read_netflix_txt(txt_file, test):
-    netflix_list = []
-
     num_rows = None
     if test == True:
         num_rows = 100
@@ -24,9 +23,7 @@ def read_netflix_txt(txt_file, test):
         for i, line in enumerate(netflix_data):
             if num_rows is not None and i >= num_rows:
                 break
-            netflix_list.append(line.rstrip().split(',', 2))
-
-    return netflix_list
+            yield line.rstrip().split(',', 2)
 
 # Writing netflix csv file
 def create_netflix_csv(csv_name, data_list):   
@@ -36,7 +33,7 @@ def create_netflix_csv(csv_name, data_list):
 # Extracting movie info from Wiki data
 def wiki_feature_info(data, key):
     if len(data['results']['bindings']) < 1 or key not in data['results']['bindings'][0]:
-        return 'NULL'
+        return None
     if key == 'genreLabel':
         return list({d['genreLabel']['value'] for d in data['results']['bindings'] if 'genreLabel' in d})
     return data['results']['bindings'][0][key]['value'].split('/')[-1] 
@@ -97,7 +94,7 @@ def wiki_query(data_csv, user_agent):
     wiki_directors = []
         
     for row in tqdm(data_csv):
-        if row[1] == "NULL":
+      if row[1] is None:
             continue
 
         SPARQL = format_sparql_query(row[2], int(row[1]))
@@ -138,24 +135,25 @@ def process_data(test=False):
     missing_count = 0
     processed_data = []
 
-    netflix_file = read_netflix_txt(os.path.join(base_dir, 'movie_titles.txt'), test)
-    num_rows = len(netflix_file)
+    netflix_data = read_netflix_txt(os.path.join(data_dir, 'movie_titles.txt'), test)
+    num_rows = len(netflix_data)
 
-    netflix_csv = os.path.join(base_dir, 'movie_data.csv')
+    netflix_csv = os.path.join(out_dir, 'movie_titles.csv')
 
-    wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(netflix_file, user_agent)
+    wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(netflix_data, user_agent)
 
-    for index, row in enumerate(netflix_file):
+    for index, row in enumerate(netflix_data):
         netflix_id, year, title = row
-        if wiki_movie_ids_list[index] == 'NULL':
+        if wiki_movie_ids_list[index] is None:
             missing_count += 1
-        processed_data.append([netflix_id, wiki_movie_ids_list[index], title, year, wiki_genres_list[index], wiki_directors_list[index]])
+        movie = [netflix_id, wiki_movie_ids_list[index], title, year, wiki_genres_list[index], wiki_directors_list[index]]
+        processed_data.append(movie)
 
     create_netflix_csv(netflix_csv, processed_data)
 
-    print('missing:', missing_count, '(', missing_count / num_rows * 100, '%)')
-    print('found:', num_rows - missing_count, '(', (num_rows - missing_count) / num_rows * 100, '%)')
-    print('total:', num_rows)
+    print(f'missing:  {missing_count} ({missing_count / num_rows * 100}%)')
+    print(f'found: {num_rows - missing_count} ({(num_rows - missing_count) / num_rows * 100}%)')
+    print(f'total: {num_rows}')
 
 if __name__ == '__main__':
     # Test is true if no argument is passed or if the first argument is not '--prod'.
