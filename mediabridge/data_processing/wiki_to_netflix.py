@@ -15,7 +15,6 @@ from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
 class WikidataServiceTimeoutException(Exception):
     pass
 
-
 @dataclass
 class MovieData:
     movie_id: Optional[str]
