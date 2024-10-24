@@ -96,37 +96,37 @@ def wiki_query(data_csv, user_agent):
       if row[1] is None:
             continue
 
-        SPARQL = format_sparql_query(row[2], int(row[1]))
+    SPARQL = format_sparql_query(row[2], int(row[1]))
 
-        tries = 0
-        while True:
-            try:
-                response = requests.post('https://query.wikidata.org/sparql',
-                            headers={'User-Agent': user_agent},
-                            data={
-                            'query': SPARQL,
-                            'format': 'json',
-                            },
-                            timeout=20,
+    tries = 0
+    while True:
+        try:
+            response = requests.post('https://query.wikidata.org/sparql',
+                        headers={'User-Agent': user_agent},
+                        data={
+                        'query': SPARQL,
+                        'format': 'json',
+                        },
+                        timeout=20,
+            )
+            break
+        except requests.exceptions.Timeout:
+            wait_time = 2 ** tries * 5
+            time.sleep(wait_time)
+            tries += 1
+            if tries > 5:
+                raise WikidataServiceTimeoutException(
+                    f'Tried {tries} time, could not reach Wikidata '
+                    f'(movie: {row[2]} {row[1]})'
                 )
-                break
-            except requests.exceptions.Timeout:
-                wait_time = 2 ** tries * 5
-                time.sleep(wait_time)
-                tries += 1
-                if tries > 5:
-                    raise WikidataServiceTimeoutException(
-                        f'Tried {tries} time, could not reach Wikidata '
-                        f'(movie: {row[2]} {row[1]})'
-                    )
-        
-        response.raise_for_status()
-        data = response.json()
-        
-        wiki_movie_ids.append(wiki_feature_info(data, 'item'))
-        wiki_genres.append(wiki_feature_info(data, 'genreLabel'))
-        wiki_directors.append(wiki_feature_info(data, 'directorLabel'))
     
+    response.raise_for_status()
+    data = response.json()
+    
+    wiki_movie_ids.append(wiki_feature_info(data, 'item'))
+    wiki_genres.append(wiki_feature_info(data, 'genreLabel'))
+    wiki_directors.append(wiki_feature_info(data, 'directorLabel'))
+
     return wiki_movie_ids, wiki_genres, wiki_directors
 
 # Calling all functions
