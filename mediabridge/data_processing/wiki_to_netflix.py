@@ -164,7 +164,7 @@ def wiki_query(data_csv, user_agent):
         if year is None:
             continue
           
-      if '"' in row[2]:
+        if '"' in row[2]:
             row[2] = row[2].replace('"','\\"')
 
         SPARQL = format_sparql_query(title, int(year))
