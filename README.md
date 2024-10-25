@@ -6,6 +6,14 @@ MediaBridge is in a _very_ early stage of the development. It's intended functio
 
 Currently, we are only accepting contributions from members of the project who meet in person at Noisebridge.
 
+## Development
+
+This code uses Python 3, probably at least 3.9.
+
+To install the project dependencies, first install pipenv globally with `pip install pipenv`. Then create a virtual env/install dependencies with `pipenv install`.
+
+To run code in the project, prefix your command with `pipenv run`, a la `pipenv run python -m mediabridge.main`.
+
 ## Testing
 
 To run unit tests,
