@@ -8,7 +8,7 @@ Currently, we are only accepting contributions from members of the project who m
 
 ## Development
 
-This code uses Python 3, probably at least 3.9.
+This code uses Python 3. It is tested on Python 3.12, but will probably work on versions back to 3.9.
 
 To install the project dependencies, first install pipenv globally with `pip install pipenv`. Then create a virtual env/install dependencies with `pipenv install`.
 
