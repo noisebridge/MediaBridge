@@ -21,8 +21,12 @@ To run unit tests,
 1. Ensure `pipenv` is installed
 2. Run `pipenv run pytest`
 
+There is a GitHub actions "check" for passing tests, which must pass for you to be able to merge your PR.
+
 ## Code formatting
 
 We use [ruff](https://docs.astral.sh/ruff/) for code formatting, linting, and import sorting. If you've installed the project with the instructions above, you should have access to the `ruff` binary.
 
 The repo comes with a `.vscode` directory that contains a recommended ruff extension, as well as settings to set ruff as your Python formatter and to format code and sort imports on save. If you're not using VSCode, you can run `ruff format` from the project root directory to format all Python code.
+
+There is a GitHub actions "check" for code formatting, which will fail if you have unformatted code in your PR.
