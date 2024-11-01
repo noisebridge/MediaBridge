@@ -218,7 +218,8 @@ def wiki_query(data_csv, user_agent):
 
 def process_data(test=False):
     """
-    If true, only process a subset of the data, for testing
+    Reads movie titles and release years from the Netflix data set (which should be downloaded and placed in the repo),
+    then tries to match them with data from Wikidata. For any matches, a CSV file is written.
     """
     missing_count = 0
     processed_data = []
