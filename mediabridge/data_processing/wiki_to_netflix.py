@@ -79,7 +79,7 @@ def wiki_feature_info(data, key):
     Returns:
         None: If the key is not present or no results are available
         List: If the key is 'genreLabel', returns a list of unique genre labels.
-        String: If they Key is present, return the movie ID of the first binding, in other words the first row in query result
+        String: If the Key is present, return the movie ID of the first binding, in other words the first row in query result
     """
     if (
         len(data["results"]["bindings"]) < 1
