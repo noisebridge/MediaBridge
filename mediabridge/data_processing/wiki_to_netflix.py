@@ -79,8 +79,7 @@ def wiki_feature_info(data, key):
     Returns:
         None: If the key is not present or no results are available
         List: If the key is 'genreLabel', returns a list of unique genre labels.
-        String: If they Key is present, return the movie ID of the firt binding, in other words the first row in query result
-
+        String: If they Key is present, return the movie ID of the first binding, in other words the first row in query result
     """
     if (
         len(data["results"]["bindings"]) < 1
@@ -107,7 +106,7 @@ def format_sparql_query(title, year):
     year (int): release year of the movie
 
     Returns:
-    SPARKLE Query (str): formatted string with movie title and year
+    SPARQL Query (str): formatted string with movie title and year
     """
     QUERY = """
         SELECT * WHERE {
@@ -219,10 +218,7 @@ def wiki_query(data_csv, user_agent):
 
 def process_data(test=False):
     """
-    Calls all functions ...
-
-    Parameters:
-    test (bool): ...
+    If true, only process a subset of the data, for testing
     """
     missing_count = 0
     processed_data = []
@@ -262,7 +258,5 @@ def process_data(test=False):
 
 if __name__ == "__main__":
     # Test is true if no argument is passed or if the first argument is not '--prod'.
-    test = len(sys.argv) < 2 or sys.argv[1] != "--prod"
-    process_data(test=test)
     test = len(sys.argv) < 2 or sys.argv[1] != "--prod"
     process_data(test=test)
