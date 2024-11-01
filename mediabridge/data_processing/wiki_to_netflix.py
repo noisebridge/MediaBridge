@@ -168,10 +168,10 @@ def wiki_query(data_csv, user_agent):
     user_agent (str): used to identify our script when sending requests to Wikidata SPARQL API.
 
     Returns:
-    wiki_movie_ids, wiki_genres, wiki_directores (tuple), where:
+    wiki_movie_ids, wiki_genres, wiki_directors (tuple), where:
         wiki_movie_ids (list): List of movie IDs
         wiki_genres (list): List of genres
-        wiki_directores (list): List of Directors
+        wiki_directors (list): List of Directors
     """
     wiki_movie_ids = []
     wiki_genres = []
