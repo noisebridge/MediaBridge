@@ -178,14 +178,13 @@ def wiki_query(data_csv, user_agent):
                 tries += 1
                 if tries > 5:
                     raise WikidataServiceTimeoutException(
-                        f"Tried {tries} times, could not reach Wikidata "
+                        f"Tried {tries} time, could not reach Wikidata "
                         f"(movie: {row[2]} {row[1]})"
                     )
 
         response.raise_for_status()
         data = response.json()
 
-        # Create WikiMovieData instance and add to the list
         wiki_data_list.append(
             movieData(
                 movie_id=wiki_feature_info(data, "item"),
