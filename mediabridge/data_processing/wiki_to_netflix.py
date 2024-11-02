@@ -16,8 +16,14 @@ out_dir = os.path.join(os.path.dirname(__file__), "../../out")
 user_agent = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
 
 
-# Reading netflix text file
 def read_netflix_txt(txt_file, test):
+    """
+    Reads and processes a Netflix text file.
+
+    Parameters:
+    txt_file (str): Path to the Netflix text file
+    test (Bool): When true, runs the functon in test mode
+    """
     num_rows = None
     if test:
         num_rows = 100
@@ -29,14 +35,52 @@ def read_netflix_txt(txt_file, test):
             yield line.rstrip().split(",", 2)
 
 
-# Writing netflix csv file
 def create_netflix_csv(csv_name, data_list):
+    """
+    Writes data to a Netflix CSV file.
+
+    Parameters:
+    csv_name (str): Name of CSV file to be created
+    data_list (list): Row of data to be written to CSV file
+    """
     with open(csv_name, "w") as netflix_csv:
         csv.writer(netflix_csv).writerows(data_list)
 
 
-# Extracting movie info from Wiki data
 def wiki_feature_info(data, key):
+    """
+    Extracts movie info from Wikidata query results.
+
+    Parameters:
+    data (dict): A dictionary representing the JSON response from a SPARQL query, where:
+        movie-related data is under 'results' -> 'bindings' -> '[key]' -> 'value'.
+        Example:
+        {
+            "results": {
+                "bindings": [
+                    {
+                        "item": {
+                            "type": "uri",
+                            "value": "http://www.wikidata.org/entity/Q12345"
+                        },
+                        "genreLabel": {
+                            "type": "literal",
+                            "value": "Science Fiction"
+                        }
+                    },
+                    {
+                        ...
+                    },
+                ]
+            }
+        }
+    key (str): The key for the information to extract (e.g. 'item', 'genreLabel', 'directorLabel').
+
+    Returns:
+        None: If the key is not present or no results are available
+        List: If the key is 'genreLabel', returns a list of unique genre labels.
+        String: If the Key is present, return the movie ID of the first binding, in other words the first row in query result
+    """
     if (
         len(data["results"]["bindings"]) < 1
         or key not in data["results"]["bindings"][0]
@@ -53,8 +97,17 @@ def wiki_feature_info(data, key):
     return data["results"]["bindings"][0][key]["value"].split("/")[-1]
 
 
-# Formatting SPARQL query for Wiki data
 def format_sparql_query(title, year):
+    """
+    Formats SPARQL query for Wiki data
+
+    Parameters:
+    title (str): name of content to query
+    year (int): release year of the movie
+
+    Returns:
+    SPARQL Query (str): formatted string with movie title and year
+    """
     QUERY = """
         SELECT * WHERE {
             SERVICE wikibase:mwapi {
@@ -103,8 +156,23 @@ def format_sparql_query(title, year):
     return QUERY % {"Title": title, "Year": year}
 
 
-# Getting list of movie IDs, genre IDs, and director IDs from request
 def wiki_query(data_csv, user_agent):
+    """
+    Formats SPARQL query for Wiki data
+
+    Parameters:
+    data_csv (list of lists): A list of rows containing movie data, where:
+        row 1: movie ID (not used in query)
+        row 2: release year
+        row 3: movie title
+    user_agent (str): used to identify our script when sending requests to Wikidata SPARQL API.
+
+    Returns:
+    wiki_movie_ids, wiki_genres, wiki_directors (tuple), where:
+        wiki_movie_ids (list): List of movie IDs
+        wiki_genres (list): List of genres
+        wiki_directors (list): List of Directors
+    """
     wiki_movie_ids = []
     wiki_genres = []
     wiki_directors = []
@@ -148,8 +216,11 @@ def wiki_query(data_csv, user_agent):
     return wiki_movie_ids, wiki_genres, wiki_directors
 
 
-# Calling all functions
 def process_data(test=False):
+    """
+    Reads movie titles and release years from the Netflix data set (which should be downloaded and placed in the repo),
+    then tries to match them with data from Wikidata. For any matches, a CSV file is written.
+    """
     missing_count = 0
     processed_data = []
 
@@ -189,5 +260,4 @@ def process_data(test=False):
 if __name__ == "__main__":
     # Test is true if no argument is passed or if the first argument is not '--prod'.
     test = len(sys.argv) < 2 or sys.argv[1] != "--prod"
-    process_data(test=test)
     process_data(test=test)
