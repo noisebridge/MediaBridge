@@ -24,6 +24,14 @@ pipenv run python -m mediabridge.main
 
 This should be run from the root of the project directory.
 
+### Running from VSCode
+
+If you'd like to run the main script (or any other script) from within VSCode, make sure you've let VSCode know about your pipenv environment. To do that:
+
+1. Open the VSCode command pallet (Control/Command+SHIFT+P)
+1. Start typing "Python select interpreter" and run the command that pops up
+1. Cboose the option that starts with `MediaBridge`.
+
 ## Testing
 
 To run unit tests,
