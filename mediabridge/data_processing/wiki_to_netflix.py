@@ -2,6 +2,7 @@ import csv
 import os
 import sys
 import time
+from dataclasses import dataclass
 
 import requests
 from tqdm import tqdm
@@ -9,6 +10,13 @@ from tqdm import tqdm
 
 class WikidataServiceTimeoutException(Exception):
     pass
+
+
+@dataclass
+class movieData:
+    movie_id: str
+    genre: str
+    director: str
 
 
 data_dir = os.path.join(os.path.dirname(__file__), "../../data")
@@ -49,36 +57,15 @@ def create_netflix_csv(csv_name, data_list):
 
 def wiki_feature_info(data, key):
     """
-    Extracts movie info from Wikidata query results.
+    Extracts movie information from a Wikidata query result.
 
     Parameters:
-    data (dict): A dictionary representing the JSON response from a SPARQL query, where:
-        movie-related data is under 'results' -> 'bindings' -> '[key]' -> 'value'.
-        Example:
-        {
-            "results": {
-                "bindings": [
-                    {
-                        "item": {
-                            "type": "uri",
-                            "value": "http://www.wikidata.org/entity/Q12345"
-                        },
-                        "genreLabel": {
-                            "type": "literal",
-                            "value": "Science Fiction"
-                        }
-                    },
-                    {
-                        ...
-                    },
-                ]
-            }
-        }
-    key (str): The key for the information to extract (e.g. 'item', 'genreLabel', 'directorLabel').
+    data (dict): JSON response from a SPARQL query, see example in get_example_json_sparql_response().
+    key (str): The key for the information to extract (e.g., 'item', 'genreLabel', 'directorLabel').
 
     Returns:
-        None: If the key is not present or no results are available
-        List: If the key is 'genreLabel', returns a list of unique genre labels.
+        None: If the key is not present or no results are available.
+        list: If the key is 'genreLabel', returns a list of unique genre labels.
         String: If the Key is present, return the movie ID of the first binding, in other words the first row in query result
     """
     if (
@@ -161,21 +148,13 @@ def wiki_query(data_csv, user_agent):
     Formats SPARQL query for Wiki data
 
     Parameters:
-    data_csv (list of lists): A list of rows containing movie data, where:
-        row 1: movie ID (not used in query)
-        row 2: release year
-        row 3: movie title
+    data_csv (list of lists): Rows of movie data with [movie ID, release year, title].
     user_agent (str): used to identify our script when sending requests to Wikidata SPARQL API.
 
     Returns:
-    wiki_movie_ids, wiki_genres, wiki_directors (tuple), where:
-        wiki_movie_ids (list): List of movie IDs
-        wiki_genres (list): List of genres
-        wiki_directors (list): List of Directors
+        list of WikiMovieData: A list of movieData instances with movie IDs, genres, and directors.
     """
-    wiki_movie_ids = []
-    wiki_genres = []
-    wiki_directors = []
+    wiki_data_list = []
 
     for row in tqdm(data_csv):
         if row[1] is None:
@@ -189,10 +168,7 @@ def wiki_query(data_csv, user_agent):
                 response = requests.post(
                     "https://query.wikidata.org/sparql",
                     headers={"User-Agent": user_agent},
-                    data={
-                        "query": SPARQL,
-                        "format": "json",
-                    },
+                    data={"query": SPARQL, "format": "json"},
                     timeout=20,
                 )
                 break
@@ -202,18 +178,23 @@ def wiki_query(data_csv, user_agent):
                 tries += 1
                 if tries > 5:
                     raise WikidataServiceTimeoutException(
-                        f"Tried {tries} time, could not reach Wikidata "
+                        f"Tried {tries} times, could not reach Wikidata "
                         f"(movie: {row[2]} {row[1]})"
                     )
 
         response.raise_for_status()
         data = response.json()
 
-        wiki_movie_ids.append(wiki_feature_info(data, "item"))
-        wiki_genres.append(wiki_feature_info(data, "genreLabel"))
-        wiki_directors.append(wiki_feature_info(data, "directorLabel"))
+        # Create WikiMovieData instance and add to the list
+        wiki_data_list.append(
+            movieData(
+                movie_id=wiki_feature_info(data, "item"),
+                genre=wiki_feature_info(data, "genreLabel"),
+                director=wiki_feature_info(data, "directorLabel"),
+            )
+        )
 
-    return wiki_movie_ids, wiki_genres, wiki_directors
+    return wiki_data_list
 
 
 def process_data(test=False):
