@@ -13,7 +13,7 @@ class WikidataServiceTimeoutException(Exception):
 
 
 @dataclass
-class movieData:
+class MovieData:
     movie_id: str
     genre: str
     director: str
