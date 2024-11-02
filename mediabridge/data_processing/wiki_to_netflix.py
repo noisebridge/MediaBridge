@@ -186,7 +186,7 @@ def wiki_query(data_csv, user_agent):
         data = response.json()
 
         wiki_data_list.append(
-            movieData(
+            MovieData(
                 movie_id=wiki_feature_info(data, "item"),
                 genre=wiki_feature_info(data, "genreLabel"),
                 director=wiki_feature_info(data, "directorLabel"),
