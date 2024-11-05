@@ -5,7 +5,7 @@ import time
 from tqdm import tqdm
 import sys
 from db.insert_data import insert_into_mongo
-from constants import *
+from constants import DATA_DIR, OUT_DIR
 
 class WikidataServiceTimeoutException(Exception):
     pass
