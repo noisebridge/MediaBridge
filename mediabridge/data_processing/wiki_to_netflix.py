@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 import sys
 import time
@@ -26,7 +27,7 @@ def read_netflix_txt(txt_file, test):
     """
     num_rows = None
     if test:
-        num_rows = 100
+        num_rows = 10
 
     with open(txt_file, "r", encoding="ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
@@ -182,10 +183,12 @@ def wiki_query(data_csv, user_agent):
             continue
 
         SPARQL = format_sparql_query(row[2], int(row[1]))
+        logging.debug(SPARQL)
 
         tries = 0
         while True:
             try:
+                logging.info("Requesting ' %s ' %s (try %i)", row[2], row[1], tries)
                 response = requests.post(
                     "https://query.wikidata.org/sparql",
                     headers={"User-Agent": user_agent},
