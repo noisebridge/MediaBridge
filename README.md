@@ -12,19 +12,9 @@ This code uses Python 3. It is tested on Python 3.12, but will probably work on 
 
 To install the project dependencies, first install pipenv globally with `pip install pipenv`. Then create a virtual env/install dependencies with `pipenv install --dev`.
 
-To run code in the project, prefix your command with `pipenv run`, a la `pipenv run python -m mediabridge.main`.
+To run code in the project, prefix your command with `pipenv run` (ex. `pipenv run python -m mediabridge.main` runs the main.py script).
 
-## Running main
-
-The "main.py" script is part of the `mediabridge` module. Additionally, running it requires `pipenv run` as mentioned above. So the full command to run the main script (or any other script in the `mediabridge` module) is:
-
-```
-pipenv run python -m mediabridge.main
-```
-
-This should be run from the root of the project directory.
-
-### Running from VSCode
+### Using the pipenv environment in VSCode
 
 To fix import errors and other Intellisense features, make sure you've let VSCode know about your pipenv environment. To do that:
 
@@ -32,12 +22,24 @@ To fix import errors and other Intellisense features, make sure you've let VSCod
 2. Search for and select the "Python: Select Interpreter" command
 3. Choose the option that starts with `MediaBridge`
 
+## Running code
+
+The "main.py" script is part of the `mediabridge` module, and running it requires `pipenv run`, as mentioned above. However, for convenience, you can simply run the dev script: 
+
+```
+pipenv run dev
+```
+
+This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`. 
+
+If you encounter a ModuleNotFoundError, make sure you are in the root directory, as the `mediabridge` directory is the module Pipenv is trying to reference.
+
 ## Testing
 
 To run unit tests,
 
 1. Ensure `pipenv` is installed
-2. Run `pipenv run pytest`
+2. Run `pipenv run test`
 
 There is a GitHub actions "check" for passing tests, which must pass for you to be able to merge your PR.
 
