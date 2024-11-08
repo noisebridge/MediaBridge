@@ -1,4 +1,4 @@
-from data_processing.wiki_to_netflix import * 
+from data_processing.wiki_to_netflix import process_data, insert_into_mongo
 
 q = wiki_to_netflix.format_sparql_query('The Room', 2003)
 print(q)
