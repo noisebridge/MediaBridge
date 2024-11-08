@@ -15,3 +15,6 @@ pytest-cov = "~=5.0"
 
 [requires]
 python_version = "3.12"
+
+[scripts]
+dev = "pipenv run python -m mediabridge.main"
