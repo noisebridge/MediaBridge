@@ -183,7 +183,7 @@ def wiki_query(data_csv, user_agent):
             continue
 
         SPARQL = format_sparql_query(row[2], int(row[1]))
-        logging.debug(SPARQL)
+        # logging.debug(SPARQL)
 
         tries = 0
         while True:
@@ -211,8 +211,14 @@ def wiki_query(data_csv, user_agent):
 
         response.raise_for_status()
         data = response.json()
+        logging.debug(data)
 
-        wiki_movie_ids.append(wiki_feature_info(data, "item"))
+        # consider consolidating this down
+        item = wiki_feature_info(data, "item")
+        if not item:
+            logging.warning("No matching data found for id %s", row[0])
+
+        wiki_movie_ids.append(item)
         wiki_genres.append(wiki_feature_info(data, "genreLabel"))
         wiki_directors.append(wiki_feature_info(data, "directorLabel"))
 
