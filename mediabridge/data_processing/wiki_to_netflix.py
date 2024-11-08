@@ -2,7 +2,8 @@ import csv
 import os
 import sys
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List, Optional
 
 import requests
 from tqdm import tqdm
@@ -14,10 +15,12 @@ class WikidataServiceTimeoutException(Exception):
 
 @dataclass
 class MovieData:
-    movie_id: str
-    genre: str
-    director: str
+    movie_id: Optional[str]
+    genre: List[str]
+    director: Optional[str]
 
+
+# need Genres, Directors, Title, year?
 
 data_dir = os.path.join(os.path.dirname(__file__), "../../data")
 out_dir = os.path.join(os.path.dirname(__file__), "../../out")
@@ -198,41 +201,54 @@ def wiki_query(data_csv, user_agent):
 
 def process_data(test=False):
     """
-    Reads movie titles and release years from the Netflix data set (which should be downloaded and placed in the repo),
-    then tries to match them with data from Wikidata. For any matches, a CSV file is written.
+    Processes Netflix movie data by enriching it with information from Wikidata and writes the results to a CSV file.
+    Netflix data was conveted from a generator to a list to avoid exaustion. was running into an issue where nothing would print to CSV file
     """
     missing_count = 0
     processed_data = []
 
-    netflix_data = read_netflix_txt(os.path.join(data_dir, "movie_titles.txt"), test)
+    netflix_data = list(
+        read_netflix_txt(os.path.join(data_dir, "movie_titles.txt"), test)
+    )
 
     netflix_csv = os.path.join(out_dir, "movie_titles.csv")
 
-    wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(
-        netflix_data, user_agent
-    )
+    enriched_movies = wiki_query(netflix_data, user_agent)
 
-    num_rows = len(wiki_movie_ids_list)
+    num_rows = len(enriched_movies)
 
     for index, row in enumerate(netflix_data):
         netflix_id, year, title = row
-        if wiki_movie_ids_list[index] is None:
+        movie_data = enriched_movies[index]
+        if movie_data.movie_id is None:
             missing_count += 1
+        if movie_data.genre:
+            genres = "; ".join(movie_data.genre)
+        else:
+            genres = ""
+        if movie_data.director:
+            director = movie_data.director
+        else:
+            director = ""
         movie = [
             netflix_id,
-            wiki_movie_ids_list[index],
+            movie_data.movie_id,
             title,
             year,
-            wiki_genres_list[index],
-            wiki_directors_list[index],
+            genres,
+            director,
         ]
         processed_data.append(movie)
 
+    print("Processed Data:")
+    for movie in processed_data:
+        print(movie)
+
     create_netflix_csv(netflix_csv, processed_data)
 
-    print(f"missing:  {missing_count} ({missing_count / num_rows * 100}%)")
+    print(f"missing:  {missing_count} ({missing_count / num_rows * 100:.2f}%)")
     print(
-        f"found: {num_rows - missing_count} ({(num_rows - missing_count) / num_rows * 100}%)"
+        f"found: {num_rows - missing_count} ({(num_rows - missing_count) / num_rows * 100:.2f}%)"
     )
     print(f"total: {num_rows}")
 
