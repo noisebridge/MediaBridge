@@ -18,4 +18,4 @@ python_version = "3.12"
 
 [scripts]
 dev = "pipenv run python -m mediabridge.main"
-tests = "pipenv run pytest"
+test = "pipenv run pytest"
