@@ -6,13 +6,17 @@ name = "pypi"
 [packages]
 python-dotenv = "~=1.0"
 requests = "~=2.26"
-ruff = "~=0.7"
 tqdm = "~=4.66"
 typer = "~=0.12"
 
 [dev-packages]
 pytest = "~=8.3"
 pytest-cov = "~=5.0"
+ruff = "~=0.7"
 
 [requires]
 python_version = "3.12"
+
+[scripts]
+dev = "pipenv run python -m mediabridge.main"
+test = "pipenv run pytest"
