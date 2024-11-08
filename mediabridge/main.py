@@ -13,7 +13,7 @@ def main(verbose: bool = typer.Option(False, "--verbose", "-v"), test: bool = Fa
         # log all messages to file
         logging.basicConfig(
             level=logging.DEBUG,
-            filename="mediabridge.log",
+            filename="out/mediabridge.log",
             filemode="a",
             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
             datefmt="%H:%M:%S",
