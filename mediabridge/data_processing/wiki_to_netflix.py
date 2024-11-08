@@ -2,7 +2,7 @@ import csv
 import os
 import sys
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
 
 import requests
