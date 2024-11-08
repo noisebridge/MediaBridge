@@ -14,6 +14,24 @@ To install the project dependencies, first install pipenv globally with `pip ins
 
 To run code in the project, prefix your command with `pipenv run`, a la `pipenv run python -m mediabridge.main`.
 
+## Running main
+
+The "main.py" script is part of the `mediabridge` module. Additionally, running it requires `pipenv run` as mentioned above. So the full command to run the main script (or any other script in the `mediabridge` module) is:
+
+```
+pipenv run python -m mediabridge.main
+```
+
+This should be run from the root of the project directory.
+
+### Running from VSCode
+
+To fix import errors and other Intellisense features, make sure you've let VSCode know about your pipenv environment. To do that:
+
+1. Open the VSCode command palette (Control/Command+SHIFT+P)
+2. Search for and select the "Python: Select Interpreter" command
+3. Choose the option that starts with `MediaBridge`
+
 ## Testing
 
 To run unit tests,
