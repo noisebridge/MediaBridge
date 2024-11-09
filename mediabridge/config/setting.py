@@ -1,1 +1,1 @@
- # Configuration settings (e.g., MongoDB URI, paths)
+# Configuration settings (e.g., MongoDB URI, paths)
