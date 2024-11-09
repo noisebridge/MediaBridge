@@ -14,7 +14,7 @@ user_agent = 'Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>'
 # Reading netflix text file
 def read_netflix_txt(txt_file, test):
     num_rows = None
-    if test == True:
+    if test:
         num_rows = 100
 
     with open(txt_file, "r", encoding = "ISO-8859-1") as netflix_data:
