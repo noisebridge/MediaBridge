@@ -1,6 +1,7 @@
-from lightfm import LightFM
-from scipy.sparse import coo_matrix
 import numpy as np
+from lightfm import LightFM
+from lightfm.evaluation import auc_score, precision_at_k
+from scipy.sparse import coo_matrix
 
 # Example interaction data
 user_ids = [0, 0, 1, 1, 2]
@@ -21,8 +22,7 @@ scores = model.predict(0, np.arange(3))
 top_items = np.argsort(-scores)
 print("Top recommended items for User 0:", top_items)
 
-# Evaluate model
-from lightfm.evaluation import precision_at_k, auc_score
+
 precision = precision_at_k(model, interaction_matrix, k=5).mean()
 auc = auc_score(model, interaction_matrix).mean()
 

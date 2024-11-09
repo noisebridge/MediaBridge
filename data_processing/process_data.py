@@ -1,7 +1,9 @@
 # This script handles the processing and creation of the interaction matrix
 
-import numpy as np
 import os
+
+import numpy as np
+
 
 def create_interaction_matrix(directory_path, num_users, num_movies, files):
     interaction_matrix = np.zeros((num_users, num_movies), dtype=np.int8)
