@@ -12,7 +12,7 @@ This code uses Python 3. It is tested on Python 3.12, but will probably work on 
 
 To install the project dependencies, first install pipenv globally with `pip install pipenv`. Then create a virtual env/install dependencies with `pipenv install --dev`.
 
-To run code in the project, prefix your command with `pipenv run` (ex. `pipenv run python -m mediabridge.main` runs the main.py script).
+To run code in the pipenv virtual environment, prefix your command with `pipenv run` (ex. `pipenv run dev` runs the development script).
 
 ### Using the pipenv environment in VSCode
 
@@ -24,15 +24,15 @@ To fix import errors and other Intellisense features, make sure you've let VSCod
 
 ## Running code
 
-The "main.py" script is part of the `mediabridge` module, and running it requires `pipenv run`, as mentioned above. However, for convenience, you can simply run the dev script: 
+For development purposes, you can simply run the dev script: 
 
 ```
 pipenv run dev
 ```
 
-This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`. 
+This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`, but this may change in the future, so using `pipenv run dev` will be ensure the correct script is always run.
 
-If you encounter a ModuleNotFoundError, make sure you are in the root directory, as the `mediabridge` directory is the module Pipenv is trying to reference.
+If you encounter a ModuleNotFoundError, make sure you are in the root directory of the project, as the `mediabridge` directory is the module Pipenv is trying to reference.
 
 ## Testing
 
