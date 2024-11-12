@@ -3,6 +3,8 @@ import logging
 import os
 import sys
 import time
+from dataclasses import dataclass
+from typing import List, Optional
 
 import requests
 from tqdm import tqdm
@@ -11,6 +13,15 @@ from tqdm import tqdm
 class WikidataServiceTimeoutException(Exception):
     pass
 
+
+@dataclass
+class MovieData:
+    movie_id: Optional[str]
+    genre: List[str]
+    director: Optional[str]
+
+
+# need Genres, Directors, Title, year?
 
 data_dir = os.path.join(os.path.dirname(__file__), "../../data")
 out_dir = os.path.join(os.path.dirname(__file__), "../../out")
@@ -50,36 +61,15 @@ def create_netflix_csv(csv_name, data_list):
 
 def wiki_feature_info(data, key):
     """
-    Extracts movie info from Wikidata query results.
+    Extracts movie information from a Wikidata query result.
 
     Parameters:
-    data (dict): A dictionary representing the JSON response from a SPARQL query, where:
-        movie-related data is under 'results' -> 'bindings' -> '[key]' -> 'value'.
-        Example:
-        {
-            "results": {
-                "bindings": [
-                    {
-                        "item": {
-                            "type": "uri",
-                            "value": "http://www.wikidata.org/entity/Q12345"
-                        },
-                        "genreLabel": {
-                            "type": "literal",
-                            "value": "Science Fiction"
-                        }
-                    },
-                    {
-                        ...
-                    },
-                ]
-            }
-        }
-    key (str): The key for the information to extract (e.g. 'item', 'genreLabel', 'directorLabel').
+    data (dict): JSON response from a SPARQL query, see example in get_example_json_sparql_response().
+    key (str): The key for the information to extract (e.g., 'item', 'genreLabel', 'directorLabel').
 
     Returns:
-        None: If the key is not present or no results are available
-        List: If the key is 'genreLabel', returns a list of unique genre labels.
+        None: If the key is not present or no results are available.
+        list: If the key is 'genreLabel', returns a list of unique genre labels.
         String: If the Key is present, return the movie ID of the first binding, in other words the first row in query result
     """
     if (
@@ -162,21 +152,13 @@ def wiki_query(data_csv, user_agent):
     Formats SPARQL query for Wiki data
 
     Parameters:
-    data_csv (list of lists): A list of rows containing movie data, where:
-        row 1: movie ID (not used in query)
-        row 2: release year
-        row 3: movie title
+    data_csv (list of lists): Rows of movie data with [movie ID, release year, title].
     user_agent (str): used to identify our script when sending requests to Wikidata SPARQL API.
 
     Returns:
-    wiki_movie_ids, wiki_genres, wiki_directors (tuple), where:
-        wiki_movie_ids (list): List of movie IDs
-        wiki_genres (list): List of genres
-        wiki_directors (list): List of Directors
+        list of WikiMovieData: A list of movieData instances with movie IDs, genres, and directors.
     """
-    wiki_movie_ids = []
-    wiki_genres = []
-    wiki_directors = []
+    wiki_data_list = []
 
     for row in tqdm(data_csv):
         if row[1] is None:
@@ -192,10 +174,7 @@ def wiki_query(data_csv, user_agent):
                 response = requests.post(
                     "https://query.wikidata.org/sparql",
                     headers={"User-Agent": user_agent},
-                    data={
-                        "query": SPARQL,
-                        "format": "json",
-                    },
+                    data={"query": SPARQL, "format": "json"},
                     timeout=20,
                 )
                 break
@@ -213,55 +192,67 @@ def wiki_query(data_csv, user_agent):
         data = response.json()
         logging.debug(data)
 
-        # consider consolidating this down
-        item = wiki_feature_info(data, "item")
-        if not item:
-            logging.warning("No matching data found for id %s", row[0])
+        wiki_data_list.append(
+            MovieData(
+                movie_id=wiki_feature_info(data, "item"),
+                genre=wiki_feature_info(data, "genreLabel"),
+                director=wiki_feature_info(data, "directorLabel"),
+            )
+        )
 
-        wiki_movie_ids.append(item)
-        wiki_genres.append(wiki_feature_info(data, "genreLabel"))
-        wiki_directors.append(wiki_feature_info(data, "directorLabel"))
-
-    return wiki_movie_ids, wiki_genres, wiki_directors
+    return wiki_data_list
 
 
 def process_data(test=False):
     """
-    Reads movie titles and release years from the Netflix data set (which should be downloaded and placed in the repo),
-    then tries to match them with data from Wikidata. For any matches, a CSV file is written.
+    Processes Netflix movie data by enriching it with information from Wikidata and writes the results to a CSV file.
+    Netflix data was conveted from a generator to a list to avoid exaustion. was running into an issue where nothing would print to CSV file
     """
     missing_count = 0
     processed_data = []
 
-    netflix_data = read_netflix_txt(os.path.join(data_dir, "movie_titles.txt"), test)
+    netflix_data = list(
+        read_netflix_txt(os.path.join(data_dir, "movie_titles.txt"), test)
+    )
 
     netflix_csv = os.path.join(out_dir, "movie_titles.csv")
 
-    wiki_movie_ids_list, wiki_genres_list, wiki_directors_list = wiki_query(
-        netflix_data, user_agent
-    )
+    enriched_movies = wiki_query(netflix_data, user_agent)
 
-    num_rows = len(wiki_movie_ids_list)
+    num_rows = len(enriched_movies)
 
     for index, row in enumerate(netflix_data):
         netflix_id, year, title = row
-        if wiki_movie_ids_list[index] is None:
+        movie_data = enriched_movies[index]
+        if movie_data.movie_id is None:
             missing_count += 1
+        if movie_data.genre:
+            genres = "; ".join(movie_data.genre)
+        else:
+            genres = ""
+        if movie_data.director:
+            director = movie_data.director
+        else:
+            director = ""
         movie = [
             netflix_id,
-            wiki_movie_ids_list[index],
+            movie_data.movie_id,
             title,
             year,
-            wiki_genres_list[index],
-            wiki_directors_list[index],
+            genres,
+            director,
         ]
         processed_data.append(movie)
 
+    print("Processed Data:")
+    for movie in processed_data:
+        print(movie)
+
     create_netflix_csv(netflix_csv, processed_data)
 
-    print(f"missing:  {missing_count} ({missing_count / num_rows * 100}%)")
+    print(f"missing:  {missing_count} ({missing_count / num_rows * 100:.2f}%)")
     print(
-        f"found: {num_rows - missing_count} ({(num_rows - missing_count) / num_rows * 100}%)"
+        f"found: {num_rows - missing_count} ({(num_rows - missing_count) / num_rows * 100:.2f}%)"
     )
     print(f"total: {num_rows}")
 
