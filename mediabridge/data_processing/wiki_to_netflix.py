@@ -196,15 +196,19 @@ def wiki_query(data_csv, user_agent):
         log.debug(data)
 
         if not data["results"]["bindings"]:
-            log.warning("Could not find movie id %s (' %s ', %s)", id, title, year)
-
-        wiki_data_list.append(
-            MovieData(
-                movie_id=wiki_feature_info(data, "item"),
-                genre=wiki_feature_info(data, "genreLabel"),
-                director=wiki_feature_info(data, "directorLabel"),
+            wiki_data_list.append(None)
+            log.warning(f"Could not find movie id {id} (' {title} ', {year})")
+        else:
+            wiki_data_list.append(
+                MovieData(
+                    movie_id=wiki_feature_info(data, "item"),
+                    genre=wiki_feature_info(data, "genreLabel"),
+                    director=wiki_feature_info(data, "directorLabel"),
+                )
             )
-        )
+            log.info(
+                f"Found match for {id} (' {title} ', {year}:\n{wiki_data_list[-1]}"
+            )
 
     return wiki_data_list
 
@@ -230,29 +234,39 @@ def process_data(test=False):
     for index, row in enumerate(netflix_data):
         netflix_id, year, title = row
         movie_data = enriched_movies[index]
-        if movie_data.movie_id is None:
+        # print(index, movie_data)
+        if movie_data is None:
             missing_count += 1
-        if movie_data.genre:
-            genres = "; ".join(movie_data.genre)
+            movie = [
+                netflix_id,
+                "null",
+                title,
+                year,
+                "null",
+                "null",
+            ]
         else:
-            genres = ""
-        if movie_data.director:
-            director = movie_data.director
-        else:
-            director = ""
-        movie = [
-            netflix_id,
-            movie_data.movie_id,
-            title,
-            year,
-            genres,
-            director,
-        ]
+            if movie_data.genre:
+                genres = "; ".join(movie_data.genre)
+            else:
+                genres = ""
+            if movie_data.director:
+                director = movie_data.director
+            else:
+                director = ""
+            movie = [
+                netflix_id,
+                movie_data.movie_id,
+                title,
+                year,
+                genres,
+                director,
+            ]
         processed_data.append(movie)
 
-    print("Processed Data:")
-    for movie in processed_data:
-        print(movie)
+    # print("Processed Data:")
+    # for movie in processed_data:
+    #     print(movie)
 
     create_netflix_csv(netflix_csv, processed_data)
 
