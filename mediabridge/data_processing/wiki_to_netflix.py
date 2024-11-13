@@ -21,6 +21,8 @@ class MovieData:
     director: Optional[str]
 
 
+log = logging.getLogger(__name__)
+
 # need Genres, Directors, Title, year?
 
 data_dir = os.path.join(os.path.dirname(__file__), "../../data")
@@ -161,16 +163,17 @@ def wiki_query(data_csv, user_agent):
     wiki_data_list = []
 
     for row in tqdm(data_csv):
-        if row[1] is None:
+        id, year, title = row
+        if year is None:
             continue
 
-        SPARQL = format_sparql_query(row[2], int(row[1]))
+        SPARQL = format_sparql_query(title, int(year))
         # logging.debug(SPARQL)
 
         tries = 0
         while True:
             try:
-                logging.info("Requesting ' %s ' %s (try %i)", row[2], row[1], tries)
+                log.info("Requesting ' %s ' %s (try %i)", title, year, tries)
                 response = requests.post(
                     "https://query.wikidata.org/sparql",
                     headers={"User-Agent": user_agent},
@@ -185,12 +188,15 @@ def wiki_query(data_csv, user_agent):
                 if tries > 5:
                     raise WikidataServiceTimeoutException(
                         f"Tried {tries} time, could not reach Wikidata "
-                        f"(movie: {row[2]} {row[1]})"
+                        f"(movie: {title} {year})"
                     )
 
         response.raise_for_status()
         data = response.json()
-        logging.debug(data)
+        log.debug(data)
+
+        if not data["results"]["bindings"]:
+            log.warning("Could not find movie id %s (' %s ', %s)", id, title, year)
 
         wiki_data_list.append(
             MovieData(
