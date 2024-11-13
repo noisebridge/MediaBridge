@@ -5,8 +5,6 @@ from tqdm.contrib.logging import logging_redirect_tqdm
 
 from mediabridge.data_processing import wiki_to_netflix
 
-LOG = logging.getLogger(__name__)
-
 
 def main(verbose: bool = typer.Option(False, "--verbose", "-v"), test: bool = False):
     if test:
