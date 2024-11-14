@@ -40,7 +40,7 @@ def read_netflix_txt(txt_file, test):
     """
     num_rows = None
     if test:
-        num_rows = 10
+        num_rows = 100
 
     with open(txt_file, "r", encoding="ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
@@ -207,7 +207,7 @@ def wiki_query(data_csv, user_agent):
                 )
             )
             log.info(
-                f"Found match for {id} (' {title} ', {year}:\n{wiki_data_list[-1]}"
+                f"Found movie id {id} (' {title} ', {year}, {wiki_data_list[-1]}) "
             )
 
     return wiki_data_list
