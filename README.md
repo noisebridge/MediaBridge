@@ -34,24 +34,6 @@ This is currently just an alias to run the main script using `pipenv run python 
 
 **NOTE:** *If you encounter a ModuleNotFoundError, make sure you are in the root directory of the project, as the `mediabridge` directory is the module Pipenv is trying to reference.*
 
-## Running main
-
-The "main.py" script is part of the `mediabridge` module. Additionally, running it requires `pipenv run` as mentioned above. So the full command to run the main script (or any other script in the `mediabridge` module) is:
-
-```
-pipenv run python -m mediabridge.main
-```
-
-This should be run from the root of the project directory.
-
-### Running from VSCode
-
-To fix import errors and other Intellisense features, make sure you've let VSCode know about your pipenv environment. To do that:
-
-1. Open the VSCode command palette (Control/Command+SHIFT+P)
-2. Search for and select the "Python: Select Interpreter" command
-3. Choose the option that starts with `MediaBridge`
-
 ## Testing
 
 To run unit tests,
