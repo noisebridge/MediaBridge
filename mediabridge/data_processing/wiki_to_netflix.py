@@ -173,7 +173,7 @@ def wiki_query(data_csv, user_agent):
         tries = 0
         while True:
             try:
-                log.info("Requesting ' %s ' %s (try %i)", title, year, tries)
+                log.info(f"Requesting id {id} (try {tries})")
                 response = requests.post(
                     "https://query.wikidata.org/sparql",
                     headers={"User-Agent": user_agent},
@@ -263,10 +263,6 @@ def process_data(test=False):
                 director,
             ]
         processed_data.append(movie)
-
-    # print("Processed Data:")
-    # for movie in processed_data:
-    #     print(movie)
 
     create_netflix_csv(netflix_csv, processed_data)
 
