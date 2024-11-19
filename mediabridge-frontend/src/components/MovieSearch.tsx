@@ -3,7 +3,11 @@ const MovieSearch = () => {
   const [title, setTitle] = useState("");
   return (
     <div>
-      <input type="text" value={title} onChange={() => setTitle} />
+      <label>
+        <p>Add liked movies: </p>
+        <input type="text" value={title} onChange={() => setTitle} />
+        <button>Add</button>
+      </label>
     </div>
   );
 };
