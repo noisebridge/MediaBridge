@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 const MovieSearch = () => {
   const [title, setTitle] = useState("");
   return (
-    <Card className="flex flex-col items-center">
+    <Card className="flex flex-col items-center mb-4">
       <CardHeader>
         <CardTitle>Mediabridge</CardTitle>
         <CardDescription>Add liked movies</CardDescription>

@@ -9,7 +9,7 @@ import { Movie } from "@/types/Movie";
 
 const MovieItem = ({ movie }: { movie: Movie }) => {
   return (
-    <Card className="max-w-[12vw] flex flex-col items-center">
+    <Card className="max-w-[12vw] flex flex-col items-center mx-2">
       <CardHeader>
         <CardTitle>{movie.title}</CardTitle>
       </CardHeader>
