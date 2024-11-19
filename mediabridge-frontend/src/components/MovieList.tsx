@@ -1,15 +1,11 @@
 import { Movie } from "../types/Movie";
+import MovieItem from "./MovieItem";
 
 const MovieList = ({ movies }: { movies: Movie[] }) => {
   return (
-    <div>
+    <div className="flex justify-center">
       {movies.map((movie) => (
-        <>
-          <div key={movie.id}>
-            <h2>{movie.title}</h2>
-            <img src={movie.image} alt={movie.title} />
-          </div>
-        </>
+        <MovieItem movie={movie} key={movie.id} />
       ))}
     </div>
   );

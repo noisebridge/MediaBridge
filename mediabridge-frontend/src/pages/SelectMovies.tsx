@@ -6,7 +6,6 @@ const SelectMovies = ({ movies }: { movies: Movie[] }) => {
   return (
     <div>
       <MovieSearch />
-      <button>Get Recommendations</button>
       <MovieList movies={movies} />
     </div>
   );

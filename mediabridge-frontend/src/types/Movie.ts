@@ -1,7 +1,7 @@
 export type Movie = {
   id: string;
   title: string;
-  year: string;
+  year: number;
   image: string;
   genre?: string;
   director?: string;
