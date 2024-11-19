@@ -163,6 +163,9 @@ def wiki_query(data_csv, user_agent):
         if row[1] is None:
             continue
 
+        if '"' in row[2]:
+            row[2] = row[2].replace('"', '\\"')
+
         SPARQL = format_sparql_query(row[2], int(row[1]))
 
         tries = 0
