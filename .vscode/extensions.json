@@ -1,6 +1,7 @@
 {
 	"recommendations": [
-		"charliermarsh.ruff"
+		"charliermarsh.ruff",
+		"mechatroner.rainbow-csv"
 	],
 	"unwantedRecommendations": [
 		
