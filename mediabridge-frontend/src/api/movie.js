@@ -21,8 +21,3 @@ export const updateMovie = async (id, movie) => {
   const response = await axios.put(`${API_ENDPOINT}/movies/${id}`, movie);
   return response.data;
 };
-
-export const deleteMovie = async (id) => {
-  const response = await axios.delete(`${API_ENDPOINT}/movies/${id}`);
-  return response.data;
-};
