@@ -11,13 +11,3 @@ export const getMovies = async () => {
   const response = await axios.get(`${API_ENDPOINT}/movies`);
   return response.data;
 };
-
-export const createMovie = async (movie) => {
-  const response = await axios.post(`${API_ENDPOINT}/movies`, movie);
-  return response.data;
-};
-
-export const updateMovie = async (id, movie) => {
-  const response = await axios.put(`${API_ENDPOINT}/movies/${id}`, movie);
-  return response.data;
-};
