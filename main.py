@@ -1,5 +1,4 @@
 # Main entry point to run the recommendation pipeline
-from data_processing.load_data import list_rating_files
 from data_processing.process_data import create_interaction_matrix
 from data_processing.save_data import save_matrix
 
