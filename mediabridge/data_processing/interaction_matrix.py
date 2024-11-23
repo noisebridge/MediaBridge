@@ -2,6 +2,7 @@ import os
 import pickle
 
 import numpy as np
+from scipy.sparse import coo_matrix
 
 
 def list_rating_files(directory_path):
@@ -10,7 +11,7 @@ def list_rating_files(directory_path):
 
 
 def create_interaction_matrix(directory_path, num_users, num_movies, files):
-    interaction_matrix = np.zeros((num_users, num_movies), dtype=np.int8)
+    interaction_matrix = coo_matrix((num_users, num_movies), dtype=np.int8)
     user_mapper = {}
     current_user_index = 0
 
