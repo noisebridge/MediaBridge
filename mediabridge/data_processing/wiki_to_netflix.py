@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 import sys
 import time
@@ -19,6 +20,8 @@ class MovieData:
     genre: List[str]
     director: Optional[str]
 
+
+log = logging.getLogger(__name__)
 
 # need Genres, Directors, Title, year?
 
@@ -160,14 +163,17 @@ def wiki_query(data_csv, user_agent):
     wiki_data_list = []
 
     for row in tqdm(data_csv):
-        if row[1] is None:
+        id, year, title = row
+        if year is None:
             continue
 
-        SPARQL = format_sparql_query(row[2], int(row[1]))
+        SPARQL = format_sparql_query(title, int(year))
+        # logging.debug(SPARQL)
 
         tries = 0
         while True:
             try:
+                log.info(f"Requesting id {id} (try {tries})")
                 response = requests.post(
                     "https://query.wikidata.org/sparql",
                     headers={"User-Agent": user_agent},
@@ -182,19 +188,27 @@ def wiki_query(data_csv, user_agent):
                 if tries > 5:
                     raise WikidataServiceTimeoutException(
                         f"Tried {tries} time, could not reach Wikidata "
-                        f"(movie: {row[2]} {row[1]})"
+                        f"(movie: {title} {year})"
                     )
 
         response.raise_for_status()
         data = response.json()
+        log.debug(data)
 
-        wiki_data_list.append(
-            MovieData(
-                movie_id=wiki_feature_info(data, "item"),
-                genre=wiki_feature_info(data, "genreLabel"),
-                director=wiki_feature_info(data, "directorLabel"),
+        if not data["results"]["bindings"]:
+            wiki_data_list.append(None)
+            log.warning(f"Could not find movie id {id} (' {title} ', {year})")
+        else:
+            wiki_data_list.append(
+                MovieData(
+                    movie_id=wiki_feature_info(data, "item"),
+                    genre=wiki_feature_info(data, "genreLabel"),
+                    director=wiki_feature_info(data, "directorLabel"),
+                )
             )
-        )
+            log.info(
+                f"Found movie id {id} (' {title} ', {year}, {wiki_data_list[-1]}) "
+            )
 
     return wiki_data_list
 
@@ -220,29 +234,35 @@ def process_data(test=False):
     for index, row in enumerate(netflix_data):
         netflix_id, year, title = row
         movie_data = enriched_movies[index]
-        if movie_data.movie_id is None:
+        # print(index, movie_data)
+        if movie_data is None:
             missing_count += 1
-        if movie_data.genre:
-            genres = "; ".join(movie_data.genre)
+            movie = [
+                netflix_id,
+                "null",
+                title,
+                year,
+                "null",
+                "null",
+            ]
         else:
-            genres = ""
-        if movie_data.director:
-            director = movie_data.director
-        else:
-            director = ""
-        movie = [
-            netflix_id,
-            movie_data.movie_id,
-            title,
-            year,
-            genres,
-            director,
-        ]
+            if movie_data.genre:
+                genres = "; ".join(movie_data.genre)
+            else:
+                genres = ""
+            if movie_data.director:
+                director = movie_data.director
+            else:
+                director = ""
+            movie = [
+                netflix_id,
+                movie_data.movie_id,
+                title,
+                year,
+                genres,
+                director,
+            ]
         processed_data.append(movie)
-
-    print("Processed Data:")
-    for movie in processed_data:
-        print(movie)
 
     create_netflix_csv(netflix_csv, processed_data)
 
