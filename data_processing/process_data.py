@@ -3,10 +3,14 @@
 import os
 
 import numpy as np
+from scipy.sparse import coo_matrix
+
+from data_processing.load_data import list_rating_files
 
 
-def create_interaction_matrix(directory_path, num_users, num_movies, files):
-    interaction_matrix = np.zeros((num_users, num_movies), dtype=np.int8)
+def create_interaction_matrix(directory_path, num_users, num_movies):
+    files = list_rating_files(directory_path)
+    interaction_matrix = coo_matrix((num_users, num_movies), dtype=np.int8)
     user_mapper = {}
     current_user_index = 0
 

@@ -7,11 +7,11 @@ from data_processing.save_data import save_matrix
 # from db.movie_storage import insert_movie_data
 
 # Configurations
-data_directory = './data/'
-movie_titles_file = f'{data_directory}movie_titles.txt'
-output_file = f'{data_directory}interaction_matrix.pkl'
-mongo_uri = 'mongodb://localhost:27017/'
-db_name = 'movie_recommendation'
+data_directory = "./data/"
+movie_titles_file = f"{data_directory}movie_titles.txt"
+output_file = f"{data_directory}interaction_matrix.pkl"
+mongo_uri = "mongodb://localhost:27017/"
+db_name = "movie_recommendation"
 
 # Number of users and movies
 num_users = 480189  # Example: Replace with actual value
@@ -21,7 +21,7 @@ num_movies = 17770  # Example: Replace with actual value
 movie_data = list_rating_files(movie_titles_file)
 
 # Step 2: Process Data
-interaction_matrix = create_interaction_matrix(data_directory, num_users, num_movies, movie_data)
+interaction_matrix = create_interaction_matrix(data_directory, num_users, num_movies)
 
 # Step 3: Save Data
 save_matrix(interaction_matrix, output_file)
