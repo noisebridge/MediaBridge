@@ -18,7 +18,7 @@ num_users = 480189  # Example: Replace with actual value
 num_movies = 17770  # Example: Replace with actual value
 
 # Step 1: Load Data
-movie_data = list_rating_files(movie_titles_file)
+# movie_data = list_rating_files(movie_titles_file)
 
 # Step 2: Process Data
 interaction_matrix = create_interaction_matrix(data_directory, num_users, num_movies)
