@@ -1,5 +1,6 @@
 import logging
 import os
+import traceback
 from datetime import datetime
 
 import typer as typer
@@ -27,7 +28,11 @@ def main(
             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
             datefmt="%H:%M:%S",
         )
-        wiki_to_netflix.process_data(test)
+        try:
+            wiki_to_netflix.process_data(test)
+        except Exception:
+            # include fatal exceptions with traceback in log
+            logging.exception("Uncaught exception")
         return
 
     if verbose:
