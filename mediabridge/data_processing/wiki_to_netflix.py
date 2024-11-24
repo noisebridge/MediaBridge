@@ -40,7 +40,7 @@ def read_netflix_txt(txt_file, test):
     """
     num_rows = None
     if test:
-        num_rows = 100
+        num_rows = 50
 
     with open(txt_file, "r", encoding="ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
