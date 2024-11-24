@@ -5,8 +5,8 @@ from scipy import sparse
 
 
 class RecommendationEngine:
-    def __init__(self, data, model_file):
-        self.data = data
+    def __init__(self, movie_ids, model_file):
+        self.movie_ids = movie_ids
         with open(model_file, "rb") as f:
             self.model = pickle.load(f)
 
@@ -18,13 +18,13 @@ class RecommendationEngine:
 
     def get_recommendations(self, user_id, user_interactions):
         scores = self.model.predict(
-            user_ids=0,
-            item_ids=self.data,
+            user_ids=user_id,
+            item_ids=self.movie_ids,
             user_features=user_interactions,
         )
         return np.argsort(-scores)
 
-    def get_data(self, user_id):
+    def get_data(self):
         print("Enter liked movies: ")
         return input().split(",")
 
@@ -40,8 +40,8 @@ class RecommendationEngine:
         data = [1] * len(liked_movies_ids)
         return sparse.coo_matrix((data, (rows, cols)))
 
-    def recommend(self, user_id=1):
-        liked_movies = self.get_data(user_id)
+    def recommend(self, user_id=0):
+        liked_movies = self.get_data()
         liked_movies_ids = self.titles_to_ids(liked_movies)
         user_interactions = self.create_user_matrix(liked_movies_ids)
 
