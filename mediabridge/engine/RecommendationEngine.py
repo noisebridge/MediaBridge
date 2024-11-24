@@ -35,10 +35,10 @@ class RecommendationEngine:
             print(title)
 
     def create_user_matrix(self, liked_movies_ids):
-        user_interactions = sparse.csr_matrix((1, self.num_items), dtype=np.float32)
-        for movie_id in liked_movies_ids:
-            user_interactions[0, movie_id] = 1
-        return user_interactions
+        rows = [0] * len(liked_movies_ids)
+        cols = liked_movies_ids
+        data = [1] * len(liked_movies_ids)
+        return sparse.coo_matrix((data, (rows, cols)))
 
     def recommend(self, user_id=1):
         liked_movies = self.get_data(user_id)
