@@ -27,23 +27,23 @@ def main(
             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
             datefmt="%H:%M:%S",
         )
-        try:
-            wiki_to_netflix.process_data(test)
-        except Exception:
-            # include fatal exceptions with traceback in log
-            logging.exception("Uncaught exception")
-        return
-
-    if verbose:
-        level = logging.INFO
     else:
-        level = logging.WARNING
-    logging.basicConfig(level=level, format="[%(levelname)s] %(message)s")
+        if verbose:
+            level = logging.INFO
+        else:
+            level = logging.WARNING
+        logging.basicConfig(level=level, format="[%(levelname)s] %(message)s")
 
     # Redirect logging to tqdm.write function to avoid colliding with
     # progress bar formatting
     with logging_redirect_tqdm():
-        wiki_to_netflix.process_data(test)
+        try:
+            wiki_to_netflix.process_data(test)
+        except Exception as e:
+            # include fatal exceptions with traceback in log
+            if log:
+                logging.exception("Uncaught exception")
+            raise e
 
 
 if __name__ == "__main__":
