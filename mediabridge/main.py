@@ -11,6 +11,11 @@ def main(
     log: bool = False,
     test: bool = False,
 ):
+    # create output directory if it doesn't exist
+    if not os.path.exists("./out"):
+        logging.warning(" /out directory does not exist, creating...")
+        os.mkdir("./out")
+
     if log:
         # log all messages to file
         logging.basicConfig(
