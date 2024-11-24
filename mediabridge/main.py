@@ -1,6 +1,5 @@
 import logging
 import os
-import traceback
 from datetime import datetime
 
 import typer as typer
