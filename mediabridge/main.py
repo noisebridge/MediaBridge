@@ -29,12 +29,15 @@ def main(
         return
 
     if verbose:
-        logging.basicConfig(level=logging.INFO)
+        level = logging.INFO
+    else:
+        level = logging.WARNING
+    logging.basicConfig(level=level, format="[%(levelname)s] %(message)s")
 
     # Redirect logging to tqdm.write function to avoid colliding with
     # progress bar formatting
     with logging_redirect_tqdm():
-        wiki_to_netflix.process_data(True)
+        wiki_to_netflix.process_data(test)
 
 
 if __name__ == "__main__":
