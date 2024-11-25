@@ -40,7 +40,7 @@ def read_netflix_txt(txt_file, test):
     """
     num_rows = None
     if test:
-        num_rows = 100
+        num_rows = 50
 
     with open(txt_file, "r", encoding="ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
@@ -266,11 +266,11 @@ def process_data(test=False):
 
     create_netflix_csv(netflix_csv, processed_data)
 
-    print(f"missing:  {missing_count} ({missing_count / num_rows * 100:.2f}%)")
     print(
-        f"found: {num_rows - missing_count} ({(num_rows - missing_count) / num_rows * 100:.2f}%)"
+        f"missing: {missing_count} ({missing_count / num_rows * 100:.2f}%)\n"
+        f"found: {num_rows - missing_count} ({(num_rows - missing_count) / num_rows * 100:.2f}%)\n"
+        f"total: {num_rows}\n",
     )
-    print(f"total: {num_rows}")
 
 
 if __name__ == "__main__":
