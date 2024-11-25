@@ -1,4 +1,5 @@
 import logging
+from contextlib import nullcontext
 from datetime import datetime
 
 import typer as typer
@@ -11,7 +12,7 @@ from mediabridge.definitions import OUTPUT_DIR
 def main(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
     log: bool = False,
-    test: bool = False,
+    full: bool = False,
 ):
     # create output directory if it doesn't exist
     if not OUTPUT_DIR.exists():
@@ -38,11 +39,11 @@ def main(
             level = logging.WARNING
         logging.basicConfig(level=level, format="[%(levelname)s] %(message)s")
 
-    # Redirect logging to tqdm.write function to avoid colliding with
-    # progress bar formatting
-    with logging_redirect_tqdm():
+    # If writing to stdout (log is false), redirect logging to tqdm.write
+    # function to avoid colliding with progress bar formatting
+    with logging_redirect_tqdm() if not log else nullcontext():
         try:
-            wiki_to_netflix.process_data(test)
+            wiki_to_netflix.process_data(not full)
         except Exception as e:
             # include fatal exceptions with traceback in log
             if log:
