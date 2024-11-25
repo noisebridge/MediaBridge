@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from time import sleep
 
 import typer as typer
 from tqdm.contrib.logging import logging_redirect_tqdm
