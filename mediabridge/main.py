@@ -1,11 +1,12 @@
 import logging
-import os
 from datetime import datetime
+from time import sleep
 
 import typer as typer
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from mediabridge.data_processing import wiki_to_netflix
+from mediabridge.definitions import OUTPUT_DIR
 
 
 def main(
@@ -14,15 +15,19 @@ def main(
     test: bool = False,
 ):
     # create output directory if it doesn't exist
-    if not os.path.exists("./out"):
-        logging.warning(" /out directory does not exist, creating...")
-        os.mkdir("./out")
+    if not OUTPUT_DIR.exists():
+        print(
+            f"[WARNING] Output directory does not exist, creating new directory at {OUTPUT_DIR}"
+        )
+        OUTPUT_DIR.mkdir()
 
     if log:
         # log all messages to file
         logging.basicConfig(
             level=logging.DEBUG,
-            filename=f"out/mb_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
+            filename=OUTPUT_DIR.joinpath(
+                f"mb_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+            ),
             filemode="w",
             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
             datefmt="%H:%M:%S",
