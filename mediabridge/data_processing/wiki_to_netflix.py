@@ -196,7 +196,7 @@ def wiki_query(data_csv, user_agent):
 
         if not data["results"]["bindings"]:
             wiki_data_list.append(None)
-            log.warning(f"Could not find movie id {id} (' {title} ', {year})")
+            log.warning(f"Could not find movie id {id} ('{title}', {year})")
         else:
             wiki_data_list.append(
                 MovieData(
@@ -205,9 +205,7 @@ def wiki_query(data_csv, user_agent):
                     director=wiki_feature_info(data, "directorLabel"),
                 )
             )
-            log.info(
-                f"Found movie id {id} (' {title} ', {year}, {wiki_data_list[-1]}) "
-            )
+            log.info(f"Found movie id {id} ('{title}', {year}, {wiki_data_list[-1]}) ")
 
     return wiki_data_list
 
