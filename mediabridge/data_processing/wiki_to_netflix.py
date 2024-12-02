@@ -1,6 +1,5 @@
 import csv
 import logging
-import os
 import sys
 import time
 from dataclasses import dataclass
@@ -8,6 +7,8 @@ from typing import List, Optional
 
 import requests
 from tqdm import tqdm
+
+from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
 
 
 class WikidataServiceTimeoutException(Exception):
@@ -25,8 +26,6 @@ log = logging.getLogger(__name__)
 
 # need Genres, Directors, Title, year?
 
-data_dir = os.path.join(os.path.dirname(__file__), "../../data")
-out_dir = os.path.join(os.path.dirname(__file__), "../../out")
 user_agent = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
 
 DEFAULT_TEST_ROWS = 100
@@ -224,9 +223,9 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     processed_data = []
     missing = []
 
-    netflix_data = list(
-        read_netflix_txt(os.path.join(data_dir, "movie_titles.txt"), num_rows=num_rows)
-    )
+    netflix_data = list(read_netflix_txt(DATA_DIR.joinpath("movie_titles.txt"), test))
+
+    netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
 
     enriched_movies = wiki_query(netflix_data, user_agent)
 
