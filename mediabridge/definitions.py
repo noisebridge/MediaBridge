@@ -7,6 +7,7 @@ if __package__ != "mediabridge":
 
 MODULE_DIR = Path(__file__).absolute().parent
 PROJECT_DIR = MODULE_DIR.parent
+DATA_DIR = PROJECT_DIR.joinpath("data")
 OUTPUT_DIR = PROJECT_DIR.joinpath("out")
 
 if __name__ == "__main__":
