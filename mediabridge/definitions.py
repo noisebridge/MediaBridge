@@ -13,4 +13,5 @@ OUTPUT_DIR = PROJECT_DIR.joinpath("out")
 if __name__ == "__main__":
     print(MODULE_DIR)
     print(PROJECT_DIR)
+    print(DATA_DIR)
     print(OUTPUT_DIR)
