@@ -12,7 +12,7 @@ ratings = [5, 4, 5, 4, 5]  # Only 4s and 5s for this example
 interaction_matrix = coo_matrix((ratings, (user_ids, movie_ids)), shape=(3, 3))
 
 # Initialize LightFM model with WARP loss
-model = LightFM(loss='warp')
+model = LightFM(loss="warp")
 
 # Train the model
 model.fit(interaction_matrix, epochs=30, num_threads=2)

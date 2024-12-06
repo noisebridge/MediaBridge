@@ -60,7 +60,9 @@ def main():
     num_movies = 17770
 
     # Process Data
-    interaction_matrix = create_interaction_matrix(data_directory, num_users, num_movies)
+    interaction_matrix = create_interaction_matrix(
+        data_directory, num_users, num_movies
+    )
 
     # Save Data
     save_matrix(interaction_matrix, output_file)
