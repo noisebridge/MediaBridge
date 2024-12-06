@@ -216,6 +216,9 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     """
     Processes Netflix movie data by enriching it with information from Wikidata and writes the results to a CSV file.
     Netflix data was conveted from a generator to a list to avoid exaustion. was running into an issue where nothing would print to CSV file
+
+    num_rows (int): Number of rows to process. If None, all rows are processed.
+    output_missing_csv_path (str): If provided, movies that could not be matched will be written to a CSV at this path.
     """
     missing_count = 0
     processed_data = []
