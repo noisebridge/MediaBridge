@@ -1,4 +1,5 @@
 import logging
+import os
 from contextlib import nullcontext
 from datetime import datetime
 
@@ -17,7 +18,25 @@ def main(
         False, "--log", "-l", help="Enable all logging message levels and log to file."
     ),
     full: bool = typer.Option(
-        False, "--full", "-f", help="Run processing on full dataset."
+        False,
+        "--full",
+        "-f",
+        help="Run processing on full dataset. Overrides --num_rows.",
+    ),
+    num_rows: int = typer.Option(
+        100,
+        "--num_rows",
+        "-n",
+        help="Number of rows to process. If --full is True, all rows are processed",
+    ),
+    missing_out_path: str = typer.Option(
+        None,
+        "--missing_out_path",
+        "-m",
+        help=(
+            f"If provided, movies that could not be matched will be written to a "
+            f"CSV at this path, relative to the {os.path.abspath(OUTPUT_DIR)} directory."
+        ),
     ),
 ):
     if not OUTPUT_DIR.exists():
@@ -48,8 +67,11 @@ def main(
     # But when logging to file, we use nullcontext or tqdm will redirect logs
     # back to stdout.
     with logging_redirect_tqdm() if not log else nullcontext():
+        num_rows = None if full else num_rows
         try:
-            wiki_to_netflix.process_data(not full)
+            wiki_to_netflix.process_data(
+                num_rows, output_missing_csv_path=missing_out_path
+            )
         except Exception as e:
             # include fatal exceptions with traceback in logs
             if log:
