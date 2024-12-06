@@ -51,7 +51,6 @@ def main():
 
     # Configurations
     data_directory = os.path.join(os.path.dirname(__file__), "../../data/")
-    ratings_directory = os.path.join(data_directory, "training_set/")
     output_directory = os.path.join(data_directory, "../output/")
     output_file = os.path.join(output_directory, "interaction_matrix.pkl")
 
