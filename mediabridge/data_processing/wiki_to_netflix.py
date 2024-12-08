@@ -29,19 +29,17 @@ data_dir = os.path.join(os.path.dirname(__file__), "../../data")
 out_dir = os.path.join(os.path.dirname(__file__), "../../out")
 user_agent = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
 
+DEFAULT_TEST_ROWS = 100
 
-def read_netflix_txt(txt_file, test):
+
+def read_netflix_txt(txt_file, num_rows=None):
     """
     Reads and processes a Netflix text file.
 
     Parameters:
     txt_file (str): Path to the Netflix text file
-    test (Bool): When true, runs the functon in test mode
+    num_rows (int): Number of rows to read from the file, defaults to all
     """
-    num_rows = None
-    if test:
-        num_rows = 50
-
     with open(txt_file, "r", encoding="ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
             if num_rows is not None and i >= num_rows:
@@ -49,7 +47,7 @@ def read_netflix_txt(txt_file, test):
             yield line.rstrip().split(",", 2)
 
 
-def create_netflix_csv(csv_name, data_list):
+def create_netflix_csv(csv_path, data_list):
     """
     Writes data to a Netflix CSV file.
 
@@ -57,7 +55,7 @@ def create_netflix_csv(csv_name, data_list):
     csv_name (str): Name of CSV file to be created
     data_list (list): Row of data to be written to CSV file
     """
-    with open(csv_name, "w") as netflix_csv:
+    with open(csv_path, "w") as netflix_csv:
         csv.writer(netflix_csv).writerows(data_list)
 
 
@@ -101,6 +99,7 @@ def format_sparql_query(title, year):
     Returns:
     SPARQL Query (str): formatted string with movie title and year
     """
+
     QUERY = """
         SELECT * WHERE {
             SERVICE wikibase:mwapi {
@@ -197,7 +196,7 @@ def wiki_query(data_csv, user_agent):
 
         if not data["results"]["bindings"]:
             wiki_data_list.append(None)
-            log.warning(f"Could not find movie id {id} (' {title} ', {year})")
+            log.warning(f"Could not find movie id {id} ({repr(title)}, {repr(year)})")
         else:
             wiki_data_list.append(
                 MovieData(
@@ -213,19 +212,21 @@ def wiki_query(data_csv, user_agent):
     return wiki_data_list
 
 
-def process_data(test=False):
+def process_data(num_rows=None, output_missing_csv_path=None):
     """
     Processes Netflix movie data by enriching it with information from Wikidata and writes the results to a CSV file.
     Netflix data was conveted from a generator to a list to avoid exaustion. was running into an issue where nothing would print to CSV file
+
+    num_rows (int): Number of rows to process. If None, all rows are processed.
+    output_missing_csv_path (str): If provided, movies that could not be matched will be written to a CSV at this path.
     """
     missing_count = 0
     processed_data = []
+    missing = []
 
     netflix_data = list(
-        read_netflix_txt(os.path.join(data_dir, "movie_titles.txt"), test)
+        read_netflix_txt(os.path.join(data_dir, "movie_titles.txt"), num_rows=num_rows)
     )
-
-    netflix_csv = os.path.join(out_dir, "movie_titles.csv")
 
     enriched_movies = wiki_query(netflix_data, user_agent)
 
@@ -234,7 +235,7 @@ def process_data(test=False):
     for index, row in enumerate(netflix_data):
         netflix_id, year, title = row
         movie_data = enriched_movies[index]
-        # print(index, movie_data)
+
         if movie_data is None:
             missing_count += 1
             movie = [
@@ -245,6 +246,7 @@ def process_data(test=False):
                 "null",
                 "null",
             ]
+            missing.append(movie)
         else:
             if movie_data.genre:
                 genres = "; ".join(movie_data.genre)
@@ -264,7 +266,11 @@ def process_data(test=False):
             ]
         processed_data.append(movie)
 
+    netflix_csv = os.path.join(out_dir, "movie_titles.csv")
     create_netflix_csv(netflix_csv, processed_data)
+    if output_missing_csv_path:
+        missing_csv = os.path.join(out_dir, output_missing_csv_path)
+        create_netflix_csv(missing_csv, missing)
 
     print(
         f"missing: {missing_count} ({missing_count / num_rows * 100:.2f}%)\n"
@@ -276,4 +282,6 @@ def process_data(test=False):
 if __name__ == "__main__":
     # Test is true if no argument is passed or if the first argument is not '--prod'.
     test = len(sys.argv) < 2 or sys.argv[1] != "--prod"
-    process_data(test=test)
+    process_data(
+        num_rows=DEFAULT_TEST_ROWS if test else None,
+    )
