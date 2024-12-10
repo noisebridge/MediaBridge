@@ -26,8 +26,7 @@ log = logging.getLogger(__name__)
 
 # need Genres, Directors, Title, year?
 
-user_agent = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
-
+USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
 DEFAULT_TEST_ROWS = 100
 
 
@@ -229,7 +228,7 @@ def process_data(num_rows=None, output_missing_csv_path=None):
 
     netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
 
-    enriched_movies = wiki_query(netflix_data, user_agent)
+    enriched_movies = wiki_query(netflix_data, USER_AGENT)
 
     num_rows = len(enriched_movies)
 
