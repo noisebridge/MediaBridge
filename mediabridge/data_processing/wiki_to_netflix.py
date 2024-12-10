@@ -223,7 +223,9 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     processed_data = []
     missing = []
 
-    netflix_data = list(read_netflix_txt(DATA_DIR.joinpath("movie_titles.txt"), test))
+    netflix_data = list(
+        read_netflix_txt(DATA_DIR.joinpath("movie_titles.txt"), num_rows)
+    )
 
     netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
 
