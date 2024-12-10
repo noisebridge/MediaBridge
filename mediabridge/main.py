@@ -34,7 +34,7 @@ def main(
         "-m",
         help=(
             f"If provided, movies that could not be matched will be written to a "
-            f"CSV at this path, relative to the {OUTPUT_DIR.absolute} directory."
+            f"CSV at this path, relative to the {OUTPUT_DIR} directory."
         ),
     ),
 ):
