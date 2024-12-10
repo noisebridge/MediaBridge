@@ -265,10 +265,10 @@ def process_data(num_rows=None, output_missing_csv_path=None):
             ]
         processed_data.append(movie)
 
-    netflix_csv = os.path.join(out_dir, "movie_titles.csv")
+    netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
     create_netflix_csv(netflix_csv, processed_data)
     if output_missing_csv_path:
-        missing_csv = os.path.join(out_dir, output_missing_csv_path)
+        missing_csv = OUTPUT_DIR.joinpath(output_missing_csv_path)
         create_netflix_csv(missing_csv, missing)
 
     print(
