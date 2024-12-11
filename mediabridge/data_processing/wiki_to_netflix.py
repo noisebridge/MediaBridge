@@ -218,13 +218,26 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     num_rows (int): Number of rows to process. If None, all rows are processed.
     output_missing_csv_path (str): If provided, movies that could not be matched will be written to a CSV at this path.
     """
+
+    if not DATA_DIR.exists():
+        raise FileNotFoundError(
+            f"Data directory does not exist at {DATA_DIR}, please create a new directory containing the netflix prize dataset files\n"
+            "https://archive.org/details/nf_prize_dataset.tar"
+        )
+
+    movie_data_path = DATA_DIR.joinpath("movie_titles.txt")
+
+    if not movie_data_path.exists():
+        raise FileNotFoundError(
+            f"{movie_data_path} not found, please download the netflix prize dataset and extract it into the data folder\n"
+            "https://archive.org/details/nf_prize_dataset.tar"
+        )
+
     missing_count = 0
     processed_data = []
     missing = []
 
-    netflix_data = list(
-        read_netflix_txt(DATA_DIR.joinpath("movie_titles.txt"), num_rows)
-    )
+    netflix_data = list(read_netflix_txt(movie_data_path, num_rows))
 
     netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
 
