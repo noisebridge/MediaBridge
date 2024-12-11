@@ -1,6 +1,5 @@
 import csv
 import logging
-import os
 import sys
 import time
 from dataclasses import dataclass
@@ -8,6 +7,8 @@ from typing import List, Optional
 
 import requests
 from tqdm import tqdm
+
+from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
 
 
 class WikidataServiceTimeoutException(Exception):
@@ -25,10 +26,7 @@ log = logging.getLogger(__name__)
 
 # need Genres, Directors, Title, year?
 
-data_dir = os.path.join(os.path.dirname(__file__), "../../data")
-out_dir = os.path.join(os.path.dirname(__file__), "../../out")
-user_agent = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
-
+USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
 DEFAULT_TEST_ROWS = 100
 
 
@@ -220,15 +218,30 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     num_rows (int): Number of rows to process. If None, all rows are processed.
     output_missing_csv_path (str): If provided, movies that could not be matched will be written to a CSV at this path.
     """
+
+    if not DATA_DIR.exists():
+        raise FileNotFoundError(
+            f"Data directory does not exist at {DATA_DIR}, please create a new directory containing the netflix prize dataset files\n"
+            "https://archive.org/details/nf_prize_dataset.tar"
+        )
+
+    movie_data_path = DATA_DIR.joinpath("movie_titles.txt")
+
+    if not movie_data_path.exists():
+        raise FileNotFoundError(
+            f"{movie_data_path} not found, please download the netflix prize dataset and extract it into the data folder\n"
+            "https://archive.org/details/nf_prize_dataset.tar"
+        )
+
     missing_count = 0
     processed_data = []
     missing = []
 
-    netflix_data = list(
-        read_netflix_txt(os.path.join(data_dir, "movie_titles.txt"), num_rows=num_rows)
-    )
+    netflix_data = list(read_netflix_txt(movie_data_path, num_rows))
 
-    enriched_movies = wiki_query(netflix_data, user_agent)
+    netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
+
+    enriched_movies = wiki_query(netflix_data, USER_AGENT)
 
     num_rows = len(enriched_movies)
 
@@ -266,10 +279,10 @@ def process_data(num_rows=None, output_missing_csv_path=None):
             ]
         processed_data.append(movie)
 
-    netflix_csv = os.path.join(out_dir, "movie_titles.csv")
+    netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
     create_netflix_csv(netflix_csv, processed_data)
     if output_missing_csv_path:
-        missing_csv = os.path.join(out_dir, output_missing_csv_path)
+        missing_csv = OUTPUT_DIR.joinpath(output_missing_csv_path)
         create_netflix_csv(missing_csv, missing)
 
     print(

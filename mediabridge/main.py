@@ -1,5 +1,4 @@
 import logging
-import os
 from contextlib import nullcontext
 from datetime import datetime
 
@@ -35,7 +34,7 @@ def main(
         "-m",
         help=(
             f"If provided, movies that could not be matched will be written to a "
-            f"CSV at this path, relative to the {os.path.abspath(OUTPUT_DIR)} directory."
+            f"CSV at this path, relative to the {OUTPUT_DIR} directory."
         ),
     ),
 ):
