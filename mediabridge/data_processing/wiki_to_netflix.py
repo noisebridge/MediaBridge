@@ -164,12 +164,6 @@ def wiki_query(data_csv, user_agent):
         id, year, title = row
         if year is None:
             continue
-<<<<<<< HEAD
-=======
-
-        if '"' in row[2]:
-            row[2] = row[2].replace('"', '\\"')
->>>>>>> 2870ce2 (Indent in the usual way)
 
         if '"' in row[2]:
             row[2] = row[2].replace('"', '\\"')
