@@ -1,14 +1,19 @@
 import csv
 import logging
-import sys
 import time
+from contextlib import nullcontext
 from dataclasses import dataclass
 from typing import List, Optional
 
 import requests
+import typer
 from tqdm import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
+
+USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
+DEFAULT_TEST_ROWS = 100
 
 
 class WikidataServiceTimeoutException(Exception):
@@ -22,12 +27,8 @@ class MovieData:
     director: Optional[str]
 
 
+app = typer.Typer()
 log = logging.getLogger(__name__)
-
-# need Genres, Directors, Title, year?
-
-USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
-DEFAULT_TEST_ROWS = 100
 
 
 def read_netflix_txt(txt_file, num_rows=None):
@@ -292,9 +293,48 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     )
 
 
+@app.command()
+def process(
+    ctx: typer.Context,
+    full: bool = typer.Option(
+        False,
+        "--full",
+        "-f",
+        help="Run processing on full dataset. Overrides --num_rows.",
+    ),
+    num_rows: int = typer.Option(
+        DEFAULT_TEST_ROWS,
+        "--num_rows",
+        "-n",
+        help="Number of rows to process. If --full is True, all rows are processed",
+    ),
+    missing_out_path: str = typer.Option(
+        None,
+        "--missing_out_path",
+        "-m",
+        help=(
+            f"If provided, movies that could not be matched will be written to a "
+            f"CSV at this path, relative to the {OUTPUT_DIR} directory."
+        ),
+    ),
+):
+    """Enrich Netflix data with Wikidata matches."""
+    log.debug(ctx.obj)
+    print(f"Processing {num_rows} rows...")
+    # We redirect logs to stdout through tqdm to avoid breaking progress bar.
+    # But when logging to file, we use nullcontext or tqdm will redirect logs
+    # back to stdout.
+    with nullcontext() if ctx.obj and ctx.obj.log else logging_redirect_tqdm():
+        num_rows = None if full else num_rows
+        try:
+            process_data(num_rows, output_missing_csv_path=missing_out_path)
+
+        except Exception as e:
+            # include fatal exceptions with traceback in logs
+            if log:
+                logging.exception("Uncaught exception")
+            raise e
+
+
 if __name__ == "__main__":
-    # Test is true if no argument is passed or if the first argument is not '--prod'.
-    test = len(sys.argv) < 2 or sys.argv[1] != "--prod"
-    process_data(
-        num_rows=DEFAULT_TEST_ROWS if test else None,
-    )
+    app()
