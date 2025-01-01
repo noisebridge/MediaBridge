@@ -313,8 +313,8 @@ def process(
         "--missing_out_path",
         "-m",
         help=(
-            f"If provided, movies that could not be matched will be written to a "
-            f"CSV at this path, relative to the {OUTPUT_DIR} directory."
+            "If provided, movies that could not be matched will be written to a "
+            "CSV at this path, relative to the output directory."
         ),
     ),
 ):
