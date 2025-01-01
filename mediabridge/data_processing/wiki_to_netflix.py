@@ -328,10 +328,9 @@ def process(
         num_rows = None if full else num_rows
         try:
             process_data(num_rows, output_missing_csv_path=missing_out_path)
-
         except Exception as e:
             # include fatal exceptions with traceback in logs
-            if log:
+            if ctx.obj and ctx.obj.log:
                 logging.exception("Uncaught exception")
             raise e
 
