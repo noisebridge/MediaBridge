@@ -232,9 +232,6 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     missing = []
 
     netflix_data = read_netflix_txt(movie_data_path, num_rows)
-
-    netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
-
     for row in netflix_data:
         id, year, title = row
         netflix_data = MovieData(int(id), title, int(year))
@@ -247,8 +244,8 @@ def process_data(num_rows=None, output_missing_csv_path=None):
             if output_missing_csv_path:
                 missing.append(netflix_data)
 
-    netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
-    create_netflix_csv(netflix_csv, processed_data)
+    output_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
+    create_netflix_csv(output_csv, processed_data)
     if output_missing_csv_path:
         missing_csv = OUTPUT_DIR.joinpath(output_missing_csv_path)
         create_netflix_csv(missing_csv, missing)
