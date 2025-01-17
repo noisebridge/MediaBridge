@@ -1,5 +1,13 @@
+import csv
+import dataclasses
+import logging
+
 from typer import Typer
 
+from mediabridge.dataclasses import EnrichedMovieData
+from mediabridge.definitions import OUTPUT_DIR
+
+log = logging.getLogger(__name__)
 app = Typer()
 
 
@@ -8,16 +16,20 @@ def load():
     """
     Load a csv of movie data into the mongo database.
     """
-    pass
+    with open(OUTPUT_DIR / "matches.csv", "r") as f:
+        reader = csv.reader(f)
 
-    # db = connect_to_mongo()
-    # collection = db["movies"]
-    # operations = []
-    # with open("movies.csv", "r") as f:
-    #     r = csv.reader(f)
-    #     header = next(r)
+        header = next(reader)
+        if header != [f.name for f in dataclasses.fields(EnrichedMovieData)]:
+            raise ValueError(
+                "Header does not match expected dataclass fields (EnrichedMovieData), "
+                f"expected {dataclasses.fields(EnrichedMovieData)}, got {header}"
+            )
 
-    #     # operations.append(UpdateOne)
+        for row in reader:
+            movie = EnrichedMovieData(*row)
+            log.info(f"Inserting {movie} into MongoDB")
+            # TODO: Needs implementation, bulk inserts for performance
 
 
 if __name__ == "__main__":
