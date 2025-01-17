@@ -1,15 +1,14 @@
 import csv
+import dataclasses
 import logging
 import time
 from contextlib import nullcontext
-from dataclasses import dataclass
-from typing import List, Optional
 
 import requests
 import typer
-from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
+from mediabridge.dataclasses import EnrichedMovieData, MovieData
 from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
 
 USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
@@ -18,13 +17,6 @@ DEFAULT_TEST_ROWS = 100
 
 class WikidataServiceTimeoutException(Exception):
     pass
-
-
-@dataclass
-class MovieData:
-    movie_id: Optional[str]
-    genre: List[str]
-    director: Optional[str]
 
 
 app = typer.Typer()
@@ -46,16 +38,24 @@ def read_netflix_txt(txt_file, num_rows=None):
             yield line.rstrip().split(",", 2)
 
 
-def create_netflix_csv(csv_path, data_list):
+def create_netflix_csv(csv_path, data_list: list[MovieData]):
     """
-    Writes data to a Netflix CSV file.
+    Writes list of MovieData objects to a CSV file, either enriched or plain.
 
     Parameters:
     csv_name (str): Name of CSV file to be created
-    data_list (list): Row of data to be written to CSV file
+    data_list (list): List of data to be written to CSV file
     """
     with open(csv_path, "w") as netflix_csv:
-        csv.writer(netflix_csv).writerows(data_list)
+        if data_list:
+            # Write header based on type of first item in data_list
+            csv.writer(netflix_csv).writerow(
+                (f.name for f in dataclasses.fields(data_list[0]))
+            )
+            # Write data
+            csv.writer(netflix_csv).writerows(
+                (movie.flatten_values() for movie in data_list)
+            )
 
 
 def wiki_feature_info(data, key):
@@ -147,68 +147,61 @@ def format_sparql_query(title, year):
     return QUERY % {"Title": title, "Year": year}
 
 
-def wiki_query(data_csv, user_agent):
+def wiki_query(movie: MovieData, user_agent: str) -> EnrichedMovieData | None:
     """
-    Formats SPARQL query for Wiki data
+    Queries Wikidata for information about a movie.
 
     Parameters:
-    data_csv (list of lists): Rows of movie data with [movie ID, release year, title].
-    user_agent (str): used to identify our script when sending requests to Wikidata SPARQL API.
+    movie (MovieData): A MovieData object to use in the sparql query.
+    user_agent (str): Used to identify our script when sending requests to Wikidata SPARQL API.
 
     Returns:
-        list of WikiMovieData: A list of movieData instances with movie IDs, genres, and directors.
+    EnrichedMovieData: An EnrichedMovieData object containing information about the movie.
     """
-    wiki_data_list = []
+    SPARQL = format_sparql_query(movie.title, movie.year)
+    # logging.debug(SPARQL)
 
-    for row in tqdm(data_csv):
-        id, year, title = row
-        if year is None:
-            continue
-
-        SPARQL = format_sparql_query(title, int(year))
-        # logging.debug(SPARQL)
-
-        tries = 0
-        while True:
-            try:
-                log.info(f"Requesting id {id} (try {tries})")
-                response = requests.post(
-                    "https://query.wikidata.org/sparql",
-                    headers={"User-Agent": user_agent},
-                    data={"query": SPARQL, "format": "json"},
-                    timeout=20,
-                )
-                break
-            except requests.exceptions.Timeout:
-                wait_time = 2**tries * 5
-                time.sleep(wait_time)
-                tries += 1
-                if tries > 5:
-                    raise WikidataServiceTimeoutException(
-                        f"Tried {tries} time, could not reach Wikidata "
-                        f"(movie: {title} {year})"
-                    )
-
-        response.raise_for_status()
-        data = response.json()
-        log.debug(data)
-
-        if not data["results"]["bindings"]:
-            wiki_data_list.append(None)
-            log.warning(f"Could not find movie id {id} ({repr(title)}, {repr(year)})")
-        else:
-            wiki_data_list.append(
-                MovieData(
-                    movie_id=wiki_feature_info(data, "item"),
-                    genre=wiki_feature_info(data, "genreLabel"),
-                    director=wiki_feature_info(data, "directorLabel"),
-                )
+    tries = 0
+    while True:
+        try:
+            log.info(f"Requesting id {movie.netflix_id} (try {tries})")
+            response = requests.post(
+                "https://query.wikidata.org/sparql",
+                headers={"User-Agent": user_agent},
+                data={"query": SPARQL, "format": "json"},
+                timeout=20,
             )
-            log.info(
-                f"Found movie id {id} (' {title} ', {year}, {wiki_data_list[-1]}) "
-            )
+            break
+        except requests.exceptions.Timeout:
+            wait_time = 2**tries * 5
+            time.sleep(wait_time)
+            tries += 1
+            if tries > 5:
+                raise WikidataServiceTimeoutException(
+                    f"Tried {tries} time, could not reach Wikidata "
+                    f"(movie: {movie.title} {movie.year})"
+                )
 
-    return wiki_data_list
+    response.raise_for_status()
+    data = response.json()
+    log.debug(data)
+
+    if not data["results"]["bindings"]:
+        log.warning(
+            f"Could not find movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
+        )
+    else:
+        log.info(
+            f"Found movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
+        )
+        return EnrichedMovieData(
+            **movie.__dict__,
+            wikidata_id=wiki_feature_info(data, "item"),
+            genres=wiki_feature_info(data, "genreLabel"),
+            director=wiki_feature_info(data, "directorLabel"),
+        )
+
+    return None
 
 
 def process_data(num_rows=None, output_missing_csv_path=None):
@@ -238,47 +231,21 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     processed_data = []
     missing = []
 
-    netflix_data = list(read_netflix_txt(movie_data_path, num_rows))
+    netflix_data = read_netflix_txt(movie_data_path, num_rows)
 
     netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
 
-    enriched_movies = wiki_query(netflix_data, USER_AGENT)
-
-    num_rows = len(enriched_movies)
-
-    for index, row in enumerate(netflix_data):
-        netflix_id, year, title = row
-        movie_data = enriched_movies[index]
-
-        if movie_data is None:
-            missing_count += 1
-            movie = [
-                netflix_id,
-                "null",
-                title,
-                year,
-                "null",
-                "null",
-            ]
-            missing.append(movie)
+    for row in netflix_data:
+        id, year, title = row
+        netflix_data = MovieData(int(id), title, int(year))
+        if wiki_data := wiki_query(netflix_data, USER_AGENT):
+            # wiki_query finds match, add to processed data
+            processed_data.append(wiki_data)
         else:
-            if movie_data.genre:
-                genres = "; ".join(movie_data.genre)
-            else:
-                genres = ""
-            if movie_data.director:
-                director = movie_data.director
-            else:
-                director = ""
-            movie = [
-                netflix_id,
-                movie_data.movie_id,
-                title,
-                year,
-                genres,
-                director,
-            ]
-        processed_data.append(movie)
+            # Otherwise, is missing a match
+            missing_count += 1
+            if output_missing_csv_path:
+                missing.append(netflix_data)
 
     netflix_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
     create_netflix_csv(netflix_csv, processed_data)

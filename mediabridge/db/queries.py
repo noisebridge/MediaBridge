@@ -5,9 +5,9 @@ def insert_into_mongo(movie):
     db = connect_to_mongo()
     collection = db["movies"]
     collection.update_one(
-        {"wikidata_id": movie[1]},
+        {"_id": movie[1]},
         {
-            "set": {
+            "$set": {
                 "netflix_id": movie[0],
                 "wikidata_id": movie[1],
                 "title": movie[2],
@@ -18,3 +18,9 @@ def insert_into_mongo(movie):
         },
         upsert=True,
     )
+
+
+def bulk_insert(operations):
+    db = connect_to_mongo()
+    collection = db["movies"]
+    collection.bulk_write(operations)
