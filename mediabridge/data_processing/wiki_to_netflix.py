@@ -6,6 +6,7 @@ from contextlib import nullcontext
 
 import requests
 import typer
+from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from mediabridge.dataclasses import EnrichedMovieData, MovieData
@@ -231,8 +232,10 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     processed_data = []
     missing = []
 
+    print(f"Processing {num_rows or 'all'} rows...")
+
     netflix_data = read_netflix_txt(movie_data_path, num_rows)
-    for row in netflix_data:
+    for row in tqdm(netflix_data, total=num_rows):
         id, year, title = row
         netflix_data = MovieData(int(id), title, int(year))
         if wiki_data := wiki_query(netflix_data, USER_AGENT):
@@ -284,7 +287,6 @@ def process(
 ):
     """Enrich Netflix data with Wikidata matches."""
     log.debug(ctx.obj)
-    print(f"Processing {num_rows} rows...")
     # We redirect logs to stdout through tqdm to avoid breaking progress bar.
     # But when logging to file, we use nullcontext or tqdm will redirect logs
     # back to stdout.
