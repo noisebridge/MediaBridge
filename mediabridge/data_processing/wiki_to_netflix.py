@@ -297,7 +297,7 @@ def process(
         except Exception as e:
             # include fatal exceptions with traceback in logs
             if ctx.obj and ctx.obj.log:
-                logging.exception("Uncaught exception")
+                logging.exception("Uncaught exception", exc_info=True)
             raise e
 
 
