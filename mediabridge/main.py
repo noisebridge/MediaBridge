@@ -15,7 +15,7 @@ app.add_typer(load.app)
 
 @dataclass
 class AppContext:
-    log: bool = False
+    log_to_file: bool = False
 
 
 @app.callback()
@@ -51,7 +51,7 @@ def main(
         else:
             level = logging.WARNING
         logging.basicConfig(level=level, format="[%(levelname)s] %(message)s")
-    ctx.obj = AppContext(log=log)
+    ctx.obj = AppContext(log_to_file=log)
 
 
 if __name__ == "__main__":

@@ -290,7 +290,7 @@ def process(
     # We redirect logs to stdout through tqdm to avoid breaking progress bar.
     # But when logging to file, we use nullcontext or tqdm will redirect logs
     # back to stdout.
-    with nullcontext() if ctx.obj and ctx.obj.log else logging_redirect_tqdm():
+    with nullcontext() if ctx.obj and ctx.obj.log_to_file else logging_redirect_tqdm():
         num_rows = None if full else num_rows
         try:
             process_data(num_rows, output_missing_csv_path=missing_out_path)
