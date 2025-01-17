@@ -14,7 +14,7 @@ class MovieData:
         """Format all dataclass fields into a 1-d list of strings by joining
         lists with semicolons"""
         return [
-            "; ".join(val) if type(val) is list else str(val)
+            ";".join(val) if isinstance(val, list) else str(val)
             for val in self.__dict__.values()
         ]
 
