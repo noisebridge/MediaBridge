@@ -5,10 +5,12 @@ from datetime import datetime
 import typer as typer
 
 from mediabridge.data_processing import wiki_to_netflix
+from mediabridge.db import load
 from mediabridge.definitions import OUTPUT_DIR
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 app.add_typer(wiki_to_netflix.app)
+app.add_typer(load.app)
 
 
 @dataclass
