@@ -244,7 +244,7 @@ def process_data(num_rows=None, output_missing_csv_path=None):
             if output_missing_csv_path:
                 missing.append(netflix_data)
 
-    output_csv = OUTPUT_DIR.joinpath("movie_titles.csv")
+    output_csv = OUTPUT_DIR.joinpath("matches.csv")
     create_netflix_csv(output_csv, processed_data)
     if output_missing_csv_path:
         missing_csv = OUTPUT_DIR.joinpath(output_missing_csv_path)
