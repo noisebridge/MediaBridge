@@ -11,8 +11,8 @@ import typer
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from mediabridge.schemas import EnrichedMovieData, MovieData
 from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
+from mediabridge.schemas import EnrichedMovieData, MovieData
 
 USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
 DEFAULT_TEST_ROWS = 100
@@ -207,7 +207,7 @@ def wiki_query(
             f"Found movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
         )
         return EnrichedMovieData(
-            **movie.__dict__,
+            **vars(movie),
             wikidata_id=wiki_feature_info(data, "item"),
             genres=wiki_feature_info(data, "genreLabel"),
             director=wiki_feature_info(data, "directorLabel"),

@@ -15,7 +15,7 @@ class MovieData:
         lists with semicolons"""
         return {
             k: (";".join(v) if isinstance(v, list) else str(v))
-            for (k, v) in self.__dict__.items()
+            for (k, v) in vars(self).items()
         }
 
 
