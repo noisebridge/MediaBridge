@@ -155,7 +155,9 @@ def format_sparql_query(title: str, year: int) -> str:
     return QUERY % {"Title": title, "Year": year}
 
 
-def wiki_query(movie: MovieData, user_agent: str) -> EnrichedMovieData | None:
+def wiki_query(
+    movie: MovieData, user_agent: str = USER_AGENT
+) -> EnrichedMovieData | None:
     """
     Queries Wikidata for information about a movie.
 
@@ -260,7 +262,7 @@ def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
         id, year, title = row
 
         netflix_data = MovieData(int(id), title, int(year))
-        if wiki_data := wiki_query(netflix_data, USER_AGENT):
+        if wiki_data := wiki_query(netflix_data):
             # wiki_query finds match, add to processed data
             processed_data.append(wiki_data)
         else:
