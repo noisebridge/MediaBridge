@@ -293,13 +293,13 @@ def process(
     ),
     num_rows: int = typer.Option(
         DEFAULT_TEST_ROWS,
-        "--num_rows",
+        "--num-rows",
         "-n",
         help="Number of rows to process. If --full is True, all rows are processed",
     ),
     missing_out_path: str = typer.Option(
         None,
-        "--missing_out_path",
+        "--missing-out-path",
         "-m",
         help=(
             "If provided, movies that could not be matched will be written to a "
