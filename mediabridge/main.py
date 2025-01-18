@@ -38,9 +38,7 @@ def main(
         # log all messages to new file
         logging.basicConfig(
             level=logging.DEBUG,
-            filename=OUTPUT_DIR.joinpath(
-                f"mb_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-            ),
+            filename=OUTPUT_DIR / f"mb_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
             filemode="x",
             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
             datefmt="%H:%M:%S",

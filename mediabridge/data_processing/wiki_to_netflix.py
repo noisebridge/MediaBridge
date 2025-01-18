@@ -242,7 +242,7 @@ def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
             "https://archive.org/details/nf_prize_dataset.tar"
         )
 
-    movie_data_path = DATA_DIR.joinpath("movie_titles.txt")
+    movie_data_path = DATA_DIR / "movie_titles.txt"
 
     if not movie_data_path.exists():
         raise FileNotFoundError(
@@ -270,10 +270,10 @@ def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
             if output_missing_csv_path:
                 missing.append(netflix_data)
 
-    output_csv = OUTPUT_DIR.joinpath("matches.csv")
+    output_csv = OUTPUT_DIR / "matches.csv"
     create_netflix_csv(output_csv, processed_data)
     if output_missing_csv_path:
-        missing_csv = OUTPUT_DIR.joinpath(output_missing_csv_path)
+        missing_csv = OUTPUT_DIR / output_missing_csv_path
         create_netflix_csv(missing_csv, missing)
 
     print(
