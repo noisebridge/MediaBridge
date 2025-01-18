@@ -11,12 +11,12 @@ class MovieData:
     year: int
 
     def flatten_values(self):
-        """Format all dataclass fields into a 1-d list of strings by joining
+        """Format all dataclass fields into a mapping of strings by joining
         lists with semicolons"""
-        return [
-            ";".join(val) if isinstance(val, list) else str(val)
-            for val in self.__dict__.values()
-        ]
+        return {
+            k: (";".join(v) if isinstance(v, list) else str(v))
+            for (k, v) in self.__dict__.items()
+        }
 
 
 @dataclass(order=True)

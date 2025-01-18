@@ -58,16 +58,15 @@ def create_netflix_csv(csv_path: Path, data_list: list[MovieData]):
 
         data_list (list[MovieData]): List of MovieData objects to be written.
     """
-    with open(csv_path, "w") as netflix_csv:
+    with open(csv_path, "w") as csv_file:
         if data_list:
             # Write header based on type of first item in data_list
-            csv.writer(netflix_csv).writerow(
-                (f.name for f in dataclasses.fields(data_list[0]))
+            writer = csv.DictWriter(
+                csv_file,
+                fieldnames=(f.name for f in dataclasses.fields(data_list[0])),
             )
-            # Write data
-            csv.writer(netflix_csv).writerows(
-                (movie.flatten_values() for movie in data_list)
-            )
+            writer.writeheader()
+            writer.writerows((movie.flatten_values() for movie in data_list))
 
 
 def wiki_feature_info(data: dict, key: str) -> str | list | None:
