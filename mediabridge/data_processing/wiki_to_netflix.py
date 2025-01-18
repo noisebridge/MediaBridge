@@ -202,11 +202,7 @@ def wiki_query(
     data = response.json()
     log.debug(data)
 
-    if not data["results"]["bindings"]:
-        log.warning(
-            f"Could not find movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
-        )
-    else:
+    if data["results"]["bindings"]:
         log.info(
             f"Found movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
         )
@@ -217,7 +213,9 @@ def wiki_query(
             director=wiki_feature_info(data, "directorLabel"),
         )
 
-    return None
+    log.warning(
+        f"Could not find movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
+    )
 
 
 def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
