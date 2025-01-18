@@ -3,6 +3,8 @@ import dataclasses
 import logging
 import time
 from contextlib import nullcontext
+from pathlib import Path
+from typing import Iterator
 
 import requests
 import typer
@@ -24,13 +26,20 @@ app = typer.Typer()
 log = logging.getLogger(__name__)
 
 
-def read_netflix_txt(txt_file, num_rows=None):
+def read_netflix_txt(
+    txt_file: Path, num_rows: int | None = None
+) -> Iterator[list[str]]:
     """
-    Reads and processes a Netflix text file.
+    Reads rows from the Netflix dataset file.
 
     Parameters:
-    txt_file (str): Path to the Netflix text file
-    num_rows (int): Number of rows to read from the file, defaults to all
+        txt_file (Path): Path to the Netflix text file.
+
+        num_rows (int | None): Number of rows to read from the file, if None,
+        all rows are read.
+
+    Yields:
+        List of strings representing the values of the next row in the file.
     """
     with open(txt_file, "r", encoding="ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
@@ -39,13 +48,15 @@ def read_netflix_txt(txt_file, num_rows=None):
             yield line.rstrip().split(",", 2)
 
 
-def create_netflix_csv(csv_path, data_list: list[MovieData]):
+def create_netflix_csv(csv_path: Path, data_list: list[MovieData]):
     """
-    Writes list of MovieData objects to a CSV file, either enriched or plain.
+    Writes list of MovieData objects to a CSV file, either with enriched or
+    plain/missing data.
 
     Parameters:
-    csv_name (str): Name of CSV file to be created
-    data_list (list): List of data to be written to CSV file
+        csv_name (Path): Path to CSV file to be written to.
+
+        data_list (list[MovieData]): List of MovieData objects to be written.
     """
     with open(csv_path, "w") as netflix_csv:
         if data_list:
@@ -59,18 +70,22 @@ def create_netflix_csv(csv_path, data_list: list[MovieData]):
             )
 
 
-def wiki_feature_info(data, key):
+def wiki_feature_info(data: dict, key: str) -> str | list | None:
     """
     Extracts movie information from a Wikidata query result.
 
     Parameters:
-    data (dict): JSON response from a SPARQL query, see example in get_example_json_sparql_response().
-    key (str): The key for the information to extract (e.g., 'item', 'genreLabel', 'directorLabel').
+        data (dict): JSON response from a SPARQL query, see example in
+        get_example_json_sparql_response().
+
+        key (str): The key for the information to extract (e.g., 'item',
+        'genreLabel', 'directorLabel').
 
     Returns:
-        None: If the key is not present or no results are available.
-        list: If the key is 'genreLabel', returns a list of unique genre labels.
-        String: If the Key is present, return the movie ID of the first binding, in other words the first row in query result
+        The formatted movie information, or None if the key is not present or no
+        results are available. If the Key is present, return a list of unique
+        genre labels if the key is 'genreLabel', otherwise return the movie ID
+        of the first binding (in other words, the first row in query result).
     """
     if (
         len(data["results"]["bindings"]) < 1
@@ -88,16 +103,9 @@ def wiki_feature_info(data, key):
     return data["results"]["bindings"][0][key]["value"].split("/")[-1]
 
 
-def format_sparql_query(title, year):
+def format_sparql_query(title: str, year: int) -> str:
     """
-    Formats SPARQL query for Wiki data
-
-    Parameters:
-    title (str): name of content to query
-    year (int): release year of the movie
-
-    Returns:
-    SPARQL Query (str): formatted string with movie title and year
+    Formats a SPARQL query for Wiki data using the given title and year.
     """
 
     QUERY = """
@@ -153,11 +161,17 @@ def wiki_query(movie: MovieData, user_agent: str) -> EnrichedMovieData | None:
     Queries Wikidata for information about a movie.
 
     Parameters:
-    movie (MovieData): A MovieData object to use in the sparql query.
-    user_agent (str): Used to identify our script when sending requests to Wikidata SPARQL API.
+        movie (MovieData): A MovieData object to use in the sparql query.
+
+        user_agent (str): Used to identify our script when sending requests to
+        Wikidata SPARQL API.
 
     Returns:
-    EnrichedMovieData: An EnrichedMovieData object containing information about the movie.
+        An EnrichedMovieData object containing information about the movie, or
+        None if no results are found.
+
+    Raises:
+        WikidataServiceTimeoutException: If the Wikidata service times out.
     """
     SPARQL = format_sparql_query(movie.title, movie.year)
     # logging.debug(SPARQL)
@@ -205,13 +219,21 @@ def wiki_query(movie: MovieData, user_agent: str) -> EnrichedMovieData | None:
     return None
 
 
-def process_data(num_rows=None, output_missing_csv_path=None):
+def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
     """
-    Processes Netflix movie data by enriching it with information from Wikidata and writes the results to a CSV file.
-    Netflix data was conveted from a generator to a list to avoid exaustion. was running into an issue where nothing would print to CSV file
+    Processes Netflix movie data by enriching it with information from Wikidata
+    and writes the results to a CSV file.
 
-    num_rows (int): Number of rows to process. If None, all rows are processed.
-    output_missing_csv_path (str): If provided, movies that could not be matched will be written to a CSV at this path.
+    Parameters:
+        num_rows (int): Number of rows to process. If None, all rows are
+        processed.
+
+        output_missing_csv_path (Path): If provided, movies that could not be
+        matched will be written to a CSV at this path.
+
+    Raises:
+        FileNotFoundError: If the data directory or the movie data file does not
+        exist.
     """
 
     if not DATA_DIR.exists():
@@ -237,6 +259,7 @@ def process_data(num_rows=None, output_missing_csv_path=None):
     netflix_data = read_netflix_txt(movie_data_path, num_rows)
     for row in tqdm(netflix_data, total=num_rows):
         id, year, title = row
+
         netflix_data = MovieData(int(id), title, int(year))
         if wiki_data := wiki_query(netflix_data, USER_AGENT):
             # wiki_query finds match, add to processed data
@@ -285,7 +308,7 @@ def process(
         ),
     ),
 ):
-    """Enrich Netflix data with Wikidata matches."""
+    """Enrich Netflix data with Wikidata matches and write matches to CSV."""
     log.debug(ctx.obj)
     log_to_file = ctx.obj and ctx.obj.log_to_file
     # We redirect logs to stdout through tqdm to avoid breaking progress bar.
