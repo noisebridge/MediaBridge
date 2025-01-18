@@ -25,7 +25,11 @@ def clean_data_folder(data_dir):
     print(f"All contents of the 'data' folder have been deleted.")
 
 
-if __name__ == "__main__":
-    data_dir = os.path.join(os.path.dirname(__file__), "../data")
+def main():
+    data_dir = os.path.join(os.path.dirname(__file__), "../../data")
 
     clean_data_folder(data_dir)
+
+
+if __name__ == "__main__":
+    main()

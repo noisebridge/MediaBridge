@@ -7,8 +7,8 @@ name = "pypi"
 python-dotenv = "~=1.0"
 ruff = "~=0.7"
 tqdm = "~=4.66"
-requests = "*"
-wget = "*"
+requests = "~=2.32"
+wget = "~=3.2"
 
 [dev-packages]
 pytest = "~=8.3"
@@ -18,5 +18,5 @@ pytest-cov = "~=5.0"
 python_version = "3.12"
 
 [scripts]
-    download_data = "python download_data.py"
-    delete_data = "python clean_up_data.py"
+    download_data = "pipenv run python -m mediabridge.data_processing.download_data"
+    delete_data = "pipenv run python -m mediabridge.data_processing.clean_up_data"
