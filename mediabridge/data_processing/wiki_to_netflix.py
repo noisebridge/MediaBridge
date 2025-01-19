@@ -218,7 +218,7 @@ def wiki_query(
     )
 
 
-def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
+def process_data(num_rows: int | None = None, output_missing_csv_path: Path = None):
     """
     Processes Netflix movie data by enriching it with information from Wikidata
     and writes the results to a CSV file.
