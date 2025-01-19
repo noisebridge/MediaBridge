@@ -173,7 +173,8 @@ def format_sparql_query(title: str, year: int) -> str:
 
 
 def wiki_query(
-    movie: MovieData, user_agent: str = USER_AGENT
+    movie: MovieData,
+    user_agent: str = USER_AGENT,
 ) -> EnrichedMovieData | None:
     """
     Queries Wikidata for information about a movie.
@@ -233,6 +234,7 @@ def wiki_query(
     log.warning(
         f"Could not find movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
     )
+    return None
 
 
 def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
