@@ -237,7 +237,10 @@ def wiki_query(
     return None
 
 
-def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
+def process_data(
+    num_rows: int | None = None,
+    output_missing_csv_path: Path | None = None,
+) -> None:
     """
     Processes Netflix movie data by enriching it with information from Wikidata
     and writes the results to a CSV file.
@@ -311,13 +314,13 @@ def process(
         "-f",
         help="Run processing on full dataset. Overrides --num_rows.",
     ),
-    num_rows: int = typer.Option(
+    num_rows: int | None = typer.Option(
         DEFAULT_TEST_ROWS,
         "--num-rows",
         "-n",
         help="Number of rows to process. If --full is True, all rows are processed",
     ),
-    missing_out_path: str = typer.Option(
+    missing_out_path: Path = typer.Option(
         None,
         "--missing-out-path",
         "-m",
