@@ -278,6 +278,7 @@ def process_data(
     print(f"Processing {num_rows or 'all'} rows...")
 
     netflix_data = read_netflix_txt(movie_data_path, num_rows)
+    i = 0
     for i, row in enumerate(tqdm(netflix_data, total=num_rows)):
         id, year, title = row
 
