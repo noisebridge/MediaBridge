@@ -61,10 +61,8 @@ def create_netflix_csv(csv_path: Path, data_list: list[MovieData]) -> None:
     if data_list:
         with open(csv_path, "w") as csv_file:
             # Write header based on type of first item in data_list
-            writer = csv.DictWriter(
-                csv_file,
-                fieldnames=(f.name for f in dataclasses.fields(data_list[0])),
-            )
+            fieldnames = [f.name for f in dataclasses.fields(data_list[0])]
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows((movie.flatten_values() for movie in data_list))
 
