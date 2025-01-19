@@ -48,7 +48,7 @@ def read_netflix_txt(
             yield line.rstrip().split(",", 2)
 
 
-def create_netflix_csv(csv_path: Path, data_list: list[MovieData]):
+def create_netflix_csv(csv_path: Path, data_list: list[MovieData]) -> None:
     """
     Writes list of MovieData objects to a CSV file, either with enriched or
     plain/missing data.
@@ -58,8 +58,8 @@ def create_netflix_csv(csv_path: Path, data_list: list[MovieData]):
 
         data_list (list[MovieData]): List of MovieData objects to be written.
     """
-    with open(csv_path, "w") as csv_file:
-        if data_list:
+    if data_list:
+        with open(csv_path, "w") as csv_file:
             # Write header based on type of first item in data_list
             writer = csv.DictWriter(
                 csv_file,
