@@ -249,20 +249,26 @@ def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
             "https://archive.org/details/nf_prize_dataset.tar"
         )
 
+    total_count = 0
     missing_count = 0
-    processed_data = []
+    processed = []
     missing = []
 
     print(f"Processing {num_rows or 'all'} rows...")
 
     netflix_data = read_netflix_txt(movie_data_path, num_rows)
     for row in tqdm(netflix_data, total=num_rows):
+        total_count += 1
+
         id, year, title = row
+        if year == "NULL":
+            log.warning(f"Skipping movie id {id}: (' {title} ', {year})")
+            continue
 
         netflix_data = MovieData(int(id), title, int(year))
         if wiki_data := wiki_query(netflix_data):
             # wiki_query finds match, add to processed data
-            processed_data.append(wiki_data)
+            processed.append(wiki_data)
         else:
             # Otherwise, is missing a match
             missing_count += 1
@@ -270,15 +276,15 @@ def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
                 missing.append(netflix_data)
 
     output_csv = OUTPUT_DIR / "matches.csv"
-    create_netflix_csv(output_csv, processed_data)
+    create_netflix_csv(output_csv, processed)
     if output_missing_csv_path:
         missing_csv = OUTPUT_DIR / output_missing_csv_path
         create_netflix_csv(missing_csv, missing)
 
     print(
-        f"missing: {missing_count} ({missing_count / num_rows * 100:.2f}%)\n"
-        f"found: {num_rows - missing_count} ({(num_rows - missing_count) / num_rows * 100:.2f}%)\n"
-        f"total: {num_rows}\n",
+        f"missing: {missing_count} ({missing_count / total_count * 100:.2f}%)\n"
+        f"found: {total_count - missing_count} ({(total_count - missing_count) / total_count * 100:.2f}%)\n"
+        f"total: {total_count}\n",
     )
 
 
