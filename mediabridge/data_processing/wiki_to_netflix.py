@@ -12,7 +12,7 @@ from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
-from mediabridge.schemas import EnrichedMovieData, MovieData
+from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
 USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
 DEFAULT_TEST_ROWS = 100

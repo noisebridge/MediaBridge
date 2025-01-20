@@ -26,11 +26,3 @@ class EnrichedMovieData(MovieData):
     wikidata_id: str
     genres: Optional[list[str]]
     director: Optional[str]
-
-
-if __name__ == "__main__":
-    print(
-        EnrichedMovieData(
-            1, "The Matrix", 1999, "Q11424", ["Action", "Drama"], "Lana Wachowski"
-        ).flatten_values()
-    )
