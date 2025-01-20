@@ -175,7 +175,6 @@ def wiki_query(
         WikidataServiceTimeoutException: If the Wikidata service times out.
     """
     SPARQL = format_sparql_query(movie.title, movie.year)
-    # logging.debug(SPARQL)
 
     tries = 0
     while True:
