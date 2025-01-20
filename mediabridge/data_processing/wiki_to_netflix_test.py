@@ -12,17 +12,14 @@ def test_wiki_query():
     movie = MovieData("0", "The Room", 2003)
     result = w2n.wiki_query(movie)
 
-    # Order of genres is not guaranteed, so we can't check for exact match
-    for genre in ["romance film", "drama film", "independent film"]:
-        assert genre in result.genres
+    # Order of genres is not guaranteed, so we sort before checking for equality
+    result.genres = sorted(result.genres)
 
-    # Wipe genres so that we can check equality with other fields
-    result.genres = None
     assert result == EnrichedMovieData(
         netflix_id="0",
         title="The Room",
         year=2003,
         wikidata_id="Q533383",
-        genres=None,
+        genres=["drama film", "independent film", "romance film"],
         director="Tommy Wiseau",
     )
