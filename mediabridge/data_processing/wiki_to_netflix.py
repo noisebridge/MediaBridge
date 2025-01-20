@@ -195,7 +195,7 @@ def wiki_query(
             if tries > 5:
                 raise WikidataServiceTimeoutException(
                     f"Tried {tries} time, could not reach Wikidata "
-                    f"(movie: {movie.title} {movie.year})"
+                    f'(movie: "{movie.title}" {movie.year})'
                 )
 
     response.raise_for_status()
@@ -203,9 +203,7 @@ def wiki_query(
     log.debug(data)
 
     if data["results"]["bindings"]:
-        log.info(
-            f"Found movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
-        )
+        log.info(f'Found movie id {movie.netflix_id}: ("{movie.title}", {movie.year})')
         return EnrichedMovieData(
             **vars(movie),
             wikidata_id=wiki_feature_info(data, "item"),
@@ -214,7 +212,7 @@ def wiki_query(
         )
 
     log.warning(
-        f"Could not find movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
+        f'Could not find movie id {movie.netflix_id}: ("{movie.title}", {movie.year})'
     )
 
 
