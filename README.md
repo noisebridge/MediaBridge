@@ -30,7 +30,7 @@ For development purposes, you can simply run the dev script:
 pipenv run dev
 ```
 
-This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`, but this may change in the future, so using `pipenv run dev` will be ensure the correct script is always run.
+This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`, but this may change in the future, so using `pipenv run dev` will ensure the correct script is always run.
 
 **NOTE:** *If you encounter a ModuleNotFoundError, make sure you are in the root directory of the project, as the `mediabridge` directory is the module Pipenv is trying to reference.*
 
