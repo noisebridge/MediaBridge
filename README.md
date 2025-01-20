@@ -38,12 +38,13 @@ This is currently just an alias to run the main script using `pipenv run python 
 
 ## Testing
 
-To run unit tests,
+To run unittests:
 
-1. Ensure `pipenv` is installed
-2. Run `pipenv run test`
+```
+pipenv run test
+```
 
-There is a GitHub actions "check" for passing tests, which must pass for you to be able to merge your PR.
+These tests are also evaluated via a GitHub action when opening or updating a PR and must pass before merging.
 
 ## Code formatting
 
