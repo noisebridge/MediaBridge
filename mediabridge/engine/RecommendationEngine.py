@@ -3,18 +3,37 @@ import pickle
 import numpy as np
 from scipy import sparse
 
+from mediabridge.db.connect import connect_to_mongo
+
 
 class RecommendationEngine:
     def __init__(self, movie_ids, model_file):
         self.movie_ids = movie_ids
+        self.db = connect_to_mongo()
         with open(model_file, "rb") as f:
             self.model = pickle.load(f)
 
+    def get_movie_id(self, title):
+        movies = self.db["movies"]
+        return movies.find({"title": title})["netflix_id"]
+
+    def get_movie_title(self, netflix_id):
+        movies = self.db["movies"]
+        return movies.find({"netflix_id": netflix_id})["title"]
+
     def titles_to_ids(self, titles):
-        pass
+        ids = []
+        for title in titles:
+            id = self.get_movie_id(title)
+            titles.append(id)
+        return ids
 
     def ids_to_titles(self, ids):
-        pass
+        titles = []
+        for id in ids:
+            title = self.get_movie_title(id)
+            ids.append(title)
+        return titles
 
     def get_recommendations(self, user_id, user_interactions):
         scores = self.model.predict(
