@@ -5,7 +5,7 @@ import logging
 from typer import Typer
 
 from mediabridge.definitions import OUTPUT_DIR
-from mediabridge.schemas import EnrichedMovieData
+from mediabridge.schemas.movies import EnrichedMovieData
 
 log = logging.getLogger(__name__)
 app = Typer()
