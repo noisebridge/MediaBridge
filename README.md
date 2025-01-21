@@ -24,13 +24,13 @@ To fix import errors and other Intellisense features, make sure you've let VSCod
 
 ## Running code
 
-For development purposes, you can simply run the dev script: 
+For development purposes, you can simply run the dev script:
 
 ```
 pipenv run dev
 ```
 
-Be sure to specify options such as -v and -l *before* any subcommands (process, load, etc.).  
+Be sure to specify options such as -v and -l *before* any subcommands (process, load, etc.).
 
 **NOTE:** *If you encounter a ModuleNotFoundError, make sure you are in the root directory of the project, as the `mediabridge` directory is the module Pipenv is trying to reference.*
 
