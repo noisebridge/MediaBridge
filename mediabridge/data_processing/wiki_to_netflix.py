@@ -223,9 +223,9 @@ def wiki_query(
         log.info(f'Found movie id {movie.netflix_id}: ("{movie.title}", {movie.year})')
         return EnrichedMovieData(
             **vars(movie),
-            wikidata_id=wiki_feature_info(data, "item"),
-            genres=wiki_feature_info(data, "genreLabel"),
-            director=wiki_feature_info(data, "directorLabel"),
+            wikidata_id=str(wiki_feature_info(data, "item")),
+            genres=wiki_feature_genres(data, "genreLabel"),
+            director=wiki_feature_optional_str(data, "directorLabel"),
         )
 
     log.warning(
@@ -233,7 +233,10 @@ def wiki_query(
     )
 
 
-def process_data(num_rows: int | None = None, output_missing_csv_path: Path = None):
+def process_data(
+    num_rows: int | None = None,
+    output_missing_csv_path: Path | None = None,
+) -> None:
     """
     Processes Netflix movie data by enriching it with information from Wikidata
     and writes the results to a CSV file.
