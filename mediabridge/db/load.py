@@ -29,7 +29,7 @@ def load():
         for row in reader:
             netflix_id, title, year, wikidata_id, genres, director = row
             movie = EnrichedMovieData(
-                int(netflix_id),
+                netflix_id,
                 title,
                 int(year),
                 wikidata_id,

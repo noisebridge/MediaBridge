@@ -283,7 +283,7 @@ def process_data(
             log.warning(f"Skipping movie id {id}: (' {title} ', {year})")
             continue
 
-        netflix_data = MovieData(int(id), title, int(year))
+        netflix_data = MovieData(id, title, int(year))
         if wiki_data := wiki_query(netflix_data):
             # wiki_query finds match, add to processed data
             processed.append(wiki_data)

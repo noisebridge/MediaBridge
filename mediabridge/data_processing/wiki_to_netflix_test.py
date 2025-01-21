@@ -11,6 +11,7 @@ def test_format_sparql_query():
 def test_wiki_query():
     movie = MovieData("0", "The Room", 2003)
     result = w_to_n.wiki_query(movie)
+    assert result
 
     # Order of genres is not guaranteed, so we sort before checking for equality
     result.genres = sorted(result.genres)
