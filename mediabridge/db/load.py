@@ -4,8 +4,8 @@ import logging
 
 from typer import Typer
 
-from mediabridge.schemas import EnrichedMovieData
 from mediabridge.definitions import OUTPUT_DIR
+from mediabridge.schemas import EnrichedMovieData
 
 log = logging.getLogger(__name__)
 app = Typer()
@@ -27,7 +27,15 @@ def load():
             )
 
         for row in reader:
-            movie = EnrichedMovieData(*row)
+            netflix_id, title, year, wikidata_id, genres, director = row
+            movie = EnrichedMovieData(
+                int(netflix_id),
+                title,
+                int(year),
+                wikidata_id,
+                genres.split(";"),
+                director,
+            )
             log.info(f"Inserting {movie} into MongoDB")
             # TODO: Needs implementation, bulk inserts for performance
 

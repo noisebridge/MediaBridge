@@ -4,15 +4,15 @@ import logging
 import time
 from contextlib import nullcontext
 from pathlib import Path
-from typing import Iterator
+from typing import Any, Iterator
 
 import requests
 import typer
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from mediabridge.schemas import EnrichedMovieData, MovieData
 from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
+from mediabridge.schemas import EnrichedMovieData, MovieData
 
 USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
 DEFAULT_TEST_ROWS = 100
@@ -48,7 +48,7 @@ def read_netflix_txt(
             yield line.rstrip().split(",", 2)
 
 
-def create_netflix_csv(csv_path: Path, data_list: list[MovieData]):
+def create_netflix_csv(csv_path: Path, data_list: list[MovieData]) -> None:
     """
     Writes list of MovieData objects to a CSV file, either with enriched or
     plain/missing data.
@@ -58,13 +58,11 @@ def create_netflix_csv(csv_path: Path, data_list: list[MovieData]):
 
         data_list (list[MovieData]): List of MovieData objects to be written.
     """
-    with open(csv_path, "w") as csv_file:
-        if data_list:
+    if data_list:
+        with open(csv_path, "w") as csv_file:
             # Write header based on type of first item in data_list
-            writer = csv.DictWriter(
-                csv_file,
-                fieldnames=(f.name for f in dataclasses.fields(data_list[0])),
-            )
+            fieldnames = [f.name for f in dataclasses.fields(data_list[0])]
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows((movie.flatten_values() for movie in data_list))
 
@@ -100,6 +98,25 @@ def wiki_feature_info(data: dict, key: str) -> str | list | None:
             }
         )
     return data["results"]["bindings"][0][key]["value"].split("/")[-1]
+
+
+def wiki_feature_optional_str(data: dict[str, Any], key: str) -> str | None:
+    """Validates that we obtained a single (optional) string."""
+    s = wiki_feature_info(data, key)
+    if s:
+        return str(s)
+    return None
+
+
+def wiki_feature_genres(data: dict[str, Any], key: str) -> list[str]:
+    """Validates that we obtained some sensible movie genres."""
+    genres = wiki_feature_info(data, key)
+    if not genres:
+        return []
+    assert isinstance(genres, list)
+    for genre in genres:
+        assert isinstance(genre, str)
+    return genres
 
 
 def format_sparql_query(title: str, year: int) -> str:
@@ -156,7 +173,8 @@ def format_sparql_query(title: str, year: int) -> str:
 
 
 def wiki_query(
-    movie: MovieData, user_agent: str = USER_AGENT
+    movie: MovieData,
+    user_agent: str = USER_AGENT,
 ) -> EnrichedMovieData | None:
     """
     Queries Wikidata for information about a movie.
@@ -208,17 +226,21 @@ def wiki_query(
         )
         return EnrichedMovieData(
             **movie.__dict__,
-            wikidata_id=wiki_feature_info(data, "item"),
-            genres=wiki_feature_info(data, "genreLabel"),
-            director=wiki_feature_info(data, "directorLabel"),
+            wikidata_id=str(wiki_feature_info(data, "item")),
+            genres=wiki_feature_genres(data, "genreLabel"),
+            director=wiki_feature_optional_str(data, "directorLabel"),
         )
 
     log.warning(
         f"Could not find movie id {movie.netflix_id}: (' {movie.title} ', {movie.year})"
     )
+    return None
 
 
-def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
+def process_data(
+    num_rows: int | None = None,
+    output_missing_csv_path: Path | None = None,
+) -> None:
     """
     Processes Netflix movie data by enriching it with information from Wikidata
     and writes the results to a CSV file.
@@ -256,7 +278,8 @@ def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
     print(f"Processing {num_rows or 'all'} rows...")
 
     netflix_data = read_netflix_txt(movie_data_path, num_rows)
-    for row in tqdm(netflix_data, total=num_rows):
+    i = 0
+    for i, row in enumerate(tqdm(netflix_data, total=num_rows)):
         id, year, title = row
 
         netflix_data = MovieData(int(id), title, int(year))
@@ -268,6 +291,7 @@ def process_data(num_rows: int = None, output_missing_csv_path: Path = None):
             missing_count += 1
             if output_missing_csv_path:
                 missing.append(netflix_data)
+    num_rows = i
 
     output_csv = OUTPUT_DIR / "matches.csv"
     create_netflix_csv(output_csv, processed_data)
@@ -291,13 +315,13 @@ def process(
         "-f",
         help="Run processing on full dataset. Overrides --num_rows.",
     ),
-    num_rows: int = typer.Option(
+    num_rows: int | None = typer.Option(
         DEFAULT_TEST_ROWS,
         "--num-rows",
         "-n",
         help="Number of rows to process. If --full is True, all rows are processed",
     ),
-    missing_out_path: str = typer.Option(
+    missing_out_path: Path = typer.Option(
         None,
         "--missing-out-path",
         "-m",

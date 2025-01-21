@@ -13,7 +13,7 @@ def list_rating_files(directory_path):
 
 
 def create_interaction_matrix(directory_path, num_users, num_movies):
-    interaction_matrix = coo_matrix((num_users, num_movies), dtype=np.int8)
+    im = interaction_matrix = coo_matrix((num_users, num_movies), dtype=np.int8)
     user_mapper = {}
     current_user_index = 0
 
@@ -35,7 +35,7 @@ def create_interaction_matrix(directory_path, num_users, num_movies):
                     current_user_index += 1
 
                 user_idx = user_mapper[user_id]
-                interaction_matrix[user_idx, movie_idx] = rating
+                im[user_idx, movie_idx] = rating  # type: ignore [reportIndexIssue]
 
     return interaction_matrix
 
