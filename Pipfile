@@ -8,6 +8,8 @@ python-dotenv = "~=1.0"
 requests = "~=2.26"
 tqdm = "~=4.66"
 typer = "~=0.12"
+scipy = "~=1.14"
+pymongo = "~=4.10"
 
 [dev-packages]
 pytest = "~=8.3"
@@ -19,4 +21,4 @@ python_version = "3.12"
 
 [scripts]
 dev = "pipenv run python -m mediabridge.main"
-test = "pipenv run pytest"
+test = "pipenv run python -m pytest"

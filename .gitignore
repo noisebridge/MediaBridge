@@ -1,5 +1,12 @@
+interaction-matrix-of-user
+mv_0000001.txt
+mv_0000002.txt
+movie_titles.txt
+myenv/
+
 data
 out
 .env
 .pytest_cache
 __pycache__
+ main

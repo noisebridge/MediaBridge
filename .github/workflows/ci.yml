@@ -22,7 +22,7 @@ jobs:
           pipenv install --dev
 
       - name: Run tests
-        run: pipenv run pytest
+        run: pipenv run test
 
   ruff:
     runs-on: ubuntu-latest
