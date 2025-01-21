@@ -15,24 +15,24 @@ class RecommendationEngine:
 
     def get_movie_id(self, title):
         movies = self.db["movies"]
-        return movies.find({"title": title})["netflix_id"]
+        return movies.find_one({"title": title}).get("netflix_id")
 
     def get_movie_title(self, netflix_id):
         movies = self.db["movies"]
-        return movies.find({"netflix_id": netflix_id})["title"]
+        return movies.find_one({"netflix_id": netflix_id}).get("title")
 
     def titles_to_ids(self, titles):
-        ids = []
+        netflix_ids = []
         for title in titles:
-            id = self.get_movie_id(title)
-            titles.append(id)
-        return ids
+            netflix_id = self.get_movie_id(title)
+            titles.append(netflix_id)
+        return netflix_ids
 
-    def ids_to_titles(self, ids):
+    def ids_to_titles(self, netflix_ids):
         titles = []
-        for id in ids:
-            title = self.get_movie_title(id)
-            ids.append(title)
+        for netflix_id in netflix_ids:
+            title = self.get_movie_title(netflix_id)
+            titles.append(title)
         return titles
 
     def get_recommendations(self, user_id, user_interactions):
