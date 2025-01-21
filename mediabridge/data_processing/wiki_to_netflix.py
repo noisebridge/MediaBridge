@@ -111,8 +111,6 @@ def wiki_feature_optional_str(data: dict[str, Any], key: str) -> str | None:
 def wiki_feature_genres(data: dict[str, Any], key: str) -> list[str]:
     """Validates that we obtained some sensible movie genres."""
     genres = wiki_feature_info(data, key)
-    if not genres:
-        return []
     assert isinstance(genres, list)
     for genre in genres:
         assert isinstance(genre, str)
@@ -231,6 +229,7 @@ def wiki_query(
     log.warning(
         f'Could not find movie id {movie.netflix_id}: ("{movie.title}", {movie.year})'
     )
+    return None
 
 
 def process_data(
