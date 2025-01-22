@@ -172,7 +172,9 @@ def format_sparql_query(title: str, year: int) -> str:
 
 def wiki_query(
     movie: MovieData,
+    *,
     user_agent: str = USER_AGENT,
+    query_endpoint: str = "https://query.wikidata.org/sparql",
 ) -> EnrichedMovieData | None:
     """
     Queries Wikidata for information about a movie.
@@ -197,7 +199,7 @@ def wiki_query(
         try:
             log.info(f"Requesting id {movie.netflix_id} (try {tries})")
             response = requests.post(
-                "https://query.wikidata.org/sparql",
+                query_endpoint,
                 headers={"User-Agent": user_agent},
                 data={"query": SPARQL, "format": "json"},
                 timeout=20,
