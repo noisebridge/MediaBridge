@@ -27,7 +27,8 @@ log = logging.getLogger(__name__)
 
 
 def read_netflix_txt(
-    txt_file: Path, num_rows: int | None = None
+    txt_file: Path,
+    num_rows: int | None = None,
 ) -> Iterator[list[str]]:
     """
     Reads rows from the Netflix dataset file.

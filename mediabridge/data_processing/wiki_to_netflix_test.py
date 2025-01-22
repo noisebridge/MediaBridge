@@ -2,6 +2,7 @@ import unittest
 
 import mediabridge.data_processing.wiki_to_netflix as w_to_n
 from mediabridge.data_processing.wiki_to_netflix_test_data import EXPECTED_SPARQL_QUERY
+from mediabridge.definitions import DATA_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
 
@@ -30,3 +31,8 @@ class TestWikiToNetflix(unittest.TestCase):
                 director="Tommy Wiseau",
             ),
         )
+
+    def test_read_netflix_txt(self) -> None:
+        movies = list(w_to_n.read_netflix_txt(DATA_DIR / "movie_titles.txt"))
+        assert len(movies) == 17_770
+        assert movies[0] == ["1", "2003", "Dinosaur Planet"]
