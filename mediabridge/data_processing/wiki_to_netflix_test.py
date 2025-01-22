@@ -11,6 +11,7 @@ class TestWikiToNetflix(unittest.TestCase):
         assert QUERY == EXPECTED_SPARQL_QUERY
 
     def test_wiki_query(self) -> None:
+        # Integration test -- this hits the wikidata.org webserver.
         movie = MovieData("0", "The Room", 2003)
         result = w_to_n.wiki_query(movie)
         assert result
