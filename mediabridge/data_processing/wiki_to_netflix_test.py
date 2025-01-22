@@ -33,6 +33,12 @@ class TestWikiToNetflix(unittest.TestCase):
         )
 
     def test_read_netflix_txt(self) -> None:
-        movies = list(w_to_n.read_netflix_txt(DATA_DIR / "movie_titles.txt"))
+        titles_txt = DATA_DIR / "movie_titles.txt"
+
+        movies = list(w_to_n.read_netflix_txt(titles_txt))
         assert len(movies) == 17_770
-        assert movies[0] == ["1", "2003", "Dinosaur Planet"]
+        assert movies[-1] == ["17770", "2003", "Alien Hunter"]
+
+        movies = list(w_to_n.read_netflix_txt(titles_txt, 3))
+        assert len(movies) == 3
+        assert movies[-1] == ["3", "1997", "Character"]
