@@ -20,5 +20,7 @@ ruff = "~=0.7"
 python_version = "3.12"
 
 [scripts]
+coverage = "pipenv run bin/coverage.sh"
 dev = "pipenv run python -m mediabridge.main"
+lint = "pipenv run bin/lint.sh"
 test = "pipenv run python -m pytest"
