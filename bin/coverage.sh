@@ -6,6 +6,6 @@ set -e
 source bin/util.sh
 
 coverage erase
-coverage run -m unittest discover -p '*_test.py'
+coverage run -m unittest mediabridge/*/*_test.py
 coverage html
 coverage report

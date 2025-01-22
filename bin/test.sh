@@ -5,6 +5,6 @@
 set -e
 source bin/util.sh
 
-${ENV} python -m unittest discover -p '*_test.py'
+${ENV} python -m unittest mediabridge/*/*_test.py
 
 ${ENV} pytest
