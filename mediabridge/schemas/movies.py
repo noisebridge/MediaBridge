@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(order=True)
@@ -25,4 +24,4 @@ class EnrichedMovieData(MovieData):
 
     wikidata_id: str
     genres: list[str]  # possibly an empty list
-    director: Optional[str]
+    director: str

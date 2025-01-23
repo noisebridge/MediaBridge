@@ -101,8 +101,8 @@ def wiki_feature_info(data: dict, key: str) -> str | list | None:
     return data["results"]["bindings"][0][key]["value"].split("/")[-1]
 
 
-def wiki_feature_optional_str(data: dict[str, Any], key: str) -> str | None:
-    """Validates that we obtained a single (optional) string."""
+def wiki_feature_str(data: dict[str, Any], key: str) -> str:
+    """Validates that we obtained a single string."""
     s = wiki_feature_info(data, key)
     assert isinstance(s, str), s
     return s
@@ -225,7 +225,7 @@ def wiki_query(
             **vars(movie),
             wikidata_id=str(wiki_feature_info(data, "item")),
             genres=wiki_feature_genres(data, "genreLabel"),
-            director=wiki_feature_optional_str(data, "directorLabel"),
+            director=wiki_feature_str(data, "directorLabel"),
         )
 
     log.warning(
