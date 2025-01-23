@@ -34,6 +34,11 @@ class TestWikiToNetflix(unittest.TestCase):
             ),
         )
 
+    def test_wiki_query_not_found(self) -> None:
+        """This integration test simply provokes the "whoops, no match" case in the target code."""
+        movie = MovieData("-1", "No Such Movie", 1901)
+        assert w_to_n.wiki_query(movie) is None
+
     def test_read_netflix_txt(self) -> None:
         movies = list(w_to_n.read_netflix_txt(TITLES_TXT))
         assert len(movies) == 17_770
