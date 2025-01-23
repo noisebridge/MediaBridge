@@ -104,9 +104,8 @@ def wiki_feature_info(data: dict, key: str) -> str | list | None:
 def wiki_feature_optional_str(data: dict[str, Any], key: str) -> str | None:
     """Validates that we obtained a single (optional) string."""
     s = wiki_feature_info(data, key)
-    if s:
-        return str(s)
-    return None
+    assert isinstance(s, str), s
+    return s
 
 
 def wiki_feature_genres(data: dict[str, Any], key: str) -> list[str]:
