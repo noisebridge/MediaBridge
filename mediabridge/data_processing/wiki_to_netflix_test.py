@@ -1,17 +1,22 @@
 import unittest
+from unittest.mock import patch
 
 import mediabridge.data_processing.wiki_to_netflix as w_to_n
-from mediabridge.data_processing.wiki_to_netflix_test_data import EXPECTED_SPARQL_QUERY
+from mediabridge.data_processing.wiki_to_netflix_test_data import (
+    EXPECTED_SPARQL_QUERY,
+    WIKIDATA_RESPONSE_THE_ROOM,
+)
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
 
 class TestWikiToNetflix(unittest.TestCase):
-    def test_format_sparql_query(self) -> None:
+    def test_format_sparql_query(self):
         QUERY = w_to_n.format_sparql_query("The Room", 2003)
         assert QUERY == EXPECTED_SPARQL_QUERY
 
-    def test_wiki_query(self) -> None:
-        # Integration test -- this hits the wikidata.org webserver.
+    @patch("mediabridge.data_processing.wiki_to_netflix.requests")
+    def test_wiki_query(self, mock_requests):
+        mock_requests.post.return_value.json.return_value = WIKIDATA_RESPONSE_THE_ROOM
         movie = MovieData("0", "The Room", 2003)
         result = w_to_n.wiki_query(movie)
         assert result
