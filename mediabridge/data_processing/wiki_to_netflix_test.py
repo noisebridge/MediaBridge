@@ -54,3 +54,12 @@ class TestWikiToNetflix(unittest.TestCase):
 
         assert len(lines) == few_rows + 1
         assert lines[-1] == "3,Character,1997"
+
+    def test_wiki_feature_info(self) -> None:
+        # This is a silly test, designed to provoke `return None`,
+        # something that live wikidata results is never observed to do.
+        # (Don't believe me? Put an `assert False` in that function and see if it triggers.)
+        # Recommend deleting this test, and the target code clause it is written for.
+        no_entries: list[str] = []
+        data = {"results": {"bindings": no_entries}}
+        assert w_to_n.wiki_feature_info(data, "clavis") is None
