@@ -1,4 +1,8 @@
+import logging
 import unittest
+from logging import Logger
+from unittest import TestCase
+from unittest.mock import patch
 
 import mediabridge.data_processing.wiki_to_netflix as w_to_n
 from mediabridge.data_processing.wiki_to_netflix_test_data import EXPECTED_SPARQL_QUERY
@@ -6,6 +10,23 @@ from mediabridge.definitions import DATA_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
 TITLES_TXT = DATA_DIR / "movie_titles.txt"
+
+
+def silence_logging(self, logger: Logger):
+    """A helper context manager to suppress logs from cluttering test output."""
+
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass  # Ignore all log records
+
+    original_handlers = logger.handlers[:]
+    logger.handlers.clear()
+    logger.addHandler(NullHandler())
+
+    try:
+        yield  # Let the test code run for a bit.
+    finally:
+        logger.handlers = original_handlers  # Turn logging back on.
 
 
 class TestWikiToNetflix(unittest.TestCase):
@@ -36,8 +57,15 @@ class TestWikiToNetflix(unittest.TestCase):
 
     def test_wiki_query_not_found(self) -> None:
         """This integration test simply provokes the "whoops, no match" case in the target code."""
+
+        # suppress noisy warnings during the test run
+        log = logging.getLogger("mediabridge.data_processing.wiki_to_netflix")
+        log.setLevel(logging.ERROR)
+
         movie = MovieData("-1", "No Such Movie", 1901)
         assert w_to_n.wiki_query(movie) is None
+
+        log.setLevel(logging.DEBUG)
 
     def test_read_netflix_txt(self) -> None:
         movies = list(w_to_n.read_netflix_txt(TITLES_TXT))
