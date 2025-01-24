@@ -60,16 +60,14 @@ class TestWikiToNetflix(unittest.TestCase):
             ),
         )
 
-    def not_yet_ready_test_wiki_query_not_found(self) -> None:
+    def test_wiki_query_not_found(self) -> None:
         """This integration test simply provokes the "whoops, no match" case in the target code."""
 
         # We need a better story about "real" or "mock" data in CI. Currently, there just isn't any.
 
         log = logging.getLogger("mediabridge.data_processing.wiki_to_netflix")
         with silence_logging(self, log):
-
-            movie = MovieData("-1", "No Such Movie", 1901)
-            assert w_to_n.wiki_query(movie) is None
+            assert w_to_n.wiki_query(MovieData("-1", "No Such Movie", 1901)) is None
 
     def test_read_netflix_txt(self) -> None:
         movies = list(w_to_n.read_netflix_txt(TITLES_TXT))

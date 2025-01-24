@@ -15,3 +15,8 @@ coverage run -p -m unittest mediabridge/*/*_test.py
 coverage combine --quiet
 coverage html
 coverage report
+
+cat <<EOF
+View the coverage report in a web browser:
+open htmlcov/index.html
+EOF
