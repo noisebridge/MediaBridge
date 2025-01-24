@@ -81,14 +81,16 @@ class TestWikiToNetflix(unittest.TestCase):
         assert len(movies) == 3
         assert movies[-1] == ["3", "1997", "Character"]
 
-        if TITLES_TXT.stat().st_size <= 74:
-            # We're in an environment, like CI, where we never downloaded the full dataset.
-            # So silently succeed, without attempting to read thousands of non-existent entries.
-            return
+        short = TITLES_TXT.stat().st_size <= 74
+        # Sometimes we're in an environment, like CI, where we never downloaded the full dataset.
+        # So silently succeed, without attempting to read thousands of non-existent entries.
+        assert short or self._read_full_netflix_txt()
 
+    def _read_full_netflix_txt(self) -> bool:
         movies = list(w_to_n.read_netflix_txt(TITLES_TXT))
         assert len(movies) == 17_770
         assert movies[-1] == ["17770", "2003", "Alien Hunter"]
+        return True
 
     def test_create_netflix_csv(self) -> None:
         output_csv = DATA_DIR / "movie_titles.csv"
