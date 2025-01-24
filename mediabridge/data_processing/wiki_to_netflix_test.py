@@ -78,8 +78,6 @@ class TestWikiToNetflix(unittest.TestCase):
         assert len(movies) == 3
         assert movies[-1] == ["3", "1997", "Character"]
 
-        # w_to_n.process_data(3, TITLES_TXT)
-
     def test_create_netflix_csv(self) -> None:
         output_csv = DATA_DIR / "movie_titles.csv"
         few_rows = 3  # A conveniently small number of rows, for fast tests.
@@ -113,9 +111,8 @@ class TestWikiToNetflix(unittest.TestCase):
             ephemeral.rename(actual)
 
     def test_process_data_pretend_theres_no_data_dir(self) -> None:
-
         self._process_with_path_missing(DATA_DIR)
         self._process_with_path_missing(TITLES_TXT)
 
     def test_process_data(self) -> None:
-        pass
+        w_to_n.process_data(2, TITLES_TXT.with_suffix(".csv"))
