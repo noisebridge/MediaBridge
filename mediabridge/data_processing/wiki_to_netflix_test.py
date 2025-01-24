@@ -102,10 +102,11 @@ class TestWikiToNetflix(unittest.TestCase):
         assert w_to_n.wiki_feature_info(data, "clavis") is None
 
     def test_process_data_pretend_theres_no_data_dir(self) -> None:
-        original_dir = Path(DATA_DIR)
-        parent = DATA_DIR.parent
-        missing = DATA_DIR.rename(parent / "missing-data")
-
-        w_to_n.process_data(1, None)
-
-        missing.rename(original_dir)
+        missing = DATA_DIR.parent / "missing-data"
+        assert not missing.exists()
+        DATA_DIR.rename(missing)
+        try:
+            with self.assertRaises(FileNotFoundError):
+                w_to_n.process_data(1, None)
+        finally:
+            missing.rename(DATA_DIR)
