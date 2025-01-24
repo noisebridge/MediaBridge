@@ -1,14 +1,17 @@
-import logging
 import unittest
 from contextlib import contextmanager
-from logging import Logger
+from logging import Handler, Logger, getLogger
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import click
 from typer import Context
 
 import mediabridge.data_processing.wiki_to_netflix as w_to_n
-from mediabridge.data_processing.wiki_to_netflix_test_data import EXPECTED_SPARQL_QUERY
+from mediabridge.data_processing.wiki_to_netflix_test_data import (
+    EXPECTED_SPARQL_QUERY,
+    WIKIDATA_RESPONSE_THE_ROOM,
+)
 from mediabridge.definitions import DATA_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
@@ -18,7 +21,7 @@ TITLES_TXT = DATA_DIR / "movie_titles.txt"
 def silence_logging(self, logger: Logger):
     """A helper context manager to suppress logs from cluttering test output."""
 
-    class NullHandler(logging.Handler):
+    class NullHandler(Handler):
         def emit(self, record):
             pass  # Ignore all log records
 
@@ -42,8 +45,9 @@ class TestWikiToNetflix(unittest.TestCase):
         QUERY = w_to_n.format_sparql_query("The Room", 2003)
         assert QUERY == EXPECTED_SPARQL_QUERY
 
-    def test_wiki_query(self) -> None:
-        # Integration test -- this hits the wikidata.org webserver.
+    @patch("mediabridge.data_processing.wiki_to_netflix.requests")
+    def test_wiki_query(self, mock_requests: MagicMock) -> None:
+        mock_requests.post.return_value.json.return_value = WIKIDATA_RESPONSE_THE_ROOM
         movie = MovieData("0", "The Room", 2003)
         result = w_to_n.wiki_query(movie)
         assert result
@@ -68,7 +72,7 @@ class TestWikiToNetflix(unittest.TestCase):
 
         # We need a better story about "real" or "mock" data in CI. Currently, there just isn't any.
 
-        log = logging.getLogger("mediabridge.data_processing.wiki_to_netflix")
+        log = getLogger("mediabridge.data_processing.wiki_to_netflix")
         with silence_logging(self, log):
             assert w_to_n.wiki_query(MovieData("-1", "No Such Movie", 1901)) is None
 
