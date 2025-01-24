@@ -36,7 +36,6 @@ def silence_logging(self, logger: Logger):
         finally:
             logger.handlers = original_handlers  # Turn logging back on.
 
-    # Return the context manager
     return _silence_logging()
 
 
@@ -75,8 +74,6 @@ class TestWikiToNetflix(unittest.TestCase):
 
     def test_wiki_query_not_found(self) -> None:
         """This integration test simply provokes the "whoops, no match" case in the target code."""
-
-        # We need a better story about "real" or "mock" data in CI. Currently, there just isn't any.
 
         log = getLogger("mediabridge.data_processing.wiki_to_netflix")
         with silence_logging(self, log):
