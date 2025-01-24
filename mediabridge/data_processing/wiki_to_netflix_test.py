@@ -78,6 +78,8 @@ class TestWikiToNetflix(unittest.TestCase):
         assert len(movies) == 3
         assert movies[-1] == ["3", "1997", "Character"]
 
+        # w_to_n.process_data(3, TITLES_TXT)
+
     def test_create_netflix_csv(self) -> None:
         output_csv = DATA_DIR / "movie_titles.csv"
         few_rows = 3  # A conveniently small number of rows, for fast tests.
@@ -108,3 +110,14 @@ class TestWikiToNetflix(unittest.TestCase):
                 w_to_n.process_data(1, None)
         finally:
             missing.rename(DATA_DIR)
+
+        alt = Path(f"{TITLES_TXT}-alt")
+        TITLES_TXT.rename(alt)
+        try:
+            with self.assertRaises(FileNotFoundError):
+                w_to_n.process_data(1, None)
+        finally:
+            alt.rename(TITLES_TXT)
+
+    def test_process_data(self) -> None:
+        pass
