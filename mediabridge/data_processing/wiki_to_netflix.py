@@ -4,6 +4,7 @@ import logging
 import time
 from contextlib import nullcontext
 from pathlib import Path
+from types import NoneType
 from typing import Any, Iterator
 
 import requests
@@ -117,10 +118,10 @@ def wiki_feature_info(data: dict, key: str) -> str | list | None:
     return data["results"]["bindings"][0][key]["value"].split("/")[-1]
 
 
-def wiki_feature_str(data: dict[str, Any], key: str) -> str:
-    """Validates that we obtained a single string."""
+def wiki_feature_optional_str(data: dict[str, Any], key: str) -> str | None:
+    """Validates that we obtained a single (optional) string."""
     s = wiki_feature_info(data, key)
-    assert isinstance(s, str), s
+    assert isinstance(s, (str, NoneType)), s
     return s
 
 
@@ -241,7 +242,7 @@ def wiki_query(
             **vars(movie),
             wikidata_id=str(wiki_feature_info(data, "item")),
             genres=wiki_feature_genres(data, "genreLabel"),
-            director=wiki_feature_str(data, "directorLabel"),
+            director=wiki_feature_optional_str(data, "directorLabel"),
         )
 
     log.warning(
