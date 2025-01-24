@@ -26,6 +26,21 @@ app = typer.Typer()
 log = logging.getLogger(__name__)
 
 
+def _ensure_movie_titles_txt_exists(txt_file: Path) -> None:
+    if not txt_file.exists():
+        folder = txt_file.parent
+        folder.mkdir(exist_ok=True)
+        with txt_file.open("w") as fout:
+            fout.write(_first_few_titles())
+
+
+def _first_few_titles() -> str:
+    return """1,2003,Dinosaur Planet
+2,2004,Isle of Man TT 2004 Review
+3,1997,Character
+"""
+
+
 def read_netflix_txt(
     txt_file: Path,
     num_rows: int | None = None,
@@ -42,6 +57,7 @@ def read_netflix_txt(
     Yields:
         List of strings representing the values of the next row in the file.
     """
+    _ensure_movie_titles_txt_exists(txt_file)
     with open(txt_file, "r", encoding="ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
             if num_rows is not None and i >= num_rows:

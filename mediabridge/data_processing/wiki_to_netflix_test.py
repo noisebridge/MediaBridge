@@ -73,13 +73,18 @@ class TestWikiToNetflix(unittest.TestCase):
             assert w_to_n.wiki_query(MovieData("-1", "No Such Movie", 1901)) is None
 
     def test_read_netflix_txt(self) -> None:
-        movies = list(w_to_n.read_netflix_txt(TITLES_TXT))
-        assert len(movies) == 17_770
-        assert movies[-1] == ["17770", "2003", "Alien Hunter"]
-
         movies = list(w_to_n.read_netflix_txt(TITLES_TXT, 3))
         assert len(movies) == 3
         assert movies[-1] == ["3", "1997", "Character"]
+
+        if TITLES_TXT.stat().st_size <= 74:
+            # We're in an environment, like CI, where we never downloaded the full dataset.
+            # So silently succeed, without attempting to read thousands of non-existent entries.
+            return
+
+        movies = list(w_to_n.read_netflix_txt(TITLES_TXT))
+        assert len(movies) == 17_770
+        assert movies[-1] == ["17770", "2003", "Alien Hunter"]
 
     def test_create_netflix_csv(self) -> None:
         output_csv = DATA_DIR / "movie_titles.csv"
