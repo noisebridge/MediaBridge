@@ -67,6 +67,12 @@ class TestWikiToNetflix(unittest.TestCase):
             ),
         )
 
+    def test_create_titles(self) -> None:
+        temp = Path("/tmp") / "nonexistent.txt"
+        w_to_n.ensure_movie_titles_txt_exists(temp)
+        assert temp.exists()
+        temp.unlink()
+
     def test_wiki_query_not_found(self) -> None:
         """This integration test simply provokes the "whoops, no match" case in the target code."""
 
