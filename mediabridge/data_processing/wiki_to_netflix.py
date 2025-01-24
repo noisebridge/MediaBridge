@@ -325,6 +325,7 @@ def process(
             "CSV at this path, relative to the output directory."
         ),
     ),
+    *,
     full: bool = typer.Option(
         False,
         "--full",

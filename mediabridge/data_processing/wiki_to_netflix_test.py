@@ -119,7 +119,7 @@ class TestWikiToNetflix(unittest.TestCase):
 
     def test_process(self) -> None:
         ctx = Context(command=example_command, info_name="mediabridge")
-        w_to_n.process(ctx, 2, TITLES_TXT.with_suffix(".csv"), False)
+        w_to_n.process(ctx, 2, TITLES_TXT.with_suffix(".csv"), full=False)
         ctx.invoke(example_command)
 
 
