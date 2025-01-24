@@ -101,23 +101,21 @@ class TestWikiToNetflix(unittest.TestCase):
         data = {"results": {"bindings": no_entries}}
         assert w_to_n.wiki_feature_info(data, "clavis") is None
 
-    def test_process_data_pretend_theres_no_data_dir(self) -> None:
-        missing = DATA_DIR.parent / "missing-data"
-        assert not missing.exists()
-        DATA_DIR.rename(missing)
+    def _process_with_path_missing(self, actual: Path) -> None:
+        """Verifies we get an error from process_data(), when a path is momentarily is missing."""
+        ephemeral = Path(f"{actual}-missing")
+        assert actual.exists()
+        actual.rename(ephemeral)
         try:
             with self.assertRaises(FileNotFoundError):
                 w_to_n.process_data(1, None)
         finally:
-            missing.rename(DATA_DIR)
+            ephemeral.rename(actual)
 
-        alt = Path(f"{TITLES_TXT}-alt")
-        TITLES_TXT.rename(alt)
-        try:
-            with self.assertRaises(FileNotFoundError):
-                w_to_n.process_data(1, None)
-        finally:
-            alt.rename(TITLES_TXT)
+    def test_process_data_pretend_theres_no_data_dir(self) -> None:
+
+        self._process_with_path_missing(DATA_DIR)
+        self._process_with_path_missing(TITLES_TXT)
 
     def test_process_data(self) -> None:
         pass
