@@ -24,4 +24,4 @@ class EnrichedMovieData(MovieData):
 
     wikidata_id: str
     genres: list[str]  # possibly an empty list
-    director: str
+    director: str | None
