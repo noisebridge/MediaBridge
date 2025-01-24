@@ -310,12 +310,6 @@ def process_data(
 @app.command()
 def process(
     ctx: typer.Context,
-    full: bool = typer.Option(
-        False,
-        "--full",
-        "-f",
-        help="Run processing on full dataset. Overrides --num_rows.",
-    ),
     num_rows: int | None = typer.Option(
         DEFAULT_TEST_ROWS,
         "--num-rows",
@@ -330,6 +324,12 @@ def process(
             "If provided, movies that could not be matched will be written to a "
             "CSV at this path, relative to the output directory."
         ),
+    ),
+    full: bool = typer.Option(
+        False,
+        "--full",
+        "-f",
+        help="Run processing on full dataset. Overrides --num_rows.",
     ),
 ):
     """Enrich Netflix data with Wikidata matches and write matches to CSV."""

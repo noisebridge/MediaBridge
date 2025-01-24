@@ -4,6 +4,9 @@ from contextlib import contextmanager
 from logging import Logger
 from pathlib import Path
 
+import click
+from typer import Context
+
 import mediabridge.data_processing.wiki_to_netflix as w_to_n
 from mediabridge.data_processing.wiki_to_netflix_test_data import EXPECTED_SPARQL_QUERY
 from mediabridge.definitions import DATA_DIR
@@ -114,5 +117,12 @@ class TestWikiToNetflix(unittest.TestCase):
         self._process_with_path_missing(DATA_DIR)
         self._process_with_path_missing(TITLES_TXT)
 
-    def test_process_data(self) -> None:
-        w_to_n.process_data(2, TITLES_TXT.with_suffix(".csv"))
+    def test_process(self) -> None:
+        ctx = Context(command=example_command, info_name="mediabridge")
+        w_to_n.process(ctx, 2, TITLES_TXT.with_suffix(".csv"), False)
+        ctx.invoke(example_command)
+
+
+@click.command()
+def example_command():
+    """This no-op lets us build a well-formed Context."""
