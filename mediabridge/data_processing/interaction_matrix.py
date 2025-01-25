@@ -5,6 +5,8 @@ from pathlib import Path
 import numpy as np
 from scipy.sparse import coo_matrix
 
+from mediabridge.definitions import DATA_DIR
+
 
 def list_rating_files(directory_path):
     """List of files in the directory that start with mv_."""
@@ -51,18 +53,15 @@ def main():
     """Main entry point to create and save the interaction matrix."""
 
     # Configurations
-    data_directory = (Path(__file__) / "../../../data").resolve()
-    output_directory = data_directory.parent / "output"
-    output_file = output_directory / "interaction_matrix.pkl"
+    output_file = DATA_DIR.parent / "output/interaction_matrix.pkl"
+    output_file.parent.mkdir(exist_ok=True)
 
     # Number of users and movies
     num_users = 480_189
     num_movies = 17_770
 
     # Process Data
-    interaction_matrix = create_interaction_matrix(
-        data_directory, num_users, num_movies
-    )
+    interaction_matrix = create_interaction_matrix(DATA_DIR, num_users, num_movies)
 
     # Save Data
     save_matrix(interaction_matrix, output_file)
