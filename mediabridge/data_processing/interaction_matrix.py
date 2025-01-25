@@ -1,6 +1,6 @@
 import os
 import pickle
-from pathlib import Path
+
 
 import numpy as np
 from scipy.sparse import coo_matrix
