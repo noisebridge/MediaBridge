@@ -1,5 +1,6 @@
 import os
 import pickle
+from pathlib import Path
 
 import numpy as np
 from scipy.sparse import coo_matrix
@@ -50,13 +51,13 @@ def main():
     """Main entry point to create and save the interaction matrix."""
 
     # Configurations
-    data_directory = os.path.join(os.path.dirname(__file__), "../../data/")
-    output_directory = os.path.join(data_directory, "../output/")
-    output_file = os.path.join(output_directory, "interaction_matrix.pkl")
+    data_directory = (Path(__file__) / "../../../data").resolve()
+    output_directory = data_directory.parent / "output"
+    output_file = output_directory / "interaction_matrix.pkl"
 
     # Number of users and movies
-    num_users = 480189
-    num_movies = 17770
+    num_users = 480_189
+    num_movies = 17_770
 
     # Process Data
     interaction_matrix = create_interaction_matrix(

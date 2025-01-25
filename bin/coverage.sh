@@ -10,6 +10,7 @@ ENV="env PYTHONPATH=.:../..:${PYTHONPATH}"
 coverage erase
 ${ENV} coverage run -p -m pytest -v
 coverage run -p mediabridge/definitions.py 2> /dev/null || true
+coverage run -p mediabridge/data_processing/interaction_matrix.py
 coverage run -p -m mediabridge.definitions
 coverage run -p -m unittest mediabridge/*/*_test.py
 coverage combine --quiet
