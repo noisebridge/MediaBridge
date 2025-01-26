@@ -349,7 +349,7 @@ def process(
         "-f",
         help="Run processing on full dataset. Overrides --num_rows.",
     ),
-):
+) -> None:
     """Enrich Netflix data with Wikidata matches and write matches to CSV."""
     log.debug(ctx.obj)
     log_to_file = ctx.obj and ctx.obj.log_to_file
