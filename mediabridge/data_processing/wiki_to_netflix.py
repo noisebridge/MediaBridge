@@ -85,7 +85,7 @@ def create_netflix_csv(csv_path: Path, data_list: list[MovieData]) -> None:
             writer.writerows((movie.flatten_values() for movie in data_list))
 
 
-def wiki_feature_info(data: dict, key: str) -> str | list | None:
+def wiki_feature_info(data: dict[str, Any], key: str) -> str | list[Any] | None:
     """
     Extracts movie information from a Wikidata query result.
 
@@ -115,7 +115,7 @@ def wiki_feature_info(data: dict, key: str) -> str | list | None:
                 if "genreLabel" in d
             }
         )
-    return data["results"]["bindings"][0][key]["value"].split("/")[-1]
+    return str(data["results"]["bindings"][0][key]["value"].split("/")[-1])
 
 
 def wiki_feature_optional_str(data: dict[str, Any], key: str) -> str | None:
