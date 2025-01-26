@@ -1,16 +1,17 @@
-from contextlib import contextmanager
-from logging import Handler, Logger
+from collections.abc import Iterator
+from contextlib import _GeneratorContextManager, contextmanager
+from logging import Handler, Logger, LogRecord
 
 
-def silence_logging(self, logger: Logger):
+def silence_logging(logger: Logger) -> _GeneratorContextManager[None]:
     """A helper context manager to suppress logs from cluttering test output."""
 
     class NullHandler(Handler):
-        def emit(self, record):
+        def emit(self, record: LogRecord) -> None:
             pass  # Ignore all log records
 
     @contextmanager
-    def _silence_logging():
+    def _silence_logging() -> Iterator[None]:
         original_handlers = logger.handlers.copy()
         logger.handlers.clear()
         logger.addHandler(NullHandler())

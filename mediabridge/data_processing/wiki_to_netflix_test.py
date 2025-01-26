@@ -55,7 +55,7 @@ class TestWikiToNetflix(unittest.TestCase):
         """This integration test simply provokes the "whoops, no match" case in the target code."""
 
         log = getLogger("mediabridge.data_processing.wiki_to_netflix")
-        with silence_logging(self, log):
+        with silence_logging(log):
             assert w_to_n.wiki_query(MovieData("-1", "No Such Movie", 1901)) is None
 
     def test_read_netflix_txt(self) -> None:
