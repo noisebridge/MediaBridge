@@ -1,6 +1,7 @@
 import os
 import pickle
 from collections.abc import Generator
+from pathlib import Path
 
 import numpy as np
 from scipy.sparse import coo_matrix
@@ -8,7 +9,7 @@ from scipy.sparse import coo_matrix
 from mediabridge.definitions import DATA_DIR
 
 
-def list_rating_files(directory_path: str) -> Generator[str, None, None]:
+def list_rating_files(directory_path: Path) -> Generator[str, None, None]:
     """List of files in the directory that start with mv_."""
     for f in os.listdir(directory_path):
         if f.startswith("mv_"):
@@ -16,7 +17,7 @@ def list_rating_files(directory_path: str) -> Generator[str, None, None]:
 
 
 def create_interaction_matrix(
-    directory_path: str,
+    directory_path: Path,
     num_users: int,
     num_movies: int,
 ) -> coo_matrix:
@@ -45,7 +46,7 @@ def create_interaction_matrix(
     return interaction_matrix
 
 
-def save_matrix(matrix: coo_matrix, output_file: str) -> None:
+def save_matrix(matrix: coo_matrix, output_file: Path) -> None:
     with open(output_file, "wb") as f:
         pickle.dump(matrix, f)
     print(f"Interaction matrix saved to {output_file}")
