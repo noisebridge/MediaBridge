@@ -1,6 +1,5 @@
 import unittest
-from contextlib import contextmanager
-from logging import Handler, Logger, getLogger
+from logging import getLogger
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -14,29 +13,9 @@ from mediabridge.data_processing.wiki_to_netflix_test_data import (
 )
 from mediabridge.definitions import DATA_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
+from tests.logging_util import silence_logging
 
 TITLES_TXT = DATA_DIR / "movie_titles.txt"
-
-
-def silence_logging(self, logger: Logger):
-    """A helper context manager to suppress logs from cluttering test output."""
-
-    class NullHandler(Handler):
-        def emit(self, record):
-            pass  # Ignore all log records
-
-    @contextmanager
-    def _silence_logging():
-        original_handlers = logger.handlers.copy()
-        logger.handlers.clear()
-        logger.addHandler(NullHandler())
-
-        try:
-            yield  # Let the test code run for a bit.
-        finally:
-            logger.handlers = original_handlers  # Turn logging back on.
-
-    return _silence_logging()
 
 
 class TestWikiToNetflix(unittest.TestCase):
@@ -138,5 +117,5 @@ class TestWikiToNetflix(unittest.TestCase):
 
 
 @click.command()
-def example_command():
+def example_command() -> None:
     """This no-op lets us build a well-formed Context."""
