@@ -11,7 +11,7 @@ from mediabridge.data_processing.wiki_to_netflix_test_data import (
     EXPECTED_SPARQL_QUERY,
     WIKIDATA_RESPONSE_THE_ROOM,
 )
-from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT, PROJECT_DIR
+from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 from tests.logging_util import silence_logging
 
@@ -66,13 +66,12 @@ class TestWikiToNetflix(unittest.TestCase):
             assert movies[-1] == ["17770", "2003", "Alien Hunter"]
 
     def test_create_netflix_csv(self) -> None:
-        output_csv = DATA_DIR / "movie_titles.csv"
         few_rows = 3  # A conveniently small number of rows, for fast tests.
         rows = list(w_to_n.read_netflix_txt(TITLES_TXT, few_rows))
         movies = [MovieData(id, title, int(year)) for id, year, title in rows]
 
-        w_to_n.create_netflix_csv(output_csv, movies)
-        lines = output_csv.read_text().splitlines()
+        w_to_n.create_netflix_csv(TITLES_CSV, movies)
+        lines = TITLES_CSV.read_text().splitlines()
 
         assert len(lines) == few_rows + 1
         assert lines[-1] == "3,Character,1997"
