@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pymongo = "~=4.10"
 python-dotenv = "~=1.0"
+rectools-lightfm = "~=1.17.3"
 requests = "~=2.26"
 scipy = "~=1.14"
 tqdm = "~=4.66"
