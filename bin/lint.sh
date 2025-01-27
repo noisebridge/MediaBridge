@@ -7,6 +7,6 @@ source bin/util.sh
 
 ${ENV} ruff check .
 
-${ENV} mypy ${STRICT} --show-traceback --warn-unreachable --ignore-missing-imports --no-namespace-packages .
+${ENV} mypy --strict --show-traceback --warn-unreachable --ignore-missing-imports --no-namespace-packages .
 
 ${ENV} pyright .
