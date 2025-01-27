@@ -16,6 +16,7 @@ from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 from tests.logging_util import silence_logging
 
 TITLES_TXT = DATA_DIR / "movie_titles.txt"
+TITLES_CSV = TITLES_TXT.with_suffix(".csv")
 
 
 class TestWikiToNetflix(unittest.TestCase):
@@ -107,13 +108,21 @@ class TestWikiToNetflix(unittest.TestCase):
             ephemeral.rename(actual)
 
     def test_process_data_pretend_theres_no_data_dir(self) -> None:
+        TITLES_CSV.unlink(missing_ok=True)
+
         self._process_with_path_missing(DATA_DIR)
         self._process_with_path_missing(TITLES_TXT)
 
+        assert not TITLES_CSV.exists()
+
     def test_process(self) -> None:
         ctx = Context(command=example_command, info_name="mediabridge")
-        w_to_n.process(ctx, 2, TITLES_TXT.with_suffix(".csv"), full=False)
+        TITLES_CSV.unlink(missing_ok=True)
+
+        w_to_n.process(ctx, 2, TITLES_CSV, full=False)
         ctx.invoke(example_command)
+
+        self.assertGreaterEqual(TITLES_CSV.stat().st_size, 82)
 
 
 @click.command()
