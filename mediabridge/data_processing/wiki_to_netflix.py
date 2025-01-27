@@ -12,7 +12,7 @@ import typer
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT, OUTPUT_DIR
+from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
 USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
@@ -256,9 +256,10 @@ def process_data(
         exist.
     """
 
-    if not DATA_DIR.exists():
+    data_dir = movie_data_path.parent
+    if not data_dir.exists():
         raise FileNotFoundError(
-            f"Data directory does not exist at {DATA_DIR}, please create a new directory containing the netflix prize dataset files\n"
+            f"Data directory does not exist at {data_dir}, please create a new directory containing the netflix prize dataset files\n"
             "https://archive.org/details/nf_prize_dataset.tar"
         )
 

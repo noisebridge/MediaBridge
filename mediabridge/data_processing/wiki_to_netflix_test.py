@@ -87,7 +87,7 @@ class TestWikiToNetflix(unittest.TestCase):
         assert w_to_n.wiki_feature_info(data, "clavis") is None
 
     def _process_with_path_missing(self, actual: Path) -> None:
-        """Verifies we get an error from process_data(), when a path is momentarily is missing."""
+        """Verifies we get an error from process_data(), when a path is momentarily missing."""
         ephemeral = Path(f"{actual}-missing")
         assert not ephemeral.exists()
         actual.rename(ephemeral)
@@ -100,7 +100,7 @@ class TestWikiToNetflix(unittest.TestCase):
     def test_process_data_pretend_theres_no_data_dir(self) -> None:
         TITLES_CSV.unlink(missing_ok=True)
 
-        self._process_with_path_missing(DATA_DIR)
+        self._process_with_path_missing(TITLES_TXT.parent)
         self._process_with_path_missing(TITLES_TXT)
 
         assert not TITLES_CSV.exists()
