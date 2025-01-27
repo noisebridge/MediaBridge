@@ -8,6 +8,7 @@ if __package__ != "mediabridge":
 MODULE_DIR = Path(__file__).parent
 PROJECT_DIR = MODULE_DIR.parent
 DATA_DIR = PROJECT_DIR / "data"
+FULL_TITLES_TXT = DATA_DIR / "movie_titles.txt"
 OUTPUT_DIR = PROJECT_DIR / "out"
 
 if __name__ == "__main__":

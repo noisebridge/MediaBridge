@@ -11,11 +11,11 @@ from mediabridge.data_processing.wiki_to_netflix_test_data import (
     EXPECTED_SPARQL_QUERY,
     WIKIDATA_RESPONSE_THE_ROOM,
 )
-from mediabridge.definitions import DATA_DIR
+from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT, PROJECT_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 from tests.logging_util import silence_logging
 
-TITLES_TXT = DATA_DIR / "movie_titles.txt"
+TITLES_TXT = PROJECT_DIR / "tests/test-data/movie_titles_test.txt"
 TITLES_CSV = TITLES_TXT.with_suffix(".csv")
 
 
@@ -46,12 +46,6 @@ class TestWikiToNetflix(unittest.TestCase):
             ),
         )
 
-    def test_create_titles(self) -> None:
-        temp = Path("/tmp") / "nonexistent.txt"
-        w_to_n.ensure_movie_titles_txt_exists(temp)
-        assert temp.exists()
-        temp.unlink()
-
     def test_wiki_query_not_found(self) -> None:
         """This integration test simply provokes the "whoops, no match" case in the target code."""
 
@@ -64,16 +58,12 @@ class TestWikiToNetflix(unittest.TestCase):
         assert len(movies) == 3
         assert movies[-1] == ["3", "1997", "Character"]
 
-        short = TITLES_TXT.stat().st_size <= 74
         # Sometimes we're in an environment, like CI, where we never downloaded the full dataset.
         # So silently succeed, without attempting to read thousands of non-existent entries.
-        assert short or self._read_full_netflix_txt()
-
-    def _read_full_netflix_txt(self) -> bool:
-        movies = list(w_to_n.read_netflix_txt(TITLES_TXT))
-        assert len(movies) == 17_770
-        assert movies[-1] == ["17770", "2003", "Alien Hunter"]
-        return True
+        if FULL_TITLES_TXT.exists():
+            movies = list(w_to_n.read_netflix_txt(FULL_TITLES_TXT))
+            assert len(movies) == 17_770
+            assert movies[-1] == ["17770", "2003", "Alien Hunter"]
 
     def test_create_netflix_csv(self) -> None:
         output_csv = DATA_DIR / "movie_titles.csv"
@@ -99,11 +89,11 @@ class TestWikiToNetflix(unittest.TestCase):
     def _process_with_path_missing(self, actual: Path) -> None:
         """Verifies we get an error from process_data(), when a path is momentarily is missing."""
         ephemeral = Path(f"{actual}-missing")
-        assert actual.exists()
+        assert not ephemeral.exists()
         actual.rename(ephemeral)
         try:
             with self.assertRaises(FileNotFoundError):
-                w_to_n.process_data(1, None)
+                w_to_n.process_data(TITLES_TXT, 1, None)
         finally:
             ephemeral.rename(actual)
 

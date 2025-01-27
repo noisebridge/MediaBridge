@@ -12,7 +12,7 @@ import typer
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
+from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT, OUTPUT_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
 USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
@@ -25,21 +25,6 @@ class WikidataServiceTimeoutException(Exception):
 
 app = typer.Typer()
 log = logging.getLogger(__name__)
-
-
-def ensure_movie_titles_txt_exists(txt_file: Path) -> None:
-    if not txt_file.exists():
-        folder = txt_file.parent
-        folder.mkdir(exist_ok=True)
-        with txt_file.open("w") as fout:
-            fout.write(_first_few_titles())
-
-
-def _first_few_titles() -> str:
-    return """1,2003,Dinosaur Planet
-2,2004,Isle of Man TT 2004 Review
-3,1997,Character
-"""
 
 
 def read_netflix_txt(
@@ -58,7 +43,6 @@ def read_netflix_txt(
     Yields:
         List of strings representing the values of the next row in the file.
     """
-    ensure_movie_titles_txt_exists(txt_file)
     with open(txt_file, "r", encoding="ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
             if num_rows is not None and i >= num_rows:
@@ -252,6 +236,7 @@ def wiki_query(
 
 
 def process_data(
+    movie_data_path: Path,
     num_rows: int | None = None,
     output_missing_csv_path: Path | None = None,
 ) -> None:
@@ -276,8 +261,6 @@ def process_data(
             f"Data directory does not exist at {DATA_DIR}, please create a new directory containing the netflix prize dataset files\n"
             "https://archive.org/details/nf_prize_dataset.tar"
         )
-
-    movie_data_path = DATA_DIR / "movie_titles.txt"
 
     if not movie_data_path.exists():
         raise FileNotFoundError(
@@ -359,7 +342,9 @@ def process(
     with nullcontext() if log_to_file else logging_redirect_tqdm():
         num_rows = None if full else num_rows
         try:
-            process_data(num_rows, output_missing_csv_path=missing_out_path)
+            process_data(
+                FULL_TITLES_TXT, num_rows, output_missing_csv_path=missing_out_path
+            )
         except Exception as e:
             # include fatal exceptions with traceback in logs
             if log_to_file:
