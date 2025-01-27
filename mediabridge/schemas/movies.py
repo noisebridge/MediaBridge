@@ -9,7 +9,7 @@ class MovieData:
     title: str
     year: int
 
-    def flatten_values(self):
+    def flatten_values(self) -> dict[str, str]:
         """Format all dataclass fields into a mapping of strings by joining
         lists with semicolons"""
         return {

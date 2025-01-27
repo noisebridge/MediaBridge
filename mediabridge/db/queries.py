@@ -1,7 +1,14 @@
+from typing import Any
+
+from pymongo.database import Database
+from pymongo.operations import InsertOne, UpdateOne
+
 from mediabridge.db.connect import connect_to_mongo
 
+MovieDoc = dict[str, str | int]
 
-def insert_into_mongo(movie):
+
+def insert_into_mongo(movie: list[str | int]) -> None:
     db = connect_to_mongo()
     collection = db["movies"]
     collection.update_one(
@@ -20,7 +27,7 @@ def insert_into_mongo(movie):
     )
 
 
-def bulk_insert(operations):
-    db = connect_to_mongo()
+def bulk_insert(operations: list[UpdateOne | InsertOne[MovieDoc]]) -> None:
+    db: Database[Any] = connect_to_mongo()
     collection = db["movies"]
     collection.bulk_write(operations)

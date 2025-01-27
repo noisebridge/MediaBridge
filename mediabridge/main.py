@@ -27,7 +27,7 @@ def main(
     log: bool = typer.Option(
         False, "--log", "-l", help="Enable all logging message levels and log to file."
     ),
-):
+) -> None:
     if not OUTPUT_DIR.exists():
         print(
             f"[WARNING] Output directory does not exist, creating new directory at {OUTPUT_DIR}"
