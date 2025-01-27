@@ -1,19 +1,27 @@
 import os
 import pickle
+from collections.abc import Generator
+from pathlib import Path
 
 import numpy as np
-from scipy.sparse import coo_matrix
+from scipy.sparse import coo_matrix, csr_matrix
+
+from mediabridge.definitions import DATA_DIR
 
 
-def list_rating_files(directory_path):
+def list_rating_files(directory_path: Path) -> Generator[str, None, None]:
     """List of files in the directory that start with mv_."""
     for f in os.listdir(directory_path):
         if f.startswith("mv_"):
             yield os.path.join(directory_path, f)
 
 
-def create_interaction_matrix(directory_path, num_users, num_movies):
-    im = interaction_matrix = coo_matrix((num_users, num_movies), dtype=np.int8)
+def create_interaction_matrix(
+    directory_path: Path,
+    num_users: int,
+    num_movies: int,
+) -> coo_matrix:
+    interaction_matrix = csr_matrix((num_users, num_movies), dtype=np.int8)
     user_mapper = {}
     current_user_index = 0
 
@@ -23,9 +31,7 @@ def create_interaction_matrix(directory_path, num_users, num_movies):
             movie_idx = movie_id - 1
 
             for line in file:
-                user_id, rating, _ = line.strip().split(",")
-                user_id = int(user_id)
-                rating = int(rating)
+                user_id, rating, _ = map(int, line.strip().split(","))
 
                 if rating < 4:
                     continue
@@ -35,33 +41,30 @@ def create_interaction_matrix(directory_path, num_users, num_movies):
                     current_user_index += 1
 
                 user_idx = user_mapper[user_id]
-                im[user_idx, movie_idx] = rating  # type: ignore [reportIndexIssue]
+                interaction_matrix[user_idx, movie_idx] = rating
 
-    return interaction_matrix
+    return coo_matrix(interaction_matrix)
 
 
-def save_matrix(matrix, output_file):
+def save_matrix(matrix: coo_matrix, output_file: Path) -> None:
     with open(output_file, "wb") as f:
         pickle.dump(matrix, f)
     print(f"Interaction matrix saved to {output_file}")
 
 
-def main():
+def main() -> None:
     """Main entry point to create and save the interaction matrix."""
 
     # Configurations
-    data_directory = os.path.join(os.path.dirname(__file__), "../../data/")
-    output_directory = os.path.join(data_directory, "../output/")
-    output_file = os.path.join(output_directory, "interaction_matrix.pkl")
+    output_file = DATA_DIR.parent / "output/interaction_matrix.pkl"
+    output_file.parent.mkdir(exist_ok=True)
 
     # Number of users and movies
-    num_users = 480189
-    num_movies = 17770
+    num_users = 480_189
+    num_movies = 17_770
 
     # Process Data
-    interaction_matrix = create_interaction_matrix(
-        data_directory, num_users, num_movies
-    )
+    interaction_matrix = create_interaction_matrix(DATA_DIR, num_users, num_movies)
 
     # Save Data
     save_matrix(interaction_matrix, output_file)

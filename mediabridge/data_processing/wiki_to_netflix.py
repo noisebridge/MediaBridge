@@ -4,6 +4,7 @@ import logging
 import time
 from contextlib import nullcontext
 from pathlib import Path
+from types import NoneType
 from typing import Any, Iterator
 
 import requests
@@ -11,7 +12,7 @@ import typer
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
+from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
 USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
@@ -27,7 +28,8 @@ log = logging.getLogger(__name__)
 
 
 def read_netflix_txt(
-    txt_file: Path, num_rows: int | None = None
+    txt_file: Path,
+    num_rows: int | None = None,
 ) -> Iterator[list[str]]:
     """
     Reads rows from the Netflix dataset file.
@@ -67,7 +69,7 @@ def create_netflix_csv(csv_path: Path, data_list: list[MovieData]) -> None:
             writer.writerows((movie.flatten_values() for movie in data_list))
 
 
-def wiki_feature_info(data: dict, key: str) -> str | list | None:
+def wiki_feature_info(data: dict[str, Any], key: str) -> str | list[Any] | None:
     """
     Extracts movie information from a Wikidata query result.
 
@@ -97,15 +99,14 @@ def wiki_feature_info(data: dict, key: str) -> str | list | None:
                 if "genreLabel" in d
             }
         )
-    return data["results"]["bindings"][0][key]["value"].split("/")[-1]
+    return str(data["results"]["bindings"][0][key]["value"].split("/")[-1])
 
 
 def wiki_feature_optional_str(data: dict[str, Any], key: str) -> str | None:
     """Validates that we obtained a single (optional) string."""
     s = wiki_feature_info(data, key)
-    if s:
-        return str(s)
-    return None
+    assert isinstance(s, (str, NoneType)), s
+    return s
 
 
 def wiki_feature_genres(data: dict[str, Any], key: str) -> list[str]:
@@ -235,6 +236,7 @@ def wiki_query(
 
 
 def process_data(
+    movie_data_path: Path,
     num_rows: int | None = None,
     output_missing_csv_path: Path | None = None,
 ) -> None:
@@ -254,13 +256,12 @@ def process_data(
         exist.
     """
 
-    if not DATA_DIR.exists():
+    data_dir = movie_data_path.parent
+    if not data_dir.exists():
         raise FileNotFoundError(
-            f"Data directory does not exist at {DATA_DIR}, please create a new directory containing the netflix prize dataset files\n"
+            f"Data directory does not exist at {data_dir}, please create a new directory containing the netflix prize dataset files\n"
             "https://archive.org/details/nf_prize_dataset.tar"
         )
-
-    movie_data_path = DATA_DIR / "movie_titles.txt"
 
     if not movie_data_path.exists():
         raise FileNotFoundError(
@@ -310,12 +311,6 @@ def process_data(
 @app.command()
 def process(
     ctx: typer.Context,
-    full: bool = typer.Option(
-        False,
-        "--full",
-        "-f",
-        help="Run processing on full dataset. Overrides --num_rows.",
-    ),
     num_rows: int | None = typer.Option(
         DEFAULT_TEST_ROWS,
         "--num-rows",
@@ -331,7 +326,14 @@ def process(
             "CSV at this path, relative to the output directory."
         ),
     ),
-):
+    *,
+    full: bool = typer.Option(
+        False,
+        "--full",
+        "-f",
+        help="Run processing on full dataset. Overrides --num_rows.",
+    ),
+) -> None:
     """Enrich Netflix data with Wikidata matches and write matches to CSV."""
     log.debug(ctx.obj)
     log_to_file = ctx.obj and ctx.obj.log_to_file
@@ -341,7 +343,9 @@ def process(
     with nullcontext() if log_to_file else logging_redirect_tqdm():
         num_rows = None if full else num_rows
         try:
-            process_data(num_rows, output_missing_csv_path=missing_out_path)
+            process_data(
+                FULL_TITLES_TXT, num_rows, output_missing_csv_path=missing_out_path
+            )
         except Exception as e:
             # include fatal exceptions with traceback in logs
             if log_to_file:
