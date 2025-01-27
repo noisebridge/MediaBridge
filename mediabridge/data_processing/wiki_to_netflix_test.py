@@ -107,12 +107,16 @@ class TestWikiToNetflix(unittest.TestCase):
 
     def test_process(self) -> None:
         ctx = Context(command=example_command, info_name="mediabridge")
-        TITLES_CSV.unlink(missing_ok=True)
+        csv = FULL_TITLES_TXT.with_suffix(".csv")
 
-        w_to_n.process(ctx, 2, TITLES_CSV, full=False)
+        if FULL_TITLES_TXT.exists():
+            # At this point we're on a developer's laptop, rather than in CI.
+            csv.unlink(missing_ok=True)
+
+            w_to_n.process(ctx, 2, csv, full=False)
+
+        self.assertGreaterEqual(csv.stat().st_size, 82)
         ctx.invoke(example_command)
-
-        self.assertGreaterEqual(TITLES_CSV.stat().st_size, 82)
 
 
 @click.command()
