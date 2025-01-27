@@ -114,8 +114,8 @@ class TestWikiToNetflix(unittest.TestCase):
 
             w_to_n.process(ctx, 2, csv, full=False)
 
-        self.assertGreaterEqual(csv.stat().st_size, 82)
-        ctx.invoke(example_command)
+            self.assertGreaterEqual(csv.stat().st_size, 82)
+            ctx.invoke(example_command)
 
 
 @click.command()
