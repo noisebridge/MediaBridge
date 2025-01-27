@@ -66,14 +66,15 @@ class TestWikiToNetflix(unittest.TestCase):
             assert movies[-1] == ["17770", "2003", "Alien Hunter"]
 
     def test_create_netflix_csv(self) -> None:
-        few_rows = 3  # A conveniently small number of rows, for fast tests.
-        rows = list(w_to_n.read_netflix_txt(TITLES_TXT, few_rows))
-        movies = [MovieData(id, title, int(year)) for id, year, title in rows]
-
+        movies = [
+            MovieData("1", year=2003, title="Dinosaur Planet"),
+            MovieData("8806", year=1966, title="The Good, the Bad, and the Ugly"),
+            MovieData("3", year=1997, title="Character"),
+        ]
         w_to_n.create_netflix_csv(TITLES_CSV, movies)
         lines = TITLES_CSV.read_text().splitlines()
 
-        assert len(lines) == few_rows + 1
+        assert len(lines) == len(movies) + 1
         assert lines[-1] == "3,Character,1997"
 
     def test_wiki_feature_info(self) -> None:
