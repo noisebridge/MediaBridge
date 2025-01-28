@@ -1,7 +1,7 @@
 from mediabridge.schemas.movies import EnrichedMovieData
 
 
-def test_flatten_values():
+def test_flatten_values() -> None:
     vals = EnrichedMovieData(
         "1", "The Matrix", 1999, "Q11424", ["Action", "Drama"], "Lana Wachowski"
     ).flatten_values()

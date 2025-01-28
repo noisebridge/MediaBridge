@@ -12,7 +12,7 @@ app = Typer()
 
 
 @app.command()
-def load():
+def load() -> None:
     """
     Load a csv of movie data into the mongo database.
     """
