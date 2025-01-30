@@ -1,6 +1,8 @@
 import unittest
 from warnings import catch_warnings, filterwarnings
 
+import pandas as pd
+
 from mediabridge.recommender.two_movies_rec import etl
 
 
@@ -13,3 +15,7 @@ class TestTwoMoviesRec(unittest.TestCase):
 
             assert LightFM(loss="warp")
             etl()
+
+    def test_df(self) -> None:
+        df = pd.DataFrame()
+        assert df.empty
