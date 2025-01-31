@@ -30,24 +30,24 @@ log = logging.getLogger(__name__)
 def read_netflix_txt(
     txt_file: Path,
     num_rows: int | None = None,
-) -> Iterator[list[str]]:
+) -> Iterator[tuple[str, ...]]:
     """
     Reads rows from the Netflix dataset file.
 
     Parameters:
-        txt_file (Path): Path to the Netflix text file.
+        txt_file: Path to the Netflix movie title file.
 
-        num_rows (int | None): Number of rows to read from the file, if None,
+        num_rows: Number of rows to read from the file, or if None,
         all rows are read.
 
     Yields:
-        List of strings representing the values of the next row in the file.
+        (id, year, title) tuples.
     """
     with open(txt_file, "r", encoding="ISO-8859-1") as netflix_data:
         for i, line in enumerate(netflix_data):
             if num_rows is not None and i >= num_rows:
                 break
-            yield line.rstrip().split(",", 2)
+            yield tuple(line.rstrip().split(",", 2))
 
 
 def create_netflix_csv(csv_path: Path, data_list: list[MovieData]) -> None:
