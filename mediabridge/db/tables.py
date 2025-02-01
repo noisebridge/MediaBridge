@@ -1,20 +1,22 @@
 from functools import cache
 from pathlib import Path
 
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import Integer, String, create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-DB_FILE: Path = Path("/tmp/movies.sqlite")
+DB_FILE = Path("/tmp/movies.sqlite")
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    """Base class for all tables."""
 
 
 class MovieTitle(Base):
     __tablename__ = "movie_title"
-    id: Column = Column(String, primary_key=True)
-    year: Column = Column(Integer)
-    title: Column = Column(String, nullable=False)
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    year: Mapped[int] = mapped_column(Integer, nullable=True)
+    title: Mapped[str] = mapped_column(String, nullable=False)
 
 
 @cache
