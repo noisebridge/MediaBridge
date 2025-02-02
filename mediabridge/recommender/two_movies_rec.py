@@ -34,10 +34,10 @@ def _etl_user_rating(glob: str = "mv_000000*.txt") -> None:
     diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
     assert training_folder.exists(), diagnostic
 
-    for file_path in training_folder.glob(glob):
+    for file_path in sorted(training_folder.glob(glob)):
         print(file_path)
         df = pd.DataFrame(_read_ratings(file_path))
-        print(df)
+        print(df.tail(2))
 
 
 def _read_ratings(file_path: Path) -> Generator[dict[str, int], None, None]:
@@ -46,4 +46,7 @@ def _read_ratings(file_path: Path) -> Generator[dict[str, int], None, None]:
         fin.readline()
         for line in fin:
             user_id, rating, _ = line.strip().split(",")
-            yield {"user_id": int(user_id), "rating": int(rating)}
+            yield {
+                "user_id": int(user_id),
+                "rating": int(rating),
+            }
