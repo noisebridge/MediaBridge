@@ -1,4 +1,5 @@
 import unittest
+from time import time
 from warnings import catch_warnings, filterwarnings
 
 import pandas as pd
@@ -18,7 +19,9 @@ class TestTwoMoviesRec(unittest.TestCase):
             assert LightFM(loss="warp")
             create_tables()
             if FULL_TITLES_TXT.exists():
+                t0 = time()
                 etl()
+                print(f"ETL finished in {time()-t0:.3f} s")
 
     def test_df(self) -> None:
         df = pd.DataFrame()

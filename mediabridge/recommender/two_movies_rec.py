@@ -13,9 +13,9 @@ from mediabridge.db.tables import get_engine
 from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
 
 
-def etl() -> None:
+def etl(glob: str = "mv_00000*.txt") -> None:
     _etl_movie_title()
-    _etl_user_rating()
+    _etl_user_rating(glob)
 
 
 def _etl_movie_title() -> None:
@@ -29,20 +29,20 @@ def _etl_movie_title() -> None:
         df.to_sql("movie_title", connection, index=False, if_exists="append")
 
 
-def _etl_user_rating(glob: str = "mv_000000*.txt") -> None:
+def _etl_user_rating(glob: str) -> None:
     training_folder = PROJECT_DIR.parent / "Netflix-Dataset/training_set/training_set"
     diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
     assert training_folder.exists(), diagnostic
 
     for file_path in sorted(training_folder.glob(glob)):
-        print(file_path)
         df = pd.DataFrame(_read_ratings(file_path))
-        print(df.tail(2))
+        assert not df.empty
+        # print(df.tail(2))
 
 
 def _read_ratings(file_path: Path) -> Generator[dict[str, int], None, None]:
     with open(file_path, "r") as fin:
-        #     movie_id = int(fin.readline().rstrip().rstrip(":"))
+        # movie_id = int(fin.readline().rstrip().rstrip(":"))
         fin.readline()
         for line in fin:
             user_id, rating, _ = line.strip().split(",")
