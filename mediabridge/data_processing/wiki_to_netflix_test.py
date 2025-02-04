@@ -13,7 +13,7 @@ from mediabridge.data_processing.wiki_to_netflix_test_data import (
 )
 from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
-from tests.logging_util import silence_logging
+from tests.util.logging_util import silence_logging
 
 TITLES_TXT = PROJECT_DIR / "tests/test-data/movie_titles_test.txt"
 TITLES_CSV = TITLES_TXT.with_suffix(".csv")
