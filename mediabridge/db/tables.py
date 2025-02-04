@@ -1,7 +1,7 @@
 from functools import cache
 from pathlib import Path
 
-from sqlalchemy import Integer, String, create_engine
+from sqlalchemy import ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -17,6 +17,16 @@ class MovieTitle(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True)
     year: Mapped[int] = mapped_column(Integer, nullable=True)
     title: Mapped[str] = mapped_column(String, nullable=False)
+
+
+_movie_fk = ForeignKey("movie_title.id")
+
+
+class Rating(Base):
+    __tablename__ = "rating"
+    user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    movie_id: Mapped[str] = mapped_column(String, _movie_fk, primary_key=True)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
 @cache
