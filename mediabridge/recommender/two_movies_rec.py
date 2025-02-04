@@ -2,6 +2,7 @@
 Recommends movies based on sparse input: the "cold start" problem.
 """
 
+import re
 from collections.abc import Generator
 from pathlib import Path
 
@@ -13,7 +14,7 @@ from mediabridge.db.tables import get_engine
 from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
 
 
-def etl(glob: str = "mv_00000*.txt") -> None:
+def etl(glob: str = "mv_000000*.txt") -> None:
     _etl_movie_title()
     _etl_user_rating(glob)
 
@@ -25,7 +26,9 @@ def _etl_movie_title() -> None:
     print(df)
 
     with get_engine().connect() as connection:
+        connection.execute(text("DELETE FROM rating"))
         connection.execute(text("DELETE FROM movie_title"))
+        connection.execute(text("COMMIT"))
         df.to_sql("movie_title", connection, index=False, if_exists="append")
 
 
@@ -33,17 +36,24 @@ def _etl_user_rating(glob: str) -> None:
     training_folder = PROJECT_DIR.parent / "Netflix-Dataset/training_set/training_set"
     diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
     assert training_folder.exists(), diagnostic
+    path_re = re.compile(r"/mv_(\d{7}).txt$")
 
     for file_path in sorted(training_folder.glob(glob)):
-        df = pd.DataFrame(_read_ratings(file_path))
+        m = path_re.search(f"{file_path}")
+        assert m
+        movie_id = int(m.group(1))
+        df = pd.DataFrame(_read_ratings(file_path, movie_id))
         assert not df.empty
-        # print(df.tail(2))
+        df["movie_id"] = movie_id
+        df.to_sql("rating", get_engine(), if_exists="append", index=False)
 
 
-def _read_ratings(file_path: Path) -> Generator[dict[str, int], None, None]:
+def _read_ratings(
+    file_path: Path, movie_id: int
+) -> Generator[dict[str, int], None, None]:
     with open(file_path, "r") as fin:
-        # movie_id = int(fin.readline().rstrip().rstrip(":"))
-        fin.readline()
+        line = fin.readline()
+        assert line == f"{movie_id}:\n"
         for line in fin:
             user_id, rating, _ = line.strip().split(",")
             yield {
