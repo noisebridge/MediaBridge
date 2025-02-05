@@ -2,9 +2,11 @@
 Recommends movies based on sparse input: the "cold start" problem.
 """
 
+import io
 import re
 from collections.abc import Generator
 from pathlib import Path
+from subprocess import PIPE, Popen
 
 import pandas as pd
 from sqlalchemy.sql import text
@@ -44,6 +46,8 @@ def _etl_user_rating(glob: str) -> None:
     is_initial = True
 
     with open(out_csv, "wb") as fout:
+        gzip_proc = Popen(["gzip", "-c"], stdin=PIPE, stdout=fout)
+        pv_proc = Popen(["pv", "-qB", "100M"], stdin=PIPE, stdout=gzip_proc.stdin)
         for file_path in tqdm(sorted(training_folder.glob(glob)), smoothing=0.01):
             m = path_re.search(f"{file_path}")
             assert m
@@ -51,9 +55,20 @@ def _etl_user_rating(glob: str) -> None:
             df = pd.DataFrame(_read_ratings(file_path, movie_id))
             assert not df.empty
             df["movie_id"] = movie_id
-            df.to_csv(fout, index=False, header=is_initial, compression="gzip")
-            is_initial = False
-            # df.to_sql("rating_temp", get_engine(), if_exists="append", index=False)
+            with io.BytesIO() as bytes_io:
+                df.to_csv(bytes_io, index=False, header=is_initial)
+                bytes_io.seek(0)
+                assert isinstance(pv_proc.stdin, io.BufferedWriter)
+                pv_proc.stdin.write(bytes_io.read())
+                is_initial = False
+
+        assert isinstance(gzip_proc.stdin, io.BufferedWriter), gzip_proc.stdin
+        assert isinstance(pv_proc.stdin, io.BufferedWriter)
+        pv_proc.stdin.close()
+        pv_proc.wait()
+        gzip_proc.stdin.close()
+        gzip_proc.wait()
+        # df.to_sql("rating_temp", get_engine(), if_exists="append", index=False)
 
 
 def _read_ratings(
