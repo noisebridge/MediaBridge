@@ -20,7 +20,7 @@ class TestTwoMoviesRec(unittest.TestCase):
             create_tables()
             if FULL_TITLES_TXT.exists():
                 t0 = time()
-                etl("mv_00*.txt")
+                etl("mv_00*.txt", max_rows=5_000_000)
                 print(f"ETL finished in {time()-t0:.3f} s")
 
     def test_df(self) -> None:

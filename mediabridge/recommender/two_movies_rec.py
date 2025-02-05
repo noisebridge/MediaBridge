@@ -19,9 +19,9 @@ from mediabridge.db.tables import RatingTemp, get_engine
 from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
 
 
-def etl(glob: str) -> None:
+def etl(glob: str, max_rows: int) -> None:
     _etl_movie_title()
-    _etl_user_rating(glob)
+    _etl_user_rating(glob, max_rows)
 
 
 def _etl_movie_title() -> None:
@@ -38,7 +38,7 @@ def _etl_movie_title() -> None:
         df.to_sql("movie_title", connection, index=False, if_exists="append")
 
 
-def _etl_user_rating(glob: str) -> None:
+def _etl_user_rating(glob: str, max_rows: int) -> None:
     training_folder = PROJECT_DIR.parent / "Netflix-Dataset/training_set/training_set"
     diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
     assert training_folder.exists(), diagnostic
@@ -70,18 +70,18 @@ def _etl_user_rating(glob: str) -> None:
             gzip_proc.stdin.close()
             gzip_proc.wait()
 
-    _insert_ratings(out_csv)
+    _insert_ratings(out_csv, max_rows)
 
 
-def _insert_ratings(csv: Path) -> None:
+def _insert_ratings(csv: Path, max_rows: int) -> None:
     with get_engine().connect() as conn:
-        df = pd.read_csv(csv)
+        df = pd.read_csv(csv, nrows=max_rows)
         conn.execute(text("DELETE FROM rating_temp"))
         conn.commit()
         print(".")
         rows = [
             {str(k): int(v) for k, v in row.items()}
-            for row in df.to_dict(orient="records")
+            for row in df[:max_rows].to_dict(orient="records")
         ]
         print(".")
         with Session(conn) as sess:
