@@ -19,9 +19,10 @@ class TestTwoMoviesRec(unittest.TestCase):
             assert LightFM(loss="warp")
             create_tables()
             if FULL_TITLES_TXT.exists():
+                # A million rows corresponds to a four-second ETL.
                 t0 = time()
-                etl("mv_00*.txt", max_rows=5_000_000)
-                print(f"ETL finished in {time()-t0:.3f} s")
+                etl("mv_00*.txt", max_rows=1_000_000)
+                print(f"ETL finished in {time() - t0:.3f} s")
 
     def test_df(self) -> None:
         df = pd.DataFrame()

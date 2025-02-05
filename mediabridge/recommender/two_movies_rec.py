@@ -15,7 +15,7 @@ from sqlalchemy.sql import text
 from tqdm import tqdm
 
 from mediabridge.data_processing.wiki_to_netflix import read_netflix_txt
-from mediabridge.db.tables import RatingTemp, get_engine
+from mediabridge.db.tables import Rating, get_engine
 from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
 
 
@@ -32,7 +32,6 @@ def _etl_movie_title() -> None:
 
     with get_engine().connect() as connection:
         connection.execute(text("DELETE FROM rating"))
-        connection.execute(text("DELETE FROM rating_temp"))
         connection.execute(text("DELETE FROM movie_title"))
         connection.execute(text("COMMIT"))
         df.to_sql("movie_title", connection, index=False, if_exists="append")
@@ -76,9 +75,9 @@ def _etl_user_rating(glob: str, max_rows: int) -> None:
 def _insert_ratings(csv: Path, max_rows: int) -> None:
     with get_engine().connect() as conn:
         df = pd.read_csv(csv, nrows=max_rows)
-        conn.execute(text("DELETE FROM rating_temp"))
+        conn.execute(text("DELETE FROM rating"))
         conn.commit()
-        print(".")
+        print(len(df), end=" rows", flush=True)
         rows = [
             {str(k): int(v) for k, v in row.items()}
             for row in df[:max_rows].to_dict(orient="records")
@@ -86,30 +85,16 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
         print(".")
         with Session(conn) as sess:
             t0 = time()
-            sess.bulk_insert_mappings(class_mapper(RatingTemp), rows)
+            sess.bulk_insert_mappings(class_mapper(Rating), rows)
             sess.commit()
-            print(f"wrote {len(rows)} rating_temp rows in {time()-t0:.3f} s")
-
-            ins = """
-            INSERT INTO rating (movie_id, user_id, rating)
-            SELECT movie_id, user_id, rating
-            FROM rating_temp
-            ORDER BY movie_id, user_id
-            """
-            t0 = time()
-            sess.execute(text(ins))
-            sess.execute(text("DELETE FROM rating_temp"))
-            sess.commit()
-            print(f"wrote {len(rows)} rating rows in {time()-t0:.3f} s")
+            print(f"wrote {len(rows)} rating rows in {time() - t0:.3f} s")
             #
             # example elapsed times:
-            # wrote 50_000_000 rating_temp rows in 170.379 s
-            # wrote 50_000_000 rating rows in 65.379 s
-            # ETL finished in 274.055 s
+            # wrote 5_000_000 rating rows in 16.033 s
+            # wrote 10_000_000 rating rows in 33.313 s
             #
-            # wrote 100_480_507 rating_temp rows in 828.986 s
-            # wrote 100_480_507 rating rows in 150.741 s
-            # ETL finished in 1075.623 s (completes within eighteen minutes)
+            # wrote 100_480_507 rating rows in 936.827 s
+            # ETL finished in 1031.222 s (completes within eighteen minutes)
 
 
 def _read_ratings(
