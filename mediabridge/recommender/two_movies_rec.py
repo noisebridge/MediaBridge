@@ -8,11 +8,9 @@ from collections.abc import Generator
 from pathlib import Path
 from subprocess import PIPE, Popen
 from time import time
-from typing import Iterable
 
 import pandas as pd
-from sqlalchemy import insert
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, class_mapper
 from sqlalchemy.sql import text
 from tqdm import tqdm
 
@@ -67,22 +65,22 @@ def _etl_user_rating(glob: str) -> None:
             assert isinstance(gzip_proc.stdin, io.BufferedWriter), gzip_proc.stdin
             gzip_proc.stdin.close()
             gzip_proc.wait()
+            _insert_ratings(out_csv)
 
+
+def _insert_ratings(csv: Path) -> None:
     with get_engine().connect() as conn:
-        df = pd.read_csv(out_csv)
+        df = pd.read_csv(csv)
         print(".")
         conn.execute(text("DELETE FROM rating_temp"))
         conn.commit()
-        rows: Iterable[dict[str, int]] = list(df.to_dict(orient="records"))
-        # for row in rows:
-            # assert isinstance(row, dict)
-            # assert ["user_id", "rating", "movie_id"] == list(row.keys())
-            # assert isinstance(row["user_id"], int)
-            # assert isinstance(row["rating"], int)
-            # assert isinstance(row["movie_id"], int)
+        rows = [
+            {str(k): int(v) for k, v in row.items()}
+            for row in df.to_dict(orient="records")
+        ]
         with Session(conn) as sess:
             t0 = time()
-            sess.execute(insert(RatingTemp), rows)
+            sess.bulk_insert_mappings(class_mapper(RatingTemp), rows)
             sess.commit()
             print(f"wrote {len(rows)} rating_temp rows in {time()-t0:.3f} s")
 
