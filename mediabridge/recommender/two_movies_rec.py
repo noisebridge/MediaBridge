@@ -47,6 +47,10 @@ def _etl_user_rating(glob: str) -> None:
     out_csv = Path("/tmp") / "rating.csv.gz"
     if not out_csv.exists():
         with open(out_csv, "wb") as fout:
+            # We don't _need_ a separate gzip child process.
+            # Specifying .to_csv('foo.csz.gz') would suffice.
+            # But then we burn a single core while holding the GIL.
+            # Forking a child lets use burn a pair of cores.
             gzip_proc = Popen(["gzip", "-c"], stdin=PIPE, stdout=fout)
             for file_path in tqdm(sorted(training_folder.glob(glob)), smoothing=0.01):
                 m = path_re.search(f"{file_path}")
@@ -72,13 +76,14 @@ def _etl_user_rating(glob: str) -> None:
 def _insert_ratings(csv: Path) -> None:
     with get_engine().connect() as conn:
         df = pd.read_csv(csv)
-        print(".")
         conn.execute(text("DELETE FROM rating_temp"))
         conn.commit()
+        print(".")
         rows = [
             {str(k): int(v) for k, v in row.items()}
             for row in df.to_dict(orient="records")
         ]
+        print(".")
         with Session(conn) as sess:
             t0 = time()
             sess.bulk_insert_mappings(class_mapper(RatingTemp), rows)
@@ -93,7 +98,7 @@ def _insert_ratings(csv: Path) -> None:
             """
             t0 = time()
             sess.execute(text(ins))
-            sess.execute(text("DROP TABLE rating_temp"))
+            sess.execute(text("DELETE FROM rating_temp"))
             sess.commit()
             print(f"wrote {len(rows)} rating rows in {time()-t0:.3f} s")
 

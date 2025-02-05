@@ -33,7 +33,7 @@ class RatingTemp(Base):
     __tablename__ = "rating_temp"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     movie_id: Mapped[str] = mapped_column(String, nullable=False)
-    user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(Integer, nullable=False)
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
