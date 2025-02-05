@@ -22,12 +22,11 @@ def clean_data_folder(data_dir):
             shutil.rmtree(item_path)
             print(f"Deleted directory: {item_path}")
 
-    print(f"All contents of the 'data' folder have been deleted.")
+    print("All contents of the 'data' folder have been deleted.")
 
 
 def main():
     data_dir = os.path.join(os.path.dirname(__file__), "../../data")
-
     clean_data_folder(data_dir)
 
 

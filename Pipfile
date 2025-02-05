@@ -5,9 +5,9 @@ name = "pypi"
 
 [packages]
 python-dotenv = "~=1.0"
+requests = "~=2.32"
 ruff = "~=0.7"
 tqdm = "~=4.66"
-requests = "~=2.32"
 wget = "~=3.2"
 
 [dev-packages]
@@ -20,3 +20,7 @@ python_version = "3.12"
 [scripts]
     download_data = "pipenv run python -m mediabridge.data_processing.download_data"
     delete_data = "pipenv run python -m mediabridge.data_processing.clean_up_data"
+    coverage = "pipenv run bin/coverage.sh"
+    dev = "pipenv run python -m mediabridge.main"
+    lint = "pipenv run bin/lint.sh"
+    test = "pipenv run python -m pytest"
