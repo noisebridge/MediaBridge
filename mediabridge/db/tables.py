@@ -1,11 +1,12 @@
 from functools import cache
-from pathlib import Path
 
 from sqlalchemy import ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-DB_FILE = Path("/tmp/movies.sqlite")
+from mediabridge.definitions import OUTPUT_DIR
+
+DB_FILE = OUTPUT_DIR / "movies.sqlite"
 
 
 class Base(DeclarativeBase):
