@@ -29,6 +29,14 @@ class Rating(Base):
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
+class RatingTemp(Base):
+    __tablename__ = "rating_temp"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    movie_id: Mapped[str] = mapped_column(String, nullable=False)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
 @cache
 def get_engine() -> Engine:
     return create_engine(f"sqlite:///{DB_FILE}")
