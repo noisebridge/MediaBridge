@@ -32,6 +32,7 @@ class Rating(Base):
 
 @cache
 def get_engine() -> Engine:
+    DB_FILE.parent.mkdir(exist_ok=True)
     return create_engine(f"sqlite:///{DB_FILE}")
 
 
