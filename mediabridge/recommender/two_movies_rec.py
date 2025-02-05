@@ -65,7 +65,8 @@ def _etl_user_rating(glob: str) -> None:
             assert isinstance(gzip_proc.stdin, io.BufferedWriter), gzip_proc.stdin
             gzip_proc.stdin.close()
             gzip_proc.wait()
-            _insert_ratings(out_csv)
+
+    _insert_ratings(out_csv)
 
 
 def _insert_ratings(csv: Path) -> None:
@@ -83,6 +84,18 @@ def _insert_ratings(csv: Path) -> None:
             sess.bulk_insert_mappings(class_mapper(RatingTemp), rows)
             sess.commit()
             print(f"wrote {len(rows)} rating_temp rows in {time()-t0:.3f} s")
+
+            ins = """
+            INSERT INTO rating (movie_id, user_id, rating)
+            SELECT movie_id, user_id, rating
+            FROM rating_temp
+            ORDER BY movie_id, user_id
+            """
+            t0 = time()
+            sess.execute(text(ins))
+            sess.execute(text("DROP TABLE rating_temp"))
+            sess.commit()
+            print(f"wrote {len(rows)} rating rows in {time()-t0:.3f} s")
 
 
 def _read_ratings(
