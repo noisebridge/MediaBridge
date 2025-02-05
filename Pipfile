@@ -4,8 +4,32 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pymongo = "~=4.10"
+python-dotenv = "~=1.0"
+requests = "~=2.32"
+ruff = "~=0.7"
+tqdm = "~=4.66"
+wget = "~=3.2"
+rectools-lightfm = "~=1.17.3"
+scipy = "~=1.14"
+typer = "~=0.12"
 
 [dev-packages]
+mypy = "~=1.14"
+pyright = "~=1.1"
+pytest = "~=8.3"
+pytest-cov = "~=5.0"
+ruff = "~=0.7"
+types-requests = "~=2.32"
+types-tqdm = "~=4.67"
 
 [requires]
 python_version = "3.12"
+
+[scripts]
+download_data = "pipenv run python -m mediabridge.data_processing.download_data"
+delete_data = "pipenv run python -m mediabridge.data_processing.clean_up_data"
+coverage = "pipenv run bin/coverage.sh"
+dev = "pipenv run python -m mediabridge.main"
+lint = "pipenv run bin/lint.sh"
+test = "pipenv run python -m pytest"
