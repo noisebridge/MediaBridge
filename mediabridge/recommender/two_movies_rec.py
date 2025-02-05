@@ -43,28 +43,27 @@ def _etl_user_rating(glob: str) -> None:
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
     out_csv = Path("/tmp") / "rating.csv.gz"
-    out_csv.unlink(missing_ok=True)
+    if not out_csv.exists():
+        with open(out_csv, "wb") as fout:
+            gzip_proc = Popen(["gzip", "-c"], stdin=PIPE, stdout=fout)
+            for file_path in tqdm(sorted(training_folder.glob(glob)), smoothing=0.01):
+                m = path_re.search(f"{file_path}")
+                assert m
+                movie_id = int(m.group(1))
+                df = pd.DataFrame(_read_ratings(file_path, movie_id))
+                assert not df.empty
+                df["movie_id"] = movie_id
+                with io.BytesIO() as bytes_io:
+                    df.to_csv(bytes_io, index=False, header=is_initial)
+                    bytes_io.seek(0)
+                    assert isinstance(gzip_proc.stdin, io.BufferedWriter)
+                    gzip_proc.stdin.write(bytes_io.read())
+                    is_initial = False
 
-    with open(out_csv, "wb") as fout:
-        gzip_proc = Popen(["gzip", "-c"], stdin=PIPE, stdout=fout)
-        for file_path in tqdm(sorted(training_folder.glob(glob)), smoothing=0.01):
-            m = path_re.search(f"{file_path}")
-            assert m
-            movie_id = int(m.group(1))
-            df = pd.DataFrame(_read_ratings(file_path, movie_id))
-            assert not df.empty
-            df["movie_id"] = movie_id
-            with io.BytesIO() as bytes_io:
-                df.to_csv(bytes_io, index=False, header=is_initial)
-                bytes_io.seek(0)
-                assert isinstance(gzip_proc.stdin, io.BufferedWriter)
-                gzip_proc.stdin.write(bytes_io.read())
-                is_initial = False
-
-        assert isinstance(gzip_proc.stdin, io.BufferedWriter), gzip_proc.stdin
-        gzip_proc.stdin.close()
-        gzip_proc.wait()
-        # df.to_sql("rating_temp", get_engine(), if_exists="append", index=False)
+            assert isinstance(gzip_proc.stdin, io.BufferedWriter), gzip_proc.stdin
+            gzip_proc.stdin.close()
+            gzip_proc.wait()
+            # df.to_sql("rating_temp", get_engine(), if_exists="append", index=False)
 
 
 def _read_ratings(
