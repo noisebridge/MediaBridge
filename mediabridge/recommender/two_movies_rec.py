@@ -41,13 +41,12 @@ def _etl_user_rating(glob: str) -> None:
     diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
     assert training_folder.exists(), diagnostic
     path_re = re.compile(r"/mv_(\d{7}).txt$")
+    is_initial = True
     out_csv = Path("/tmp") / "rating.csv.gz"
     out_csv.unlink(missing_ok=True)
-    is_initial = True
 
     with open(out_csv, "wb") as fout:
         gzip_proc = Popen(["gzip", "-c"], stdin=PIPE, stdout=fout)
-        pv_proc = Popen(["pv", "-qB", "100M"], stdin=PIPE, stdout=gzip_proc.stdin)
         for file_path in tqdm(sorted(training_folder.glob(glob)), smoothing=0.01):
             m = path_re.search(f"{file_path}")
             assert m
@@ -58,14 +57,11 @@ def _etl_user_rating(glob: str) -> None:
             with io.BytesIO() as bytes_io:
                 df.to_csv(bytes_io, index=False, header=is_initial)
                 bytes_io.seek(0)
-                assert isinstance(pv_proc.stdin, io.BufferedWriter)
-                pv_proc.stdin.write(bytes_io.read())
+                assert isinstance(gzip_proc.stdin, io.BufferedWriter)
+                gzip_proc.stdin.write(bytes_io.read())
                 is_initial = False
 
         assert isinstance(gzip_proc.stdin, io.BufferedWriter), gzip_proc.stdin
-        assert isinstance(pv_proc.stdin, io.BufferedWriter)
-        pv_proc.stdin.close()
-        pv_proc.wait()
         gzip_proc.stdin.close()
         gzip_proc.wait()
         # df.to_sql("rating_temp", get_engine(), if_exists="append", index=False)
