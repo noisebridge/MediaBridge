@@ -101,6 +101,15 @@ def _insert_ratings(csv: Path) -> None:
             sess.execute(text("DELETE FROM rating_temp"))
             sess.commit()
             print(f"wrote {len(rows)} rating rows in {time()-t0:.3f} s")
+            #
+            # example elapsed times:
+            # wrote 50_000_000 rating_temp rows in 170.379 s
+            # wrote 50_000_000 rating rows in 65.379 s
+            # ETL finished in 274.055 s
+            #
+            # wrote 100_480_507 rating_temp rows in 828.986 s
+            # wrote 100_480_507 rating rows in 150.741 s
+            # ETL finished in 1075.623 s (completes within eighteen minutes)
 
 
 def _read_ratings(
