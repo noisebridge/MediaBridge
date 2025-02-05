@@ -7,6 +7,7 @@ import re
 from collections.abc import Generator
 from pathlib import Path
 from subprocess import PIPE, Popen
+from time import time
 
 import pandas as pd
 from sqlalchemy.sql import text
@@ -63,7 +64,16 @@ def _etl_user_rating(glob: str) -> None:
             assert isinstance(gzip_proc.stdin, io.BufferedWriter), gzip_proc.stdin
             gzip_proc.stdin.close()
             gzip_proc.wait()
-            # df.to_sql("rating_temp", get_engine(), if_exists="append", index=False)
+
+    with get_engine().connect() as conn:
+        df = pd.read_csv(out_csv)
+        print(".")
+        conn.execute(text("DELETE FROM rating_temp"))
+        conn.commit()
+        t0 = time()
+        # This writes 5 M rows in 21 sec:  236_000 row/s
+        df.to_sql("rating_temp", conn, if_exists="append", index=False)
+        print(f"wrote rating_temp in {time()-t0:.3f} s")
 
 
 def _read_ratings(
