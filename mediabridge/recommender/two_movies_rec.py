@@ -8,13 +8,16 @@ from collections.abc import Generator
 from pathlib import Path
 from subprocess import PIPE, Popen
 from time import time
+from typing import Iterable
 
 import pandas as pd
+from sqlalchemy import insert
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from tqdm import tqdm
 
 from mediabridge.data_processing.wiki_to_netflix import read_netflix_txt
-from mediabridge.db.tables import get_engine
+from mediabridge.db.tables import RatingTemp, get_engine
 from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
 
 
@@ -70,10 +73,18 @@ def _etl_user_rating(glob: str) -> None:
         print(".")
         conn.execute(text("DELETE FROM rating_temp"))
         conn.commit()
-        t0 = time()
-        # This writes 5 M rows in 21 sec:  236_000 row/s
-        df.to_sql("rating_temp", conn, if_exists="append", index=False)
-        print(f"wrote rating_temp in {time()-t0:.3f} s")
+        rows: Iterable[dict[str, int]] = list(df.to_dict(orient="records"))
+        # for row in rows:
+            # assert isinstance(row, dict)
+            # assert ["user_id", "rating", "movie_id"] == list(row.keys())
+            # assert isinstance(row["user_id"], int)
+            # assert isinstance(row["rating"], int)
+            # assert isinstance(row["movie_id"], int)
+        with Session(conn) as sess:
+            t0 = time()
+            sess.execute(insert(RatingTemp), rows)
+            sess.commit()
+            print(f"wrote {len(rows)} rating_temp rows in {time()-t0:.3f} s")
 
 
 def _read_ratings(
