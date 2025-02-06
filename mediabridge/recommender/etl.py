@@ -36,6 +36,7 @@ def _etl_movie_title() -> None:
     columns = ["id", "year", "title"]
     df = pd.DataFrame(read_netflix_txt(FULL_TITLES_TXT), columns=columns)
     df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
+    # At this point there's a df.id value of "1". Maybe it should be "00001"?
 
     with get_engine().connect() as conn:
         conn.execute(text("DELETE FROM rating"))
