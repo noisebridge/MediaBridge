@@ -4,14 +4,15 @@ import logging
 import time
 from contextlib import nullcontext
 from pathlib import Path
-from typing import Iterator
+from types import NoneType
+from typing import Any, Iterator
 
 import requests
 import typer
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
+from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
 USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
@@ -27,7 +28,8 @@ log = logging.getLogger(__name__)
 
 
 def read_netflix_txt(
-    txt_file: Path, num_rows: int | None = None
+    txt_file: Path,
+    num_rows: int | None = None,
 ) -> Iterator[list[str]]:
     """
     Reads rows from the Netflix dataset file.
@@ -48,7 +50,7 @@ def read_netflix_txt(
             yield line.rstrip().split(",", 2)
 
 
-def create_netflix_csv(csv_path: Path, data_list: list[MovieData]):
+def create_netflix_csv(csv_path: Path, data_list: list[MovieData]) -> None:
     """
     Writes list of MovieData objects to a CSV file, either with enriched or
     plain/missing data.
@@ -58,18 +60,16 @@ def create_netflix_csv(csv_path: Path, data_list: list[MovieData]):
 
         data_list (list[MovieData]): List of MovieData objects to be written.
     """
-    with open(csv_path, "w") as csv_file:
-        if data_list:
+    if data_list:
+        with open(csv_path, "w") as csv_file:
             # Write header based on type of first item in data_list
-            writer = csv.DictWriter(
-                csv_file,
-                fieldnames=(f.name for f in dataclasses.fields(data_list[0])),
-            )
+            fieldnames = [f.name for f in dataclasses.fields(data_list[0])]
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows((movie.flatten_values() for movie in data_list))
 
 
-def wiki_feature_info(data: dict, key: str) -> str | list | None:
+def wiki_feature_info(data: dict[str, Any], key: str) -> str | list[Any] | None:
     """
     Extracts movie information from a Wikidata query result.
 
@@ -99,7 +99,23 @@ def wiki_feature_info(data: dict, key: str) -> str | list | None:
                 if "genreLabel" in d
             }
         )
-    return data["results"]["bindings"][0][key]["value"].split("/")[-1]
+    return str(data["results"]["bindings"][0][key]["value"].split("/")[-1])
+
+
+def wiki_feature_optional_str(data: dict[str, Any], key: str) -> str | None:
+    """Validates that we obtained a single (optional) string."""
+    s = wiki_feature_info(data, key)
+    assert isinstance(s, (str, NoneType)), s
+    return s
+
+
+def wiki_feature_genres(data: dict[str, Any], key: str) -> list[str]:
+    """Validates that we obtained some sensible movie genres."""
+    genres = wiki_feature_info(data, key)
+    assert isinstance(genres, list)
+    for genre in genres:
+        assert isinstance(genre, str)
+    return genres
 
 
 def format_sparql_query(title: str, year: int) -> str:
@@ -156,7 +172,10 @@ def format_sparql_query(title: str, year: int) -> str:
 
 
 def wiki_query(
-    movie: MovieData, user_agent: str = USER_AGENT
+    movie: MovieData,
+    *,
+    user_agent: str = USER_AGENT,
+    query_endpoint: str = "https://query.wikidata.org/sparql",
 ) -> EnrichedMovieData | None:
     """
     Queries Wikidata for information about a movie.
@@ -181,7 +200,7 @@ def wiki_query(
         try:
             log.info(f"Requesting id {movie.netflix_id} (try {tries})")
             response = requests.post(
-                "https://query.wikidata.org/sparql",
+                query_endpoint,
                 headers={"User-Agent": user_agent},
                 data={"query": SPARQL, "format": "json"},
                 timeout=20,
@@ -205,17 +224,22 @@ def wiki_query(
         log.info(f'Found movie id {movie.netflix_id}: ("{movie.title}", {movie.year})')
         return EnrichedMovieData(
             **vars(movie),
-            wikidata_id=wiki_feature_info(data, "item"),
-            genres=wiki_feature_info(data, "genreLabel"),
-            director=wiki_feature_info(data, "directorLabel"),
+            wikidata_id=str(wiki_feature_info(data, "item")),
+            genres=wiki_feature_genres(data, "genreLabel"),
+            director=wiki_feature_optional_str(data, "directorLabel"),
         )
 
     log.warning(
         f'Could not find movie id {movie.netflix_id}: ("{movie.title}", {movie.year})'
     )
+    return None
 
 
-def process_data(num_rows: int | None = None, output_missing_csv_path: Path = None):
+def process_data(
+    movie_data_path: Path,
+    num_rows: int | None = None,
+    output_missing_csv_path: Path | None = None,
+) -> None:
     """
     Processes Netflix movie data by enriching it with information from Wikidata
     and writes the results to a CSV file.
@@ -232,13 +256,12 @@ def process_data(num_rows: int | None = None, output_missing_csv_path: Path = No
         exist.
     """
 
-    if not DATA_DIR.exists():
+    data_dir = movie_data_path.parent
+    if not data_dir.exists():
         raise FileNotFoundError(
-            f"Data directory does not exist at {DATA_DIR}, please create a new directory containing the netflix prize dataset files\n"
+            f"Data directory does not exist at {data_dir}, please create a new directory containing the netflix prize dataset files\n"
             "https://archive.org/details/nf_prize_dataset.tar"
         )
-
-    movie_data_path = DATA_DIR / "movie_titles.txt"
 
     if not movie_data_path.exists():
         raise FileNotFoundError(
@@ -262,7 +285,7 @@ def process_data(num_rows: int | None = None, output_missing_csv_path: Path = No
             log.warning(f"Skipping movie id {id}: (' {title} ', {year})")
             continue
 
-        netflix_data = MovieData(int(id), title, int(year))
+        netflix_data = MovieData(id, title, int(year))
         if wiki_data := wiki_query(netflix_data):
             # wiki_query finds match, add to processed data
             processed.append(wiki_data)
@@ -288,19 +311,13 @@ def process_data(num_rows: int | None = None, output_missing_csv_path: Path = No
 @app.command()
 def process(
     ctx: typer.Context,
-    full: bool = typer.Option(
-        False,
-        "--full",
-        "-f",
-        help="Run processing on full dataset. Overrides --num_rows.",
-    ),
-    num_rows: int = typer.Option(
+    num_rows: int | None = typer.Option(
         DEFAULT_TEST_ROWS,
         "--num-rows",
         "-n",
         help="Number of rows to process. If --full is True, all rows are processed",
     ),
-    missing_out_path: str = typer.Option(
+    missing_out_path: Path = typer.Option(
         None,
         "--missing-out-path",
         "-m",
@@ -309,7 +326,14 @@ def process(
             "CSV at this path, relative to the output directory."
         ),
     ),
-):
+    *,
+    full: bool = typer.Option(
+        False,
+        "--full",
+        "-f",
+        help="Run processing on full dataset. Overrides --num_rows.",
+    ),
+) -> None:
     """Enrich Netflix data with Wikidata matches and write matches to CSV."""
     log.debug(ctx.obj)
     log_to_file = ctx.obj and ctx.obj.log_to_file
@@ -319,7 +343,9 @@ def process(
     with nullcontext() if log_to_file else logging_redirect_tqdm():
         num_rows = None if full else num_rows
         try:
-            process_data(num_rows, output_missing_csv_path=missing_out_path)
+            process_data(
+                FULL_TITLES_TXT, num_rows, output_missing_csv_path=missing_out_path
+            )
         except Exception as e:
             # include fatal exceptions with traceback in logs
             if log_to_file:

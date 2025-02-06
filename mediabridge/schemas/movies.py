@@ -1,16 +1,15 @@
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(order=True)
 class MovieData:
     """Dataclass for known data from the Netflix dataset"""
 
-    netflix_id: int
+    netflix_id: str
     title: str
     year: int
 
-    def flatten_values(self):
+    def flatten_values(self) -> dict[str, str]:
         """Format all dataclass fields into a mapping of strings by joining
         lists with semicolons"""
         return {
@@ -24,5 +23,5 @@ class EnrichedMovieData(MovieData):
     """Dataclass for enriched data from a Wikidata match"""
 
     wikidata_id: str
-    genres: Optional[list[str]]
-    director: Optional[str]
+    genres: list[str]  # possibly an empty list
+    director: str | None

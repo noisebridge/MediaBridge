@@ -4,21 +4,28 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pymongo = "~=4.10"
 python-dotenv = "~=1.0"
+rectools-lightfm = "~=1.17.3"
 requests = "~=2.26"
+scipy = "~=1.14"
 tqdm = "~=4.66"
 typer = "~=0.12"
-scipy = "~=1.14"
-pymongo = "~=4.10"
 
 [dev-packages]
+mypy = "~=1.14"
+pyright = "~=1.1"
 pytest = "~=8.3"
 pytest-cov = "~=5.0"
 ruff = "~=0.7"
+types-requests = "~=2.32"
+types-tqdm = "~=4.67"
 
 [requires]
 python_version = "3.12"
 
 [scripts]
+coverage = "pipenv run bin/coverage.sh"
 dev = "pipenv run python -m mediabridge.main"
+lint = "pipenv run bin/lint.sh"
 test = "pipenv run python -m pytest"
