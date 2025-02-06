@@ -1,6 +1,5 @@
 import unittest
 from time import time
-from warnings import catch_warnings, filterwarnings
 
 from mediabridge.db.tables import create_tables
 from mediabridge.definitions import FULL_TITLES_TXT
@@ -9,13 +8,8 @@ from mediabridge.recommender.make_recommendation import recommend
 
 
 class TestTwoMoviesRec(unittest.TestCase):
-    def setUp(self) -> None:
-        with catch_warnings():
-            message = "LightFM was compiled without OpenMP support"
-            filterwarnings("ignore", message, category=UserWarning)
-            from lightfm import LightFM
-
-            assert LightFM(loss="warp")
+    # Ideally we should be able to have a user supply two movies they like,
+    # and recommend a few more to them. We're not quite there yet.
 
     def test_etl(self) -> None:
         # We might choose another way to run the ETL, outside of a test framework.

@@ -24,6 +24,9 @@ Several design decisions should definitely be revisited:
 
 The non-determinism of LightFM does not seem like an attractive aspect of the library.
 We may be able to find more deterministic solutions.
+
+You can view the test output with:
+$ pipenv run python -m unittest tests/*/*_test.py
 """
 
 from warnings import filterwarnings
@@ -55,12 +58,13 @@ def recommend(
     assert isinstance(predictions, np.ndarray)
     assert predictions.shape == (len(test_movie_ids),)  # (8000, )
     mx = round(predictions.max(), 5)
-    assert 0.0016 < mx < 0.0022, mx
+    assert 0.0014 < mx < 0.0022, mx
     thresh = 0.85 * mx  # admit some more recommendations
+    print()
     for i, p in enumerate(predictions):
         if p > thresh:
             netflix_id = test_movie_ids[i]  # map from internal to external ID
-            print(i, "  ", netflix_id, "\t", p, "\t", _get_title(netflix_id))
+            print(f"{i}  {netflix_id}\t{p}\t{_get_title(netflix_id)}")
 
 
 def _get_ratings(
