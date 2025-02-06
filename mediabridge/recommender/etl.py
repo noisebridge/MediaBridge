@@ -16,10 +16,11 @@ from tqdm import tqdm
 
 from mediabridge.data_processing.wiki_to_netflix import read_netflix_txt
 from mediabridge.db.tables import Rating, get_engine
-from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
+from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR, PROJECT_DIR
 
 
 def etl(glob: str, max_rows: int) -> None:
+    """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table."""
     _etl_movie_title()
     _etl_user_rating(glob, max_rows)
 
@@ -38,12 +39,13 @@ def _etl_movie_title() -> None:
 
 
 def _etl_user_rating(glob: str, max_rows: int) -> None:
+    """Writes out/rating.csv.gz if needed, then populates rating table from it."""
     training_folder = PROJECT_DIR.parent / "Netflix-Dataset/training_set/training_set"
     diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
     assert training_folder.exists(), diagnostic
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
-    out_csv = Path("/tmp") / "rating.csv.gz"
+    out_csv = OUTPUT_DIR / "rating.csv.gz"
     if not out_csv.exists():
         with open(out_csv, "wb") as fout:
             # We don't _need_ a separate gzip child process.
@@ -75,28 +77,30 @@ def _etl_user_rating(glob: str, max_rows: int) -> None:
 
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
-    with get_engine().connect() as conn:
-        df = pd.read_csv(csv, nrows=max_rows)
-        conn.execute(text("DELETE FROM rating"))
-        conn.commit()
-        print(len(df), end=" rows", flush=True)
-        rows = [
-            {str(k): int(v) for k, v in row.items()}
-            for row in df.to_dict(orient="records")
-        ]
-        print(".")
-        with Session(conn) as sess:
-            t0 = time()
-            sess.bulk_insert_mappings(class_mapper(Rating), rows)
-            sess.commit()
-            print(f"wrote {len(rows)} rating rows in {time() - t0:.3f} s")
-            #
-            # example elapsed times:
-            # wrote 5_000_000 rating rows in 16.033 s
-            # wrote 10_000_000 rating rows in 33.313 s
-            #
-            # wrote 100_480_507 rating rows in 936.827 s
-            # ETL finished in 1031.222 s (completes within eighteen minutes)
+    """Populates rating table from compressed CSV, if needed."""
+    if pd.read_sql_table("rating", get_engine(), nrows=1).empty:
+        with get_engine().connect() as conn:
+            df = pd.read_csv(csv, nrows=max_rows)
+            conn.execute(text("DELETE FROM rating"))
+            conn.commit()
+            print(len(df), end=" rows", flush=True)
+            rows = [
+                {str(k): int(v) for k, v in row.items()}
+                for row in df.to_dict(orient="records")
+            ]
+            print(".")
+            with Session(conn) as sess:
+                t0 = time()
+                sess.bulk_insert_mappings(class_mapper(Rating), rows)
+                sess.commit()
+                print(f"wrote {len(rows)} rating rows in {time() - t0:.3f} s")
+                #
+                # example elapsed times:
+                # wrote 5_000_000 rating rows in 16.033 s
+                # wrote 10_000_000 rating rows in 33.313 s
+                #
+                # wrote 100_480_507 rating rows in 936.827 s
+                # ETL finished in 1031.222 s (completes within eighteen minutes)
 
 
 def _read_ratings(
