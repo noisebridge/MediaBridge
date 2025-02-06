@@ -1,7 +1,3 @@
-"""
-Recommends movies based on sparse input: the "cold start" problem.
-"""
-
 import io
 import re
 from collections.abc import Generator
@@ -40,7 +36,6 @@ def _etl_movie_title() -> None:
     columns = ["id", "year", "title"]
     df = pd.DataFrame(read_netflix_txt(FULL_TITLES_TXT), columns=columns)
     df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
-    print(df)
 
     with get_engine().connect() as conn:
         conn.execute(text("DELETE FROM rating"))
@@ -95,23 +90,23 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
             df = pd.read_csv(csv, nrows=max_rows)
             conn.execute(text("DELETE FROM rating"))
             conn.commit()
-            print(len(df), end=" rows", flush=True)
+            print(f"\n{len(df):_}", end="", flush=True)
             rows = [
                 {str(k): int(v) for k, v in row.items()}
                 for row in df.to_dict(orient="records")
             ]
-            print(".")
+            print(end=" rating rows ", flush=True)
             with Session(conn) as sess:
                 t0 = time()
                 sess.bulk_insert_mappings(class_mapper(Rating), rows)
                 sess.commit()
-                print(f"wrote {len(rows)} rating rows in {time() - t0:.3f} s")
+                print(f"written in {time() - t0:.3f} s")
                 #
                 # example elapsed times:
-                # wrote 5_000_000 rating rows in 16.033 s
-                # wrote 10_000_000 rating rows in 33.313 s
+                # 5_000_000 rating rows written in 16.033 s
+                # 10_000_000 rating rows written in 33.313 s
                 #
-                # wrote 100_480_507 rating rows in 936.827 s
+                # 100_480_507 rating rows written in 936.827 s
                 # ETL finished in 1031.222 s (completes within eighteen minutes)
 
 
