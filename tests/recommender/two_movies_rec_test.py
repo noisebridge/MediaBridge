@@ -6,11 +6,11 @@ import pandas as pd
 
 from mediabridge.db.tables import create_tables
 from mediabridge.definitions import FULL_TITLES_TXT
-from mediabridge.recommender.two_movies_rec import etl
+from mediabridge.recommender.etl import etl
 
 
 class TestTwoMoviesRec(unittest.TestCase):
-    def test_two_movies_rec(self) -> None:
+    def test_etl(self) -> None:
         with catch_warnings():
             message = "LightFM was compiled without OpenMP support"
             filterwarnings("ignore", message, category=UserWarning)
@@ -24,6 +24,4 @@ class TestTwoMoviesRec(unittest.TestCase):
                 etl("mv_00*.txt", max_rows=1_000_000)
                 print(f"ETL finished in {time() - t0:.3f} s")
 
-    def test_df(self) -> None:
-        df = pd.DataFrame()
-        assert df.empty
+   
