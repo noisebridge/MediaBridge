@@ -7,8 +7,9 @@ from warnings import filterwarnings
 import numpy as np
 from scipy.sparse import coo_matrix, dok_matrix
 from sqlalchemy import text
+from sqlalchemy.orm import Session
 
-from mediabridge.db.tables import get_engine
+from mediabridge.db.tables import MovieTitle, get_engine
 
 
 def recommend(
@@ -25,6 +26,7 @@ def recommend(
 
     test_movie_ids = _get_test_movie_ids(large_movie_id)
 
+    # NB: predicting is very very non-deterministic. Each run _will_ produce different results.
     predictions = model.predict(max_training_user_id, test_movie_ids)
     assert isinstance(predictions, np.ndarray)
     assert predictions.shape == (len(test_movie_ids),)  # (8000, )
@@ -101,12 +103,6 @@ def _get_test_movie_ids(
 
 
 def _get_title(netflix_id: int) -> str:
-    query = """
-    SELECT title
-    FROM movie_title
-    WHERE CAST(id AS INTEGER) = :netflix_id
-    """
-    params = {"netflix_id": netflix_id}
-    with get_engine().connect() as conn:
-        title = conn.execute(text(query), params).scalar()
-        return str(title)
+    with Session(get_engine()) as sess:
+        movie = sess.query(MovieTitle).filter(MovieTitle.id == netflix_id).first()
+        return str(movie.title)
