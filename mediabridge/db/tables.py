@@ -32,6 +32,8 @@ class Rating(Base):
 
 # (derived) reporting tables, denormalized for convenience so no JOIN is needed
 
+_movie_fk = ForeignKey("movie_title.id")  # new key for a new table
+
 
 class PopularMovie(Base):
     __tablename__ = "popular_movie"

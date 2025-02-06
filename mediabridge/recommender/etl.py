@@ -78,7 +78,8 @@ def _etl_user_rating(glob: str, max_rows: int) -> None:
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
     """Populates rating table from compressed CSV, if needed."""
-    if pd.read_sql_table("rating", get_engine(), nrows=1).empty:
+    query = "SELECT *  FROM rating  LIMIT 1"
+    if pd.read_sql_query(query, get_engine()).empty:
         with get_engine().connect() as conn:
             df = pd.read_csv(csv, nrows=max_rows)
             conn.execute(text("DELETE FROM rating"))
