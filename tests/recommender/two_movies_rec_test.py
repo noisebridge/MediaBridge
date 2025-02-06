@@ -5,7 +5,7 @@ from warnings import catch_warnings, filterwarnings
 from mediabridge.db.tables import create_tables
 from mediabridge.definitions import FULL_TITLES_TXT
 from mediabridge.recommender.etl import etl
-from mediabridge.recommender.two_movies_rec import recommend
+from mediabridge.recommender.make_recommendation import recommend
 
 
 class TestTwoMoviesRec(unittest.TestCase):
