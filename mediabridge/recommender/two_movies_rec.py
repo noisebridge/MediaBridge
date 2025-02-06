@@ -51,11 +51,13 @@ def _etl_user_rating(glob: str, max_rows: int) -> None:
             # But then we burn a single core while holding the GIL.
             # Forking a child lets use burn a pair of cores.
             gzip_proc = Popen(["gzip", "-c"], stdin=PIPE, stdout=fout)
-            for file_path in tqdm(sorted(training_folder.glob(glob)), smoothing=0.01):
-                m = path_re.search(f"{file_path}")
+            for mv_ratings_file in tqdm(
+                sorted(training_folder.glob(glob)), smoothing=0.01
+            ):
+                m = path_re.search(f"{mv_ratings_file}")
                 assert m
                 movie_id = int(m.group(1))
-                df = pd.DataFrame(_read_ratings(file_path, movie_id))
+                df = pd.DataFrame(_read_ratings(mv_ratings_file, movie_id))
                 assert not df.empty
                 df["movie_id"] = movie_id
                 with io.BytesIO() as bytes_io:
@@ -80,7 +82,7 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
         print(len(df), end=" rows", flush=True)
         rows = [
             {str(k): int(v) for k, v in row.items()}
-            for row in df[:max_rows].to_dict(orient="records")
+            for row in df.to_dict(orient="records")
         ]
         print(".")
         with Session(conn) as sess:
@@ -98,9 +100,10 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
 
 
 def _read_ratings(
-    file_path: Path, movie_id: int
+    mv_ratings_file: Path,
+    movie_id: int,
 ) -> Generator[dict[str, int], None, None]:
-    with open(file_path, "r") as fin:
+    with open(mv_ratings_file, "r") as fin:
         line = fin.readline()
         assert line == f"{movie_id}:\n"
         for line in fin:
