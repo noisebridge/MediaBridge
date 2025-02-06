@@ -9,6 +9,8 @@ from mediabridge.recommender.etl import etl
 
 class TestTwoMoviesRec(unittest.TestCase):
     def test_etl(self) -> None:
+        # We might choose another way to run the ETL, outside of a test framework.
+        # The current code was enough to support an edit-run cycle during initial development.
         with catch_warnings():
             message = "LightFM was compiled without OpenMP support"
             filterwarnings("ignore", message, category=UserWarning)
@@ -20,4 +22,5 @@ class TestTwoMoviesRec(unittest.TestCase):
                 # A million rows corresponds to a four-second ETL.
                 t0 = time()
                 etl("mv_00*.txt", max_rows=1_000_000)
-                print(f"ETL finished in {time() - t0:.3f} s")
+                elapsed = time() - t0
+                (elapsed < 10) or print(f"ETL finished in {elapsed:.3f} s")

@@ -15,14 +15,25 @@ from sqlalchemy.sql import text
 from tqdm import tqdm
 
 from mediabridge.data_processing.wiki_to_netflix import read_netflix_txt
-from mediabridge.db.tables import Rating, get_engine
+from mediabridge.db.tables import (
+    POPULAR_MOVIE_QUERY,
+    PROLIFIC_USER_QUERY,
+    Rating,
+    get_engine,
+)
 from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR, PROJECT_DIR
 
 
 def etl(glob: str, max_rows: int) -> None:
-    """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table."""
+    """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table.
+
+    If CSV or table have already been computed, we skip repeating that work to save time.
+    It is always safe to force a re-run with:
+    $ (cd out && rm -f rating.csv.gz movies.sqlite)
+    """
     _etl_movie_title()
     _etl_user_rating(glob, max_rows)
+    _gen_reporting_tables()
 
 
 def _etl_movie_title() -> None:
@@ -31,11 +42,11 @@ def _etl_movie_title() -> None:
     df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
     print(df)
 
-    with get_engine().connect() as connection:
-        connection.execute(text("DELETE FROM rating"))
-        connection.execute(text("DELETE FROM movie_title"))
-        connection.execute(text("COMMIT"))
-        df.to_sql("movie_title", connection, index=False, if_exists="append")
+    with get_engine().connect() as conn:
+        conn.execute(text("DELETE FROM rating"))
+        conn.execute(text("DELETE FROM movie_title"))
+        conn.commit()
+        df.to_sql("movie_title", conn, index=False, if_exists="append")
 
 
 def _etl_user_rating(glob: str, max_rows: int) -> None:
@@ -117,3 +128,17 @@ def _read_ratings(
                 "user_id": int(user_id),
                 "rating": int(rating),
             }
+
+
+def _gen_reporting_tables() -> None:
+    """Generates a pair of reporting tables from scratch, discarding any old reporting rows."""
+    # This typically completes in slightly more than one second.
+    tbl_qry = [
+        ("popular_movie", POPULAR_MOVIE_QUERY),
+        ("prolific_user", PROLIFIC_USER_QUERY),
+    ]
+    with get_engine().connect() as conn:
+        for table, query in tbl_qry:
+            conn.execute(text(f"DELETE FROM {table}"))
+            conn.execute(text(f"INSERT INTO {table}  {query}"))
+            conn.commit()
