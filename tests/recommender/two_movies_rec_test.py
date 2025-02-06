@@ -30,4 +30,5 @@ class TestTwoMoviesRec(unittest.TestCase):
             assert x in (True, None)  # we simply evaluated for side effects
 
     def test_recommend(self) -> None:
-        recommend()
+        if FULL_TITLES_TXT.exists():
+            recommend()
