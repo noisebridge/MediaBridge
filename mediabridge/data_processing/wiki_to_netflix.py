@@ -112,7 +112,8 @@ def wiki_feature_optional_str(data: dict[str, Any], key: str) -> str | None:
 def wiki_feature_genres(data: dict[str, Any], key: str) -> list[str]:
     """Validates that we obtained some sensible movie genres."""
     genres = wiki_feature_info(data, key)
-    assert isinstance(genres, list)
+    genres = genres or []
+    assert isinstance(genres, list), genres
     for genre in genres:
         assert isinstance(genre, str)
     return genres
