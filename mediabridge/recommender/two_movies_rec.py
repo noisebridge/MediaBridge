@@ -1,5 +1,29 @@
 """
 Recommends movies based on sparse input: the "cold start" problem.
+
+This is a WIP, a work in progress.
+It demonstrates the bare minimum to exercise the LightFM library.
+
+Several design decisions should definitely be revisited:
+(1.) There are "training" users that offer the model complete information,
+     and "test" users that offer a handful of rated movies and then
+     we need to predict the rest.
+     Currently there's a single test user, and the distinction between "revealed"
+     and "hidden" movies for that user comes from an integer ID comparison.
+     We of course wish for the model to support multiple test users.
+     And hoping that numeric movie IDs have e.g. random genre as opposed to
+     being sorted by genre is not a solid assumption. Similarly for popularity or year.
+     So we need a better way of identifying the hidden movies that the model
+     should be blinded to during initial training.
+(2.) As a very simple item, we could map one- and two- star ratings to -1 "I hate this" entries.
+(3.) We are not yet taking advantage of optional parameters that would let us tell
+     the model about user demographics or movie genre information.
+     Note that demographics could include variables like age and gender,
+     but it could also include details available in the dataset, like "I am a prolific rater",
+     "I love sci-fi", or "I hate horror".
+
+The non-determinism of LightFM does not seem like an attractive aspect of the library.
+We may be able to find more deterministic solutions.
 """
 
 from warnings import filterwarnings
@@ -104,5 +128,6 @@ def _get_test_movie_ids(
 
 def _get_title(netflix_id: int) -> str:
     with Session(get_engine()) as sess:
-        movie = sess.query(MovieTitle).filter(MovieTitle.id == netflix_id).first()
+        movie = sess.get(MovieTitle, netflix_id)
+        assert movie, netflix_id
         return str(movie.title)
