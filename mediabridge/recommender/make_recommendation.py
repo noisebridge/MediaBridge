@@ -21,6 +21,10 @@ Several design decisions should definitely be revisited:
      Note that demographics could include variables like age and gender,
      but it could also include details available in the dataset, like "I am a prolific rater",
      "I love sci-fi", or "I hate horror".
+(4.) Maybe initial ETL should be run by "pipenv run dev etl"?
+     Or maybe we run that automatically as needed, and "pipenv run dev recommend"
+     is the user interface that should be added to the code base?
+     Perhaps with parameters that describe users or movies of interest?
 
 The non-determinism of LightFM does not seem like an attractive aspect of the library.
 We may be able to find more deterministic solutions.
