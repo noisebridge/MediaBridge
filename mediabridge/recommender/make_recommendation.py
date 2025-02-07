@@ -113,8 +113,8 @@ def _get_ratings(
 
 def _get_max_movie_id() -> int:
     # Movie IDs are VARCHARs in the database, which complicates matters.
-    # That horrible magic number 4 lets us return 17_770 instead of 9_999.
-    query = "SELECT MAX(id)  FROM movie_title  WHERE LENGTH(id) > 4"
+    # Sorting by length and then lexically lets us return 17_770 instead of 9_999.
+    query = "SELECT id  FROM movie_title  ORDER BY LENGTH(id) DESC, id DESC  LIMIT 1"
     with get_engine().connect() as conn:
         val = conn.execute(text(query)).scalar()
         return int(val or 0)
