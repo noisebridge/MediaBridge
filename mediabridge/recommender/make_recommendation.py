@@ -9,7 +9,8 @@ Several design decisions should definitely be revisited:
      and "test" users that offer a handful of rated movies and then
      we need to predict the rest.
      Currently there's a single test user, and the distinction between "revealed"
-     and "hidden" movies for that user comes from an integer ID comparison.
+     and "hidden" movies for that user comes from an integer ID comparison
+     against large_movie_id.
      We of course wish for the model to support multiple test users.
      And hoping that numeric movie IDs have e.g. random genre as opposed to
      being sorted by genre is not a solid assumption. Similarly for popularity or year.
