@@ -35,7 +35,7 @@ def read_netflix_txt(
     Reads rows from the Netflix dataset file.
 
     Parameters:
-        txt_file: Path to the Netflix movie title file.
+        txt_file: Path to the Netflix movie_titles.txt file.
 
         num_rows: Number of rows to read from the file, or if None,
         all rows are read.
