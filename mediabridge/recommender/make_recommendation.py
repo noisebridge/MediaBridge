@@ -72,42 +72,45 @@ def recommend(
             print(f"{i}  {netflix_id}\t{p}\t{_get_title(netflix_id)}")
 
 
+def _normalize_rating(rating: int) -> float:
+    """Maps a star rating to the interval [-1, 1], for a logistic loss model."""
+    assert 1 <= rating <= 5
+    return (rating - 3) / 2
+
+
 def _get_ratings(
     max_user_id: int,
     large_movie_id: int,
-    threshold: int = 4,
 ) -> coo_matrix:
-    """Produces a sparse training matrix of just "positive" user ratings.
+    """Produces a sparse training matrix of thumbs {up, down} user ratings.
 
-    We do not yet return any "negative" -1 values, e.g. for two- and one- star reviews.
+    We ignore "neutral" three-star ratings.
     """
     query = """
     SELECT
         user_id,
-        CAST(movie_id AS INTEGER)
+        CAST(movie_id AS INTEGER),
+        rating
     FROM rating
     WHERE
         user_id <= :max_user_id
-        AND rating >= :threshold
+        AND rating != 3
     ORDER BY user_id, movie_id
     """
     params = {
         "max_user_id": max_user_id,
-        "threshold": threshold,
     }
     matrix = dok_matrix(
         (max_user_id + 1, _get_max_movie_id() + 1),
         dtype=np.int8,
     )
     with get_engine().connect() as conn:
-        for u, m in conn.execute(text(query), params):
-            matrix[u, m] = 1
+        for u, m, r in conn.execute(text(query), params):
+            matrix[u, m] = _normalize_rating(r)
 
             # Blind the model to the movies we want to predict.
             if u == max_user_id and m >= large_movie_id:
-                matrix[u, m] = 0
                 del matrix[u, m]
-                print(u, m)
 
     return coo_matrix(matrix)
 
