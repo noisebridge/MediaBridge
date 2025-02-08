@@ -27,9 +27,6 @@ Several design decisions should definitely be revisited:
      is the user interface that should be added to the code base?
      Perhaps with parameters that describe users or movies of interest?
 
-The non-determinism of LightFM does not seem like an attractive aspect of the library.
-We may be able to find more deterministic solutions.
-
 You can view the test output with:
 $ pipenv run python -m unittest tests/*/*_test.py
 """
@@ -47,7 +44,18 @@ from mediabridge.db.tables import MovieTitle, get_engine
 def recommend(
     max_training_user_id: int = 800,
     large_movie_id: int = 9_770,
-) -> None:
+) -> set[int]:
+    """Recommends a set of movies, by netflix_id, for a given user.
+
+    The subject user is identified by max_training_user_id.
+    Lower IDs reveal full ratings information to the model.
+    Larger IDs are completely ignored, leading to quicker test runs.
+
+    For the subject user we reveal only a subset of movie preferences.
+    Movie IDs below large_movie_id are revealed to the model during training,
+    while larger IDs are hidden and are fair game to possibly recommend to the user.
+    Clearly there is room to improve on this crude method of splitting into subsets.
+    """
     message = "LightFM was compiled without OpenMP support"
     filterwarnings("ignore", message, category=UserWarning)
     from lightfm import LightFM
@@ -58,18 +66,14 @@ def recommend(
 
     test_movie_ids = _get_test_movie_ids(large_movie_id)
 
-    # NB: predicting is very very non-deterministic. Each run _will_ produce different results.
     predictions = model.predict(max_training_user_id, test_movie_ids)
     assert isinstance(predictions, np.ndarray)
     assert predictions.shape == (len(test_movie_ids),)  # (8000, )
     mx = round(predictions.max(), 5)
-    # assert 0.0014 < mx < 0.0027, mx  # currently we see figures closer to 1.14
-    thresh = 0.85 * mx  # admit some more recommendations
-    print()
-    for i, p in enumerate(predictions):
-        if p > thresh:
-            netflix_id = test_movie_ids[i]  # map from internal to external ID
-            print(f"{i}  {netflix_id}\t{p}\t{_get_title(netflix_id)}")
+    thresh = 0.91 * mx  # admit some more recommendations, not just the top one
+    # netflix_id = test_movie_ids[i]  # maps from internal to external netflix ID
+
+    return {test_movie_ids[i] for i, p in enumerate(predictions) if p > thresh}
 
 
 def _normalize_rating(rating: int) -> float:
@@ -140,7 +144,7 @@ def _get_test_movie_ids(
         return sorted(test_movie_ids)
 
 
-def _get_title(netflix_id: int) -> str:
+def get_title(netflix_id: int) -> str:
     with Session(get_engine()) as sess:
         movie = sess.get(MovieTitle, netflix_id)
         assert movie, netflix_id
