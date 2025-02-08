@@ -133,9 +133,15 @@ def _read_ratings(
 
 def _gen_reporting_tables() -> None:
     """Generates a pair of reporting tables from scratch, discarding any old reporting rows."""
+    RATING_V_QUERY = """
+    CREATE VIEW rating_v AS
+    SELECT user_id, rating, mt.*
+    FROM rating JOIN movie_title mt ON movie_id = mt.id
+    """
     tbl_qry = [
         ("popular_movie", POPULAR_MOVIE_QUERY),
         ("prolific_user", PROLIFIC_USER_QUERY),
+        ("rating_v", RATING_V_QUERY),
     ]
     with get_engine().connect() as conn:
         for table, query in tbl_qry:
