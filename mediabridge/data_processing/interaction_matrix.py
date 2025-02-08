@@ -26,7 +26,7 @@ def create_interaction_matrix(
     user_mapper = {}
     current_user_index = 0
 
-    for file_path in tqdm(sorted(list_rating_files(directory_path)), smoothing=.001):
+    for file_path in tqdm(sorted(list_rating_files(directory_path)), smoothing=0.001):
         with open(file_path, "r") as file:
             movie_id = int(file.readline().strip().replace(":", ""))
             movie_idx = movie_id - 1
