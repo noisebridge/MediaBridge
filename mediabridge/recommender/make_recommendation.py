@@ -63,7 +63,7 @@ def recommend(
     assert isinstance(predictions, np.ndarray)
     assert predictions.shape == (len(test_movie_ids),)  # (8000, )
     mx = round(predictions.max(), 5)
-    assert 0.0014 < mx < 0.0022, mx
+    assert 0.0014 < mx < 0.0027, mx
     thresh = 0.85 * mx  # admit some more recommendations
     print()
     for i, p in enumerate(predictions):

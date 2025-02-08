@@ -3,7 +3,7 @@ from time import time
 
 from mediabridge.db.tables import create_tables
 from mediabridge.definitions import FULL_TITLES_TXT
-from mediabridge.recommender.etl import etl
+from mediabridge.data_processing.etl import etl
 from mediabridge.recommender.make_recommendation import recommend
 
 
