@@ -23,7 +23,7 @@ class TestTwoMoviesRec(unittest.TestCase):
             # A million rows corresponds to a four-second ETL.
             t0 = time()
 
-            etl("mv_00*.txt", max_rows=1_000_000)
+            etl(max_rows=1_000_000)
 
             elapsed = time() - t0
             x = (elapsed < 10) or print(f"ETL finished in {elapsed:.3f} s")

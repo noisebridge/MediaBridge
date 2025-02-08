@@ -19,8 +19,10 @@ from mediabridge.db.tables import (
 )
 from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR, PROJECT_DIR
 
+GLOB = "mv_00*.txt"
 
-def etl(glob: str, max_rows: int) -> None:
+
+def etl(max_rows: int) -> None:
     """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table.
 
     If CSV or table have already been computed, we skip repeating that work to save time.
@@ -28,7 +30,7 @@ def etl(glob: str, max_rows: int) -> None:
     $ (cd out && rm -f rating.csv.gz movies.sqlite)
     """
     _etl_movie_title()
-    _etl_user_rating(glob, max_rows)
+    _etl_user_rating(max_rows)
     _gen_reporting_tables()
 
 
@@ -45,7 +47,7 @@ def _etl_movie_title() -> None:
         df.to_sql("movie_title", conn, index=False, if_exists="append")
 
 
-def _etl_user_rating(glob: str, max_rows: int) -> None:
+def _etl_user_rating(max_rows: int) -> None:
     """Writes out/rating.csv.gz if needed, then populates rating table from it."""
     training_folder = PROJECT_DIR.parent / "Netflix-Dataset/training_set/training_set"
     diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
@@ -61,7 +63,7 @@ def _etl_user_rating(glob: str, max_rows: int) -> None:
             # Forking a child lets use burn a pair of cores.
             gzip_proc = Popen(["gzip", "-c"], stdin=PIPE, stdout=fout)
             for mv_ratings_file in tqdm(
-                sorted(training_folder.glob(glob)), smoothing=0.01
+                sorted(training_folder.glob(GLOB)), smoothing=0.01
             ):
                 m = path_re.search(f"{mv_ratings_file}")
                 assert m
