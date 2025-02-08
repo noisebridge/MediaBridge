@@ -31,20 +31,21 @@ def etl(max_rows: int) -> None:
     """
     _etl_movie_title()
     _etl_user_rating(max_rows)
-    _gen_reporting_tables()
 
 
 def _etl_movie_title() -> None:
-    columns = ["id", "year", "title"]
-    df = pd.DataFrame(read_netflix_txt(FULL_TITLES_TXT), columns=columns)
-    df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
-    # At this point there's a df.id value of "1". Maybe it should be "00001"?
+    query = "SELECT *  FROM movie_title  LIMIT 1"
+    if pd.read_sql_query(query, get_engine()).empty:
+        columns = ["id", "year", "title"]
+        df = pd.DataFrame(read_netflix_txt(FULL_TITLES_TXT), columns=columns)
+        df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
+        # At this point there's a df.id value of "1". Maybe it should be "00001"?
 
-    with get_engine().connect() as conn:
-        conn.execute(text("DELETE FROM rating"))
-        conn.execute(text("DELETE FROM movie_title"))
-        conn.commit()
-        df.to_sql("movie_title", conn, index=False, if_exists="append")
+        with get_engine().connect() as conn:
+            conn.execute(text("DELETE FROM rating"))
+            conn.execute(text("DELETE FROM movie_title"))
+            conn.commit()
+            df.to_sql("movie_title", conn, index=False, if_exists="append")
 
 
 def _etl_user_rating(max_rows: int) -> None:
@@ -104,13 +105,15 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
                 sess.bulk_insert_mappings(class_mapper(Rating), rows)
                 sess.commit()
                 print(f"written in {time() - t0:.3f} s")
+
+                _gen_reporting_tables()
                 #
                 # example elapsed times:
                 # 5_000_000 rating rows written in 16.033 s
                 # 10_000_000 rating rows written in 33.313 s
                 #
                 # 100_480_507 rating rows written in 936.827 s
-                # ETL finished in 1031.222 s (completes within eighteen minutes)
+                # ETL finished in 1031.222 s (completes in ~ twenty minutes)
 
 
 def _read_ratings(
@@ -130,7 +133,6 @@ def _read_ratings(
 
 def _gen_reporting_tables() -> None:
     """Generates a pair of reporting tables from scratch, discarding any old reporting rows."""
-    # This typically completes in slightly more than one second.
     tbl_qry = [
         ("popular_movie", POPULAR_MOVIE_QUERY),
         ("prolific_user", PROLIFIC_USER_QUERY),
