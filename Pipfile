@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+datasette = "~=0.65"
 numpy = "~=1.26"
 pandas = "~=2.2"
 pymongo = "~=4.10"
@@ -30,6 +31,7 @@ types-tqdm = "~=4.67"
 python_version = "3.12"
 
 [scripts]
+browse = "pipenv run datasette serve out/movies.sqlite"
 coverage = "pipenv run bin/coverage.sh"
 dev = "pipenv run python -m mediabridge.main"
 lint = "pipenv run bin/lint.sh"
