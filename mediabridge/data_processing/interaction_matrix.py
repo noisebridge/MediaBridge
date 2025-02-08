@@ -4,7 +4,7 @@ from collections.abc import Generator
 from pathlib import Path
 
 import numpy as np
-from scipy.sparse import coo_matrix, csr_matrix
+from scipy.sparse import coo_matrix, dok_matrix
 
 from mediabridge.definitions import DATA_DIR
 
@@ -21,7 +21,7 @@ def create_interaction_matrix(
     num_users: int,
     num_movies: int,
 ) -> coo_matrix:
-    interaction_matrix = csr_matrix((num_users, num_movies), dtype=np.int8)
+    interaction_matrix = dok_matrix((num_users, num_movies), dtype=np.int8)
     user_mapper = {}
     current_user_index = 0
 
