@@ -32,3 +32,6 @@ class TestTwoMoviesRec(unittest.TestCase):
     def test_recommend(self) -> None:
         if FULL_TITLES_TXT.exists():
             recommend()
+
+        # Consider evaluating the result with
+        # https://making.lyst.com/lightfm/docs/lightfm.evaluation.html#lightfm.evaluation.precision_at_k

@@ -16,7 +16,7 @@ Several design decisions should definitely be revisited:
      being sorted by genre is not a solid assumption. Similarly for popularity or year.
      So we need a better way of identifying the hidden movies that the model
      should be blinded to during initial training.
-(2.) As a very simple item, we could map one- and two- star ratings to -1 "I hate this" entries.
+(2.) DONE: represent one-star ratings as -1.
 (3.) We are not yet taking advantage of optional parameters that would let us tell
      the model about user demographics or movie genre information.
      Note that demographics could include variables like age and gender,
@@ -74,6 +74,8 @@ def recommend(
 
 def _normalize_rating(rating: int) -> float:
     """Maps a star rating to the interval [-1, 1], for a logistic loss model."""
+    # The inputs skew toward positive ratings, so the overall mean will be positive.
+    # We may need to defer normalization until the sample mean is known.
     assert 1 <= rating <= 5
     return (rating - 3) / 2
 
