@@ -31,7 +31,7 @@ def create_interaction_matrix(
             movie_idx = movie_id - 1
 
             for line in file:
-                user_id, rating, _ = map(int, line.strip().split(","))
+                user_id, rating = map(int, line.strip().split(",")[:2])
 
                 if rating < 4:
                     continue
