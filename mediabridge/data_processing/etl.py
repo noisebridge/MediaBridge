@@ -133,7 +133,7 @@ def _read_ratings(
 
 def _gen_reporting_tables() -> None:
     """Generates a pair of reporting tables from scratch, discarding any old reporting rows."""
-    RATING_V_QUERY = """
+    RATING_V_DDL = """
     CREATE VIEW rating_v AS
     SELECT user_id, rating, mt.*
     FROM rating JOIN movie_title mt ON movie_id = mt.id
@@ -141,9 +141,10 @@ def _gen_reporting_tables() -> None:
     tbl_qry = [
         ("popular_movie", POPULAR_MOVIE_QUERY),
         ("prolific_user", PROLIFIC_USER_QUERY),
-        ("rating_v", RATING_V_QUERY),
     ]
     with get_engine().connect() as conn:
+        conn.execute(text("DROP VIEW  IF EXISTS  rating_v"))
+        conn.execute(text(RATING_V_DDL))
         for table, query in tbl_qry:
             conn.execute(text(f"DELETE FROM {table}"))
             conn.execute(text(f"INSERT INTO {table}  {query}"))
