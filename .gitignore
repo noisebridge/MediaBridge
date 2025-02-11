@@ -1,5 +1,13 @@
-data
-out
+.coverage
 .env
 .pytest_cache
-__pycache__
+__pycache__/
+data/
+interaction-matrix-of-user
+movie_titles.txt
+mv_0000001.txt
+mv_0000002.txt
+myenv/
+nf_prize_dataset.tar.gz
+out/
+output/

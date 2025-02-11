@@ -1,6 +1,6 @@
 # What is MediaBridge?
 
-MediaBridge is a project being developed at the [Noisebridge](https://github.com/noisebridge) hackerspace in San Francisco, CA, USA. See also the [Noisebridge hompage](https://www.noisebridge.net/wiki/Noisebridge) and the [wiki entry for this project](https://www.noisebridge.net/wiki/Python_Project_Meetup).
+MediaBridge is a project being developed at the [Noisebridge](https://github.com/noisebridge) hackerspace in San Francisco, CA, USA. See also the [Noisebridge homepage](https://www.noisebridge.net/wiki/Noisebridge) and the [wiki entry for this project](https://www.noisebridge.net/wiki/Python_Project_Meetup).
 
 MediaBridge is in a _very_ early stage of the development. It's intended functionality is to provide recommendations that _bridge_ media types. So for example, you might say you're interested in the film _Saw_ and MediaBrige might recommend the video game _Silent Hill_ or a Stephen King book. For now, we are working on simply returning recommendations for movies, based on the [Netflix Prize dataset](https://www.kaggle.com/datasets/netflix-inc/netflix-prize-data).
 
@@ -12,19 +12,9 @@ This code uses Python 3. It is tested on Python 3.12, but will probably work on 
 
 To install the project dependencies, first install pipenv globally with `pip install pipenv`. Then create a virtual env/install dependencies with `pipenv install --dev`.
 
-To run code in the project, prefix your command with `pipenv run`, a la `pipenv run python -m mediabridge.main`.
+To run code in the pipenv virtual environment, prefix your command with `pipenv run` (ex. `pipenv run python` runs the python interpreter in the pipenv environment).
 
-## Running main
-
-The "main.py" script is part of the `mediabridge` module. Additionally, running it requires `pipenv run` as mentioned above. So the full command to run the main script (or any other script in the `mediabridge` module) is:
-
-```
-pipenv run python -m mediabridge.main
-```
-
-This should be run from the root of the project directory.
-
-### Running from VSCode
+### Using the pipenv environment in VSCode
 
 To fix import errors and other Intellisense features, make sure you've let VSCode know about your pipenv environment. To do that:
 
@@ -32,14 +22,29 @@ To fix import errors and other Intellisense features, make sure you've let VSCod
 2. Search for and select the "Python: Select Interpreter" command
 3. Choose the option that starts with `MediaBridge`
 
+## Running code
+
+For development purposes, you can simply run the dev script:
+
+```
+pipenv run dev
+```
+
+Be sure to specify options such as -v and -l *before* any subcommands (process, load, etc.).
+
+**NOTE:** *If you encounter a ModuleNotFoundError, make sure you are in the root directory of the project, as the `mediabridge` directory is the module Pipenv is trying to reference.*
+
+This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`, but this may change in the future, so using `pipenv run dev` will ensure the correct script is always run.
+
 ## Testing
 
-To run unit tests,
+To run unittests:
 
-1. Ensure `pipenv` is installed
-2. Run `pipenv run pytest`
+```
+pipenv run test
+```
 
-There is a GitHub actions "check" for passing tests, which must pass for you to be able to merge your PR.
+These tests are also evaluated via a GitHub action when opening or updating a PR and must pass before merging.
 
 ## Code formatting
 
