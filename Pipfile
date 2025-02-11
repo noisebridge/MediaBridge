@@ -4,16 +4,22 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+datasette = "~=0.65"
+numpy = "~=1.26"
+pandas = "~=2.2"
 pymongo = "~=4.10"
 python-dotenv = "~=1.0"
 rectools-lightfm = "~=1.17.3"
 requests = "~=2.26"
+scikit-surprise = "~=1.1"
 scipy = "~=1.14"
+sqlalchemy = "~=2.0"
 tqdm = "~=4.66"
 typer = "~=0.12"
 
 [dev-packages]
 mypy = "~=1.14"
+pandas-stubs = "~=2.2"
 pyright = "~=1.1"
 pytest = "~=8.3"
 pytest-cov = "~=5.0"
@@ -25,6 +31,7 @@ types-tqdm = "~=4.67"
 python_version = "3.12"
 
 [scripts]
+browse = "pipenv run datasette serve out/movies.sqlite"
 coverage = "pipenv run bin/coverage.sh"
 dev = "pipenv run python -m mediabridge.main"
 lint = "pipenv run bin/lint.sh"

@@ -13,7 +13,7 @@ from mediabridge.data_processing.wiki_to_netflix_test_data import (
 )
 from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
-from tests.logging_util import silence_logging
+from tests.util.logging_util import silence_logging
 
 TITLES_TXT = PROJECT_DIR / "tests/test-data/movie_titles_test.txt"
 TITLES_CSV = TITLES_TXT.with_suffix(".csv")
@@ -56,14 +56,14 @@ class TestWikiToNetflix(unittest.TestCase):
     def test_read_netflix_txt(self) -> None:
         movies = list(w_to_n.read_netflix_txt(TITLES_TXT, 3))
         assert len(movies) == 3
-        assert movies[-1] == ["3", "1997", "Character"]
+        assert movies[-1] == ("3", "1997", "Character")
 
         # Sometimes we're in an environment, like CI, where we never downloaded the full dataset.
         # So silently succeed, without attempting to read thousands of non-existent entries.
         if FULL_TITLES_TXT.exists():
             movies = list(w_to_n.read_netflix_txt(FULL_TITLES_TXT))
             assert len(movies) == 17_770
-            assert movies[-1] == ["17770", "2003", "Alien Hunter"]
+            assert movies[-1] == ("17770", "2003", "Alien Hunter")
 
     def test_create_netflix_csv(self) -> None:
         movies = [

@@ -4,7 +4,8 @@ from collections.abc import Generator
 from pathlib import Path
 
 import numpy as np
-from scipy.sparse import coo_matrix, csr_matrix
+from scipy.sparse import coo_matrix, dok_matrix
+from tqdm import tqdm
 
 from mediabridge.definitions import DATA_DIR
 
@@ -21,17 +22,17 @@ def create_interaction_matrix(
     num_users: int,
     num_movies: int,
 ) -> coo_matrix:
-    interaction_matrix = csr_matrix((num_users, num_movies), dtype=np.int8)
+    interaction_matrix = dok_matrix((num_users, num_movies), dtype=np.int8)
     user_mapper = {}
     current_user_index = 0
 
-    for file_path in list_rating_files(directory_path):
+    for file_path in tqdm(sorted(list_rating_files(directory_path)), smoothing=0.001):
         with open(file_path, "r") as file:
             movie_id = int(file.readline().strip().replace(":", ""))
             movie_idx = movie_id - 1
 
             for line in file:
-                user_id, rating, _ = map(int, line.strip().split(","))
+                user_id, rating = map(int, line.strip().split(",")[:2])
 
                 if rating < 4:
                     continue
