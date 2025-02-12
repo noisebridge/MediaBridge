@@ -7,10 +7,12 @@ import typer as typer
 from mediabridge.data_processing import wiki_to_netflix
 from mediabridge.db import load
 from mediabridge.definitions import OUTPUT_DIR
+from mediabridge.recommender import make_recommendation
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 app.add_typer(wiki_to_netflix.app)
 app.add_typer(load.app)
+app.add_typer(make_recommendation.app)
 
 
 @dataclass

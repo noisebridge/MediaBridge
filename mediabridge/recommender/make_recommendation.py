@@ -37,10 +37,14 @@ import numpy as np
 from scipy.sparse import coo_matrix, dok_matrix
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+from typer import Typer
 
 from mediabridge.db.tables import MovieTitle, get_engine
 
+app = Typer()
 
+
+@app.command()
 def recommend(
     max_training_user_id: int = 800,
     large_movie_id: int = 9_770,
@@ -140,7 +144,7 @@ def _get_test_movie_ids(
     """
     params = {"max_training_user_id": large_movie_id}
     with get_engine().connect() as conn:
-        test_movie_ids = [int(m) for m, in conn.execute(text(query), params)]
+        test_movie_ids = [int(m) for (m,) in conn.execute(text(query), params)]
         return sorted(test_movie_ids)
 
 
