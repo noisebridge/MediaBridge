@@ -11,11 +11,11 @@ from mediabridge.data_processing.wiki_to_netflix_test_data import (
     EXPECTED_SPARQL_QUERY,
     WIKIDATA_RESPONSE_THE_ROOM,
 )
-from mediabridge.definitions import FULL_TITLES_TXT, PROJECT_DIR
+from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 from tests.util.logging_util import silence_logging
 
-TITLES_TXT = PROJECT_DIR / "tests/test-data/movie_titles_test.txt"
+TITLES_TXT = DATA_DIR / "movie_titles.txt"
 TITLES_CSV = TITLES_TXT.with_suffix(".csv")
 
 

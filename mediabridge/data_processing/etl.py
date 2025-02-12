@@ -17,7 +17,7 @@ from mediabridge.db.tables import (
     Rating,
     get_engine,
 )
-from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR, PROJECT_DIR
+from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT, OUTPUT_DIR
 
 GLOB = "mv_00*.txt"
 
@@ -50,8 +50,8 @@ def _etl_movie_title() -> None:
 
 def _etl_user_rating(max_rows: int) -> None:
     """Writes out/rating.csv.gz if needed, then populates rating table from it."""
-    training_folder = PROJECT_DIR.parent / "Netflix-Dataset/training_set/training_set"
-    diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
+    training_folder = DATA_DIR / "training_set"
+    diagnostic = "Please run `pipenv run dev init` to download the necessary dataset"
     assert training_folder.exists(), diagnostic
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
