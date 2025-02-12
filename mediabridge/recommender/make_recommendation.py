@@ -9,13 +9,14 @@ Several design decisions should definitely be revisited:
      and "test" users that offer a handful of rated movies and then
      we need to predict the rest.
      Currently there's a single test user, and the distinction between "revealed"
-     and "hidden" movies for that user comes from an integer ID comparison.
+     and "hidden" movies for that user comes from an integer ID comparison
+     against large_movie_id.
      We of course wish for the model to support multiple test users.
      And hoping that numeric movie IDs have e.g. random genre as opposed to
      being sorted by genre is not a solid assumption. Similarly for popularity or year.
      So we need a better way of identifying the hidden movies that the model
      should be blinded to during initial training.
-(2.) As a very simple item, we could map one- and two- star ratings to -1 "I hate this" entries.
+(2.) DONE: represent one-star ratings as -1.
 (3.) We are not yet taking advantage of optional parameters that would let us tell
      the model about user demographics or movie genre information.
      Note that demographics could include variables like age and gender,
@@ -25,9 +26,6 @@ Several design decisions should definitely be revisited:
      Or maybe we run that automatically as needed, and "pipenv run dev recommend"
      is the user interface that should be added to the code base?
      Perhaps with parameters that describe users or movies of interest?
-
-The non-determinism of LightFM does not seem like an attractive aspect of the library.
-We may be able to find more deterministic solutions.
 
 You can view the test output with:
 $ pipenv run python -m unittest tests/*/*_test.py
@@ -46,7 +44,18 @@ from mediabridge.db.tables import MovieTitle, get_engine
 def recommend(
     max_training_user_id: int = 800,
     large_movie_id: int = 9_770,
-) -> None:
+) -> set[int]:
+    """Recommends a set of movies, by netflix_id, for a given user.
+
+    The subject user is identified by max_training_user_id.
+    Lower IDs reveal full ratings information to the model.
+    Larger IDs are completely ignored, leading to quicker test runs.
+
+    For the subject user we reveal only a subset of movie preferences.
+    Movie IDs below large_movie_id are revealed to the model during training,
+    while larger IDs are hidden and are fair game to possibly recommend to the user.
+    Clearly there is room to improve on this crude method of splitting into subsets.
+    """
     message = "LightFM was compiled without OpenMP support"
     filterwarnings("ignore", message, category=UserWarning)
     from lightfm import LightFM
@@ -57,64 +66,65 @@ def recommend(
 
     test_movie_ids = _get_test_movie_ids(large_movie_id)
 
-    # NB: predicting is very very non-deterministic. Each run _will_ produce different results.
     predictions = model.predict(max_training_user_id, test_movie_ids)
     assert isinstance(predictions, np.ndarray)
     assert predictions.shape == (len(test_movie_ids),)  # (8000, )
     mx = round(predictions.max(), 5)
-    assert 0.0014 < mx < 0.0022, mx
-    thresh = 0.85 * mx  # admit some more recommendations
-    print()
-    for i, p in enumerate(predictions):
-        if p > thresh:
-            netflix_id = test_movie_ids[i]  # map from internal to external ID
-            print(f"{i}  {netflix_id}\t{p}\t{_get_title(netflix_id)}")
+    thresh = 0.91 * mx  # admit some more recommendations, not just the top one
+    # netflix_id = test_movie_ids[i]  # maps from internal to external netflix ID
+
+    return {test_movie_ids[i] for i, p in enumerate(predictions) if p > thresh}
+
+
+def _normalize_rating(rating: int) -> float:
+    """Maps a star rating to the interval [-1, 1], for a logistic loss model."""
+    # The inputs skew toward positive ratings, so the overall mean will be positive.
+    # We may need to defer normalization until the sample mean is known.
+    assert 1 <= rating <= 5
+    return (rating - 3) / 2
 
 
 def _get_ratings(
     max_user_id: int,
     large_movie_id: int,
-    threshold: int = 4,
 ) -> coo_matrix:
-    """Produces a sparse training matrix of just "positive" user ratings.
+    """Produces a sparse training matrix of thumbs {up, down} user ratings.
 
-    We do not yet return any "negative" -1 values, e.g. for two- and one- star reviews.
+    We ignore "neutral" three-star ratings.
     """
     query = """
     SELECT
         user_id,
-        CAST(movie_id AS INTEGER)
+        CAST(movie_id AS INTEGER),
+        rating
     FROM rating
     WHERE
         user_id <= :max_user_id
-        AND rating >= :threshold
+        AND rating != 3
     ORDER BY user_id, movie_id
     """
     params = {
         "max_user_id": max_user_id,
-        "threshold": threshold,
     }
     matrix = dok_matrix(
         (max_user_id + 1, _get_max_movie_id() + 1),
         dtype=np.int8,
     )
     with get_engine().connect() as conn:
-        for u, m in conn.execute(text(query), params):
-            matrix[u, m] = 1
+        for u, m, r in conn.execute(text(query), params):
+            matrix[u, m] = _normalize_rating(r)
 
             # Blind the model to the movies we want to predict.
             if u == max_user_id and m >= large_movie_id:
-                matrix[u, m] = 0
                 del matrix[u, m]
-                print(u, m)
 
     return coo_matrix(matrix)
 
 
 def _get_max_movie_id() -> int:
     # Movie IDs are VARCHARs in the database, which complicates matters.
-    # That horrible magic number 4 lets us return 17_770 instead of 9_999.
-    query = "SELECT MAX(id)  FROM movie_title  WHERE LENGTH(id) > 4"
+    # Sorting by length and then lexically lets us return 17_770 instead of 9_999.
+    query = "SELECT id  FROM movie_title  ORDER BY LENGTH(id) DESC, id DESC  LIMIT 1"
     with get_engine().connect() as conn:
         val = conn.execute(text(query)).scalar()
         return int(val or 0)
@@ -134,7 +144,7 @@ def _get_test_movie_ids(
         return sorted(test_movie_ids)
 
 
-def _get_title(netflix_id: int) -> str:
+def get_title(netflix_id: int) -> str:
     with Session(get_engine()) as sess:
         movie = sess.get(MovieTitle, netflix_id)
         assert movie, netflix_id

@@ -73,7 +73,6 @@ SELECT
     ROUND(AVG(rating), 3) AS avg_rating
 FROM rating
 GROUP BY user_id
-ORDER BY cnt DESC
 """
 
 

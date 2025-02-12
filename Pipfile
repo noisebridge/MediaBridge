@@ -4,15 +4,20 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+datasette = "~=0.65"
+numpy = "~=1.26"
 pandas = "~=2.2"
 pymongo = "~=4.10"
 python-dotenv = "~=1.0"
 rectools-lightfm = "~=1.17.3"
 requests = "~=2.26"
+ruff = "~=0.7"
+scikit-surprise = "~=1.1"
 scipy = "~=1.14"
 sqlalchemy = "~=2.0"
 tqdm = "~=4.66"
 typer = "~=0.12"
+wget = "~=3.2"
 
 [dev-packages]
 mypy = "~=1.14"
@@ -28,7 +33,10 @@ types-tqdm = "~=4.67"
 python_version = "3.12"
 
 [scripts]
+browse = "pipenv run datasette serve out/movies.sqlite"
 coverage = "pipenv run bin/coverage.sh"
+delete_data = "pipenv run python -m mediabridge.data_processing.clean_up_data"
 dev = "pipenv run python -m mediabridge.main"
+download_data = "pipenv run python -m mediabridge.data_processing.download_data"
 lint = "pipenv run bin/lint.sh"
 test = "pipenv run python -m pytest"

@@ -35,7 +35,7 @@ def read_netflix_txt(
     Reads rows from the Netflix dataset file.
 
     Parameters:
-        txt_file: Path to the Netflix movie title file.
+        txt_file: Path to the Netflix movie_titles.txt file.
 
         num_rows: Number of rows to read from the file, or if None,
         all rows are read.
@@ -222,7 +222,8 @@ def wiki_query(
     log.debug(data)
 
     if data["results"]["bindings"]:
-        log.info(f'Found movie id {movie.netflix_id}: ("{movie.title}", {movie.year})')
+        log.info(
+            f'Found movie id {movie.netflix_id}: ("{movie.title}", {movie.year})')
         return EnrichedMovieData(
             **vars(movie),
             wikidata_id=str(wiki_feature_info(data, "item")),
