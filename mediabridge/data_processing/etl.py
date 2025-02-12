@@ -92,6 +92,7 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
     if pd.read_sql_query(query, get_engine()).empty:
         with get_engine().connect() as conn:
             df = pd.read_csv(csv, nrows=max_rows)
+            df = df.sort_values(by=["user_id", "movie_id"])
             conn.execute(text("DELETE FROM rating"))
             conn.commit()
             print(f"\n{len(df):_}", end="", flush=True)

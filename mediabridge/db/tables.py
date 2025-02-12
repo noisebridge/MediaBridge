@@ -20,13 +20,10 @@ class MovieTitle(Base):
     title: Mapped[str] = mapped_column(String, nullable=False)
 
 
-_movie_fk = ForeignKey("movie_title.id")
-
-
 class Rating(Base):
     __tablename__ = "rating"
-    movie_id: Mapped[str] = mapped_column(String, _movie_fk, primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    movie_id: Mapped[str] = mapped_column(String, primary_key=True)
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
