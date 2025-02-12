@@ -27,12 +27,16 @@ class RecommendationEngineTest(unittest.TestCase):
             OUTPUT_DIR / "interaction_matrix.pkl",
         )
 
+    def tearDown(self) -> None:
+        self.engine.db.client.close()
+
     def test_connect_to_mongo(self) -> None:
         if os.environ.get("MONGODB_URI"):
-            client = connect_to_mongo()
-            num_collections = len(list(client.list_collections()))
+            db = connect_to_mongo()
+            num_collections = len(list(db.list_collections()))
             if num_collections == 0:
                 etl_mongo_movie_titles()
+            db.client.close()
 
     def test_get_movie_id(self) -> None:
         self.assertEqual("1", self.engine.get_movie_id("Dinosaur Planet"))
