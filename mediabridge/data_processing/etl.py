@@ -6,15 +6,14 @@ from subprocess import PIPE, Popen
 from time import time
 
 import pandas as pd
-from sqlalchemy.orm import Session, class_mapper
 from sqlalchemy.sql import text
 from tqdm import tqdm
 
 from mediabridge.data_processing.wiki_to_netflix import read_netflix_txt
 from mediabridge.db.tables import (
+    DB_FILE,
     POPULAR_MOVIE_QUERY,
     PROLIFIC_USER_QUERY,
-    Rating,
     get_engine,
 )
 from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR, PROJECT_DIR
@@ -88,33 +87,60 @@ def _etl_user_rating(max_rows: int) -> None:
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
     """Populates rating table from compressed CSV, if needed."""
+    create_rating_csv = """
+        CREATE TABLE rating_csv (
+            user_id   INTEGER  NOT NULL,
+            rating    INTEGER  NOT NULL,
+            movie_id  TEXT     NOT NULL)
+    """
+    ins = "INSERT INTO rating  SELECT user_id, movie_id, rating  FROM rating_csv  ORDER BY 1, 2, 3"
+    cmds = [
+        ".mode csv",
+        ".headers on",
+        f".import {_get_input_csv(max_rows)} rating_csv",
+    ]
     query = "SELECT *  FROM rating  LIMIT 1"
     if pd.read_sql_query(query, get_engine()).empty:
         with get_engine().connect() as conn:
-            df = pd.read_csv(csv, nrows=max_rows)
-            df = df.sort_values(by=["user_id", "movie_id"])
-            conn.execute(text("DELETE FROM rating"))
+            print(f"\n{max_rows:_}", end="", flush=True)
+            t0 = time()
+            conn.execute(text("DROP TABLE  IF EXISTS  rating_csv"))
+            conn.execute(text(create_rating_csv))
             conn.commit()
-            print(f"\n{len(df):_}", end="", flush=True)
-            rows = [
-                {str(k): int(v) for k, v in row.items()}
-                for row in df.to_dict(orient="records")
-            ]
+            with Popen(
+                ["sqlite3", DB_FILE],
+                text=True,
+                stdin=PIPE,
+                stdout=PIPE,
+            ) as proc:
+                print()
+                for cmd in cmds:
+                    proc.stdin.write(f"{cmd}\n")
             print(end=" rating rows ", flush=True)
-            with Session(conn) as sess:
-                t0 = time()
-                sess.bulk_insert_mappings(class_mapper(Rating), rows)
-                sess.commit()
-                print(f"written in {time() - t0:.3f} s")
+            conn.execute(text("DELETE FROM rating"))
+            conn.execute(text(ins))
+            conn.execute(text("DROP TABLE rating_csv"))
+            conn.commit()
+            print(f"written in {time() - t0:.3f} s")
 
-                _gen_reporting_tables()
-                #
-                # example elapsed times:
-                # 5_000_000 rating rows written in 16.033 s
-                # 10_000_000 rating rows written in 33.313 s
-                #
-                # 100_480_507 rating rows written in 936.827 s
-                # ETL finished in 1031.222 s (completes in ~ twenty minutes)
+            _gen_reporting_tables()
+            #
+            # example elapsed times:
+            # 10_000_000 rating rows written in 18.560 s
+            #
+            # 100_480_507 rating rows written in 936.827 s
+            # ETL finished in 1031.222 s (completes in ~ twenty minutes)
+
+
+def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:
+    """Optionally subsets the input prize data, doing work only in the subset case."""
+    csv = OUTPUT_DIR / "rating.csv"
+    if max_rows < all_rows:
+        df = pd.read_csv(csv, nrows=max_rows)
+        csv = OUTPUT_DIR / "rating-small.csv"
+        df.to_csv(csv, index=False)
+    assert csv.exists(), csv
+    return csv
 
 
 def _read_ratings(
