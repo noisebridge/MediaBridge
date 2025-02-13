@@ -67,7 +67,7 @@ PROLIFIC_USER_QUERY = """
 SELECT
     user_id,
     COUNT(*) AS cnt,
-    ROUND(AVG(rating), 3) AS avg_rating
+    ROUND(AVG(CAST(rating AS REAL)), 3) AS avg_rating
 FROM rating
 GROUP BY user_id
 """

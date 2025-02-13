@@ -94,11 +94,6 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
             movie_id  TEXT     NOT NULL)
     """
     ins = "INSERT INTO rating  SELECT user_id, movie_id, rating  FROM rating_csv  ORDER BY 1, 2, 3"
-    cmds = [
-        ".mode csv",
-        ".headers on",
-        f".import {_get_input_csv(max_rows)} rating_csv",
-    ]
     query = "SELECT *  FROM rating  LIMIT 1"
     if pd.read_sql_query(query, get_engine()).empty:
         with get_engine().connect() as conn:
@@ -107,15 +102,13 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
             conn.execute(text("DROP TABLE  IF EXISTS  rating_csv"))
             conn.execute(text(create_rating_csv))
             conn.commit()
-            with Popen(
-                ["sqlite3", DB_FILE],
-                text=True,
-                stdin=PIPE,
-                stdout=PIPE,
-            ) as proc:
-                print()
-                for cmd in cmds:
-                    proc.stdin.write(f"{cmd}\n")
+            _run_sqlite_child(
+                [
+                    ".mode csv",
+                    ".headers on",
+                    f".import {_get_input_csv(max_rows)} rating_csv",
+                ]
+            )
             print(end=" rating rows ", flush=True)
             conn.execute(text("DELETE FROM rating"))
             conn.execute(text(ins))
@@ -128,7 +121,7 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
             # example elapsed times:
             # 10_000_000 rating rows written in 18.560 s
             #
-            # 100_480_507 rating rows written in 936.827 s
+            # 101_000_000 rating rows written in 228.983 s (four minutes)
             # ETL finished in 1031.222 s (completes in ~ twenty minutes)
 
 
@@ -140,7 +133,19 @@ def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:
         csv = OUTPUT_DIR / "rating-small.csv"
         df.to_csv(csv, index=False)
     assert csv.exists(), csv
-    return csv
+    return Path(csv)
+
+
+def _run_sqlite_child(cmds: list[str]) -> None:
+    with Popen(
+        ["sqlite3", DB_FILE],
+        text=True,
+        stdin=PIPE,
+        stdout=PIPE,
+    ) as proc:
+        assert isinstance(proc.stdin, io.TextIOWrapper)
+        for cmd in cmds:
+            proc.stdin.write(f"{cmd}\n")
 
 
 def _read_ratings(
