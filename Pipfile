@@ -39,4 +39,8 @@ delete_data = "pipenv run python -m mediabridge.data_processing.clean_up_data"
 dev = "pipenv run python -m mediabridge.main"
 download_data = "pipenv run python -m mediabridge.data_processing.download_data"
 lint = "pipenv run bin/lint.sh"
+
+# These two do the same thing. Some folks prefer the unittest runner. For example,
+# it works better with "tqdm" and with "print" debugging, and offers nicer traces.
 test = "pipenv run python -m pytest"
+unittest = "bash -c 'pipenv run python -m unittest $(find tests mediabridge -name *_test.py)'"
