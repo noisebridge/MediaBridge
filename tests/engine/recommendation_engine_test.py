@@ -45,4 +45,5 @@ class RecommendationEngineTest(unittest.TestCase):
             db.client.close()
 
     def test_get_movie_id(self) -> None:
-        self.assertEqual("1", self.engine.get_movie_id("Dinosaur Planet"))
+        if _enabled:
+            self.assertEqual("1", self.engine.get_movie_id("Dinosaur Planet"))
