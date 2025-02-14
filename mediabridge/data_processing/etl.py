@@ -26,7 +26,7 @@ def etl(max_rows: int) -> None:
 
     If CSV or table have already been computed, we skip repeating that work to save time.
     It is always safe to force a re-run with:
-    $ (cd out && rm -f rating.csv.gz movies.sqlite)
+    $ (cd out && rm -f rating.csv movies.sqlite)
     """
     _etl_movie_title()
     _etl_user_rating(max_rows)
@@ -47,16 +47,18 @@ def _etl_movie_title() -> None:
             df.to_sql("movie_title", conn, index=False, if_exists="append")
 
 
+RATING_CSV = OUTPUT_DIR / "rating.csv"  # uncompressed, to accommodate sqlite .import
+
+
 def _etl_user_rating(max_rows: int) -> None:
-    """Writes out/rating.csv.gz if needed, then populates rating table from it."""
+    """Writes out/rating.csv if needed, then populates rating table from it."""
     training_folder = PROJECT_DIR.parent / "Netflix-Dataset/training_set/training_set"
     diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
     assert training_folder.exists(), diagnostic
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
-    out_csv = OUTPUT_DIR / "rating.csv.gz"
-    if not out_csv.exists():
-        with open(out_csv, "wb") as fout:
+    if not RATING_CSV.exists():
+        with open(RATING_CSV, "wb") as fout:
             # We don't _need_ a separate gzip child process.
             # Specifying .to_csv('foo.csz.gz') would suffice.
             # But then we burn a single core while holding the GIL.
@@ -82,7 +84,7 @@ def _etl_user_rating(max_rows: int) -> None:
             gzip_proc.stdin.close()
             gzip_proc.wait()
 
-    _insert_ratings(out_csv, max_rows)
+    _insert_ratings(RATING_CSV, max_rows)
 
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
@@ -127,7 +129,7 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
 
 def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:
     """Optionally subsets the input prize data, doing work only in the subset case."""
-    csv = OUTPUT_DIR / "rating.csv"
+    csv = RATING_CSV
     if max_rows < all_rows:
         df = pd.read_csv(csv, nrows=max_rows)
         csv = OUTPUT_DIR / "rating-small.csv"
