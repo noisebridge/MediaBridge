@@ -18,6 +18,7 @@ from mediabridge.db.tables import (
     POPULAR_MOVIE_QUERY,
     PROLIFIC_USER_QUERY,
     Rating,
+    create_tables,
     get_engine,
 )
 from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT, OUTPUT_DIR
@@ -39,16 +40,21 @@ def etl(regen: bool = False, max_reviews: int = 100_000_000) -> None:
     engine = get_engine()
 
     if regen:
+        prompt = "\n! Are you sure you want to delete ALL existing sqlite data? y/n !\n"
+        if input(prompt) != "y":
+            print("\nAborting process\n")
+            return
         log.info("Dropping existing tables...")
         with engine.connect() as conn:
             conn.execute(text("DROP TABLE IF EXISTS rating"))
             conn.execute(text("DROP TABLE IF EXISTS movie_title"))
             conn.commit()
-        # Add delete of csv?
+        create_tables()
+        # Delete compressed csv?
 
     log.info("Loading movie info into db...")
     _etl_movie_title()
-    # _etl_user_rating(max_reviews)
+    _etl_user_rating(max_reviews)
 
 
 def _etl_movie_title() -> None:
