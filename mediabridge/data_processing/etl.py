@@ -7,7 +7,6 @@ from subprocess import PIPE, Popen
 from time import time
 
 import pandas as pd
-import typer
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session, class_mapper
 from sqlalchemy.sql import text
@@ -23,14 +22,12 @@ from mediabridge.db.tables import (
 )
 from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT, OUTPUT_DIR
 
-app = typer.Typer()
 log = logging.getLogger(__name__)
 
 GLOB = "mv_00*.txt"
 
 
-@app.command()
-def etl(regen: bool = False, max_reviews: int = 100_000_000) -> None:
+def etl(max_reviews: int, regen: bool = False) -> None:
     """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table.
 
     If CSV or table have already been computed, we skip repeating that work to save time.
@@ -38,13 +35,8 @@ def etl(regen: bool = False, max_reviews: int = 100_000_000) -> None:
     $ (cd out && rm -f rating.csv.gz movies.sqlite)
     """
     engine = get_engine()
-
     if regen:
-        prompt = "\n! Are you sure you want to delete ALL existing sqlite data? y/n !\n"
-        if input(prompt) != "y":
-            print("\nAborting process\n")
-            return
-        log.info("Dropping existing tables...")
+        logging.info("Recreating tables...")
         with engine.connect() as conn:
             conn.execute(text("DROP TABLE IF EXISTS rating"))
             conn.execute(text("DROP TABLE IF EXISTS movie_title"))

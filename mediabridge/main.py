@@ -6,15 +6,12 @@ import typer as typer
 
 from mediabridge.data_processing import etl, wiki_to_netflix
 from mediabridge.data_processing.download_data import download_prize_dataset
-from mediabridge.db import load
 from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
 from mediabridge.recommender import make_recommendation
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 app.add_typer(wiki_to_netflix.app)
-app.add_typer(load.app)
 app.add_typer(make_recommendation.app)
-app.add_typer(etl.app)
 
 
 @dataclass
@@ -63,6 +60,16 @@ def init(force: bool = False):
         download_prize_dataset()
     else:
         logging.info("Skipping dataset download...")
+
+
+@app.command()
+def load(max_reviews: int = 100_000_000, regen: bool = False):
+    if regen:
+        prompt = "\n! Are you sure you want to delete ALL existing sqlite data? y/n !\n"
+        if input(prompt) != "y":
+            print("\nAborting process.")
+            return
+    etl.etl(max_reviews=max_reviews, regen=regen)
 
 
 if __name__ == "__main__":
