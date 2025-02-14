@@ -20,18 +20,24 @@ def etl_mongo_movie_titles() -> None:
     movies_collection.insert_many(rows)
 
 
+# In a github Actions CI environment, we will be "disabled".
+_enabled = bool(os.getenv("MONGODB_URI"))
+
+
 class RecommendationEngineTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.engine = RecommendationEngine(
-            ["1", "2"],
-            OUTPUT_DIR / "interaction_matrix.pkl",
-        )
+        if _enabled:
+            self.engine = RecommendationEngine(
+                ["1", "2"],
+                OUTPUT_DIR / "interaction_matrix.pkl",
+            )
 
     def tearDown(self) -> None:
-        self.engine.db.client.close()
+        if _enabled:
+            self.engine.db.client.close()
 
     def test_connect_to_mongo(self) -> None:
-        if os.environ.get("MONGODB_URI"):
+        if _enabled:
             db = connect_to_mongo()
             num_collections = len(list(db.list_collections()))
             if num_collections == 0:
