@@ -29,7 +29,7 @@ def move_files(source_path, destination_path):
     print("\nDownload Complete!")
 
 
-def main():
+def download_prize_dataset():
     url = "https://archive.org/download/nf_prize_dataset.tar/nf_prize_dataset.tar.gz"
     compressed_filename = "nf_prize_dataset.tar.gz"
     data_dir = Path(__file__).resolve().parent.parent / "data"
@@ -45,4 +45,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    download_prize_dataset()
