@@ -36,7 +36,7 @@ class TestTwoMoviesRec(unittest.TestCase):
             # A million rows corresponds to a four-second ETL.
             t0 = time()
 
-            etl(max_rows=101_000_000)
+            etl(max_reviews=1_000_000, regen=True)
 
             elapsed = time() - t0
             x = (elapsed < 10) or print(f"ETL finished in {elapsed:.3f} s")
@@ -44,7 +44,6 @@ class TestTwoMoviesRec(unittest.TestCase):
 
     def test_recommend(self) -> None:
         if FULL_TITLES_TXT.exists():
-
             ids = _clean(recommend())
 
             self.assertEqual(
