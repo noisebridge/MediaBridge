@@ -4,15 +4,17 @@ from datetime import datetime
 
 import typer as typer
 
-from mediabridge.data_processing import wiki_to_netflix
+from mediabridge.data_processing import etl, wiki_to_netflix
+from mediabridge.data_processing.download_data import download_prize_dataset
 from mediabridge.db import load
-from mediabridge.definitions import OUTPUT_DIR
+from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
 from mediabridge.recommender import make_recommendation
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 app.add_typer(wiki_to_netflix.app)
 app.add_typer(load.app)
 app.add_typer(make_recommendation.app)
+app.add_typer(etl.app)
 
 
 @dataclass
@@ -52,6 +54,15 @@ def main(
             level = logging.WARNING
         logging.basicConfig(level=level, format="[%(levelname)s] %(message)s")
     ctx.obj = AppContext(log_to_file=log)
+
+
+@app.command()
+def init(force: bool = False):
+    """Download all required datasets and initialize all data for recommendations"""
+    if force or not DATA_DIR.exists():
+        download_prize_dataset()
+    else:
+        logging.info("Skipping dataset download...")
 
 
 if __name__ == "__main__":

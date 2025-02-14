@@ -1,4 +1,5 @@
 import io
+import logging
 import re
 from collections.abc import Generator
 from pathlib import Path
@@ -6,6 +7,8 @@ from subprocess import PIPE, Popen
 from time import time
 
 import pandas as pd
+import typer
+from sqlalchemy import inspect
 from sqlalchemy.orm import Session, class_mapper
 from sqlalchemy.sql import text
 from tqdm import tqdm
@@ -19,36 +22,56 @@ from mediabridge.db.tables import (
 )
 from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT, OUTPUT_DIR
 
+app = typer.Typer()
+log = logging.getLogger(__name__)
+
 GLOB = "mv_00*.txt"
 
 
-def etl(max_rows: int) -> None:
+@app.command()
+def etl(regen: bool = False, max_reviews: int = 100_000_000) -> None:
     """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table.
 
     If CSV or table have already been computed, we skip repeating that work to save time.
     It is always safe to force a re-run with:
     $ (cd out && rm -f rating.csv.gz movies.sqlite)
     """
+    engine = get_engine()
+
+    if regen:
+        log.info("Dropping existing tables...")
+        with engine.connect() as conn:
+            conn.execute(text("DROP TABLE IF EXISTS rating"))
+            conn.execute(text("DROP TABLE IF EXISTS movie_title"))
+            conn.commit()
+        # Add delete of csv?
+
+    log.info("Loading movie info into db...")
     _etl_movie_title()
-    _etl_user_rating(max_rows)
+    # _etl_user_rating(max_reviews)
 
 
 def _etl_movie_title() -> None:
-    query = "SELECT *  FROM movie_title  LIMIT 1"
-    if pd.read_sql_query(query, get_engine()).empty:
-        columns = ["id", "year", "title"]
-        df = pd.DataFrame(read_netflix_txt(FULL_TITLES_TXT), columns=columns)
-        df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
-        # At this point there's a df.id value of "1". Maybe it should be "00001"?
+    insp = inspect(get_engine())
+    if insp.has_table("movie_title"):
+        query = "SELECT *  FROM movie_title  LIMIT 1"
+        # if there is already data in movie_title, skip reprocessing
+        if not pd.read_sql_query(query, get_engine()).empty:
+            log.warning(
+                "movie_title table already populated with data, skipping reprocessing..."
+            )
+            return
 
-        with get_engine().connect() as conn:
-            conn.execute(text("DELETE FROM rating"))
-            conn.execute(text("DELETE FROM movie_title"))
-            conn.commit()
-            df.to_sql("movie_title", conn, index=False, if_exists="append")
+    columns = ["id", "year", "title"]
+    df = pd.DataFrame(read_netflix_txt(FULL_TITLES_TXT), columns=columns)
+    df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
+    # At this point there's a df.id value of "1". Maybe it should be "00001"?
+
+    with get_engine().connect() as conn:
+        df.to_sql("movie_title", conn, index=False, if_exists="append")
 
 
-def _etl_user_rating(max_rows: int) -> None:
+def _etl_user_rating(max_reviews: int) -> None:
     """Writes out/rating.csv.gz if needed, then populates rating table from it."""
     training_folder = DATA_DIR / "training_set"
     diagnostic = "Please run `pipenv run dev init` to download the necessary dataset"
@@ -83,37 +106,36 @@ def _etl_user_rating(max_rows: int) -> None:
             gzip_proc.stdin.close()
             gzip_proc.wait()
 
-    _insert_ratings(out_csv, max_rows)
+    _insert_ratings(out_csv, max_reviews)
 
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
     """Populates rating table from compressed CSV, if needed."""
-    query = "SELECT *  FROM rating  LIMIT 1"
-    if pd.read_sql_query(query, get_engine()).empty:
-        with get_engine().connect() as conn:
-            df = pd.read_csv(csv, nrows=max_rows)
-            conn.execute(text("DELETE FROM rating"))
-            conn.commit()
-            print(f"\n{len(df):_}", end="", flush=True)
-            rows = [
-                {str(k): int(v) for k, v in row.items()}
-                for row in df.to_dict(orient="records")
-            ]
-            print(end=" rating rows ", flush=True)
-            with Session(conn) as sess:
-                t0 = time()
-                sess.bulk_insert_mappings(class_mapper(Rating), rows)
-                sess.commit()
-                print(f"written in {time() - t0:.3f} s")
+    # query = "SELECT *  FROM rating  LIMIT 1"
+    # if not pd.read_sql_query(query, get_engine()).empty:
+    #     return
+    with get_engine().connect() as conn:
+        df = pd.read_csv(csv, nrows=max_rows)
+        print(f"\n{len(df):_}", end="", flush=True)
+        rows = [
+            {str(k): int(v) for k, v in row.items()}
+            for row in df.to_dict(orient="records")
+        ]
+        print(end=" rating rows ", flush=True)
+        with Session(conn) as sess:
+            t0 = time()
+            sess.bulk_insert_mappings(class_mapper(Rating), rows)
+            sess.commit()
+            print(f"written in {time() - t0:.3f} s")
 
-                _gen_reporting_tables()
-                #
-                # example elapsed times:
-                # 5_000_000 rating rows written in 16.033 s
-                # 10_000_000 rating rows written in 33.313 s
-                #
-                # 100_480_507 rating rows written in 936.827 s
-                # ETL finished in 1031.222 s (completes in ~ twenty minutes)
+            _gen_reporting_tables()
+            #
+            # example elapsed times:
+            # 5_000_000 rating rows written in 16.033 s
+            # 10_000_000 rating rows written in 33.313 s
+            #
+            # 100_480_507 rating rows written in 936.827 s
+            # ETL finished in 1031.222 s (completes in ~ twenty minutes)
 
 
 def _read_ratings(
