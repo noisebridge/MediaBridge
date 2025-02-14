@@ -58,12 +58,8 @@ def _etl_user_rating(max_rows: int) -> None:
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
     if not RATING_CSV.exists():
-        with open(RATING_CSV, "wb") as fout:
-            # We don't _need_ a separate gzip child process.
-            # Specifying .to_csv('foo.csz.gz') would suffice.
-            # But then we burn a single core while holding the GIL.
-            # Forking a child lets use burn a pair of cores.
-            gzip_proc = Popen(["gzip", "-c"], stdin=PIPE, stdout=fout)
+        # Transform to "tidy" data, per Hadley Wickham, with a uniform "movie_id" column.
+        with open(RATING_CSV, "w") as fout:
             for mv_ratings_file in tqdm(
                 sorted(training_folder.glob(GLOB)), smoothing=0.01
             ):
@@ -73,16 +69,8 @@ def _etl_user_rating(max_rows: int) -> None:
                 df = pd.DataFrame(_read_ratings(mv_ratings_file, movie_id))
                 assert not df.empty
                 df["movie_id"] = movie_id
-                with io.BytesIO() as bytes_io:
-                    df.to_csv(bytes_io, index=False, header=is_initial)
-                    bytes_io.seek(0)
-                    assert isinstance(gzip_proc.stdin, io.BufferedWriter)
-                    gzip_proc.stdin.write(bytes_io.read())
-                    is_initial = False
-
-            assert isinstance(gzip_proc.stdin, io.BufferedWriter), gzip_proc.stdin
-            gzip_proc.stdin.close()
-            gzip_proc.wait()
+                df.to_csv(fout, index=False, header=is_initial)
+                is_initial = False
 
     _insert_ratings(RATING_CSV, max_rows)
 
@@ -115,6 +103,7 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
             conn.execute(text("DELETE FROM rating"))
             conn.execute(text(ins))
             conn.execute(text("DROP TABLE rating_csv"))
+            conn.execute(text("VACUUM"))
             conn.commit()
             print(f"written in {time() - t0:.3f} s")
 
@@ -123,8 +112,8 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
             # example elapsed times:
             # 10_000_000 rating rows written in 18.560 s
             #
-            # 101_000_000 rating rows written in 228.983 s (four minutes)
-            # ETL finished in 1031.222 s (completes in ~ twenty minutes)
+            # 101_000_000 rating rows written in 225.923 s (four minutes)
+            # ETL finished in 468.062 s (eight minutes)
 
 
 def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:

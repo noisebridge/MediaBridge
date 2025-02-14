@@ -1,6 +1,6 @@
 from functools import cache
 
-from sqlalchemy import ForeignKey, Integer, Numeric, String, create_engine
+from sqlalchemy import REAL, ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -60,14 +60,14 @@ class ProlificUser(Base):
     __tablename__ = "prolific_user"
     id: Mapped[int] = mapped_column(Integer, _user_fk, primary_key=True)
     count: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    avg_rating: Mapped[float] = mapped_column(Numeric(10, 3), nullable=False)
+    avg_rating: Mapped[float] = mapped_column(REAL, nullable=False)
 
 
 PROLIFIC_USER_QUERY = """
 SELECT
-    user_id,
+    CAST(user_id AS INTEGER),
     COUNT(*) AS cnt,
-    ROUND(AVG(CAST(rating AS REAL)), 3) AS avg_rating
+    ROUND(AVG(rating), 3) AS avg_rating
 FROM rating
 GROUP BY user_id
 """
