@@ -1,3 +1,4 @@
+import io
 import os
 import sys
 import unittest
@@ -26,6 +27,7 @@ class RecommendationEngineTest(unittest.TestCase):
     def tearDown(self) -> None:
         if _enabled:
             sys.stdin = sys.__stdin__
+            sys.stdout = sys.__stdout__
             self.engine.db.client.close()
 
     def test_connect_to_mongo(self) -> None:
@@ -75,7 +77,13 @@ class RecommendationEngineTest(unittest.TestCase):
     @patch("builtins.input", return_value=dino_alien)
     def test_get_data(self, _mock_input: Any) -> None:
         if _enabled:
+            sys.stdout = io.StringIO()  # Think of this as /dev/null
             self.assertEqual(
                 self.dino_alien.split(","),
                 self.engine.get_data(),
             )
+
+    def test_display_recommendations(self) -> None:
+        if _enabled:
+            sys.stdout = io.StringIO()
+            self.engine.display_recommendations(["1", "16377"])
