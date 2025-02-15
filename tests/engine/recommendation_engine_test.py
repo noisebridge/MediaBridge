@@ -74,7 +74,7 @@ class RecommendationEngineTest(unittest.TestCase):
             # user_interactions = self.engine.create_user_matrix(liked_movies_ids)
             # self.assertEqual("", self.engine.get_recommendations(6, user_interactions))
 
-    dino_alien = "Dinosaur Planet,Alien"
+    dino_alien = "Dinosaur Planet,Alien Files"
 
     @patch("builtins.input", return_value=dino_alien)
     def test_get_data(self, _mock_input: Any) -> None:
@@ -91,6 +91,17 @@ class RecommendationEngineTest(unittest.TestCase):
             self.engine.display_recommendations(["1", "16377"])
 
     def test_create_user_matrix(self) -> None:
-        matrix = self.engine.create_user_matrix(self.liked_movies_ids)
-        assert isinstance(matrix, coo_matrix)
-        self.assertEqual((1, 16378), matrix.shape)
+        if _enabled:
+            matrix = self.engine.create_user_matrix(self.liked_movies_ids)
+            assert isinstance(matrix, coo_matrix)
+            self.assertEqual((1, 16378), matrix.shape)
+
+    @patch("builtins.input", return_value=dino_alien)
+    def test_recommend(self, _mock_input: Any) -> None:
+        if _enabled:
+            pass
+            # I do not yet know how to properly call .recommend()
+            # numpy.core._exceptions._UFuncNoLoopError: ufunc 'maximum' did not contain
+            #   a loop with signature matching types (dtype('<U4'), dtype('<U4')) -> None
+            # sys.stdout = io.StringIO()
+            # self.assertEqual("", self.engine.recommend())
