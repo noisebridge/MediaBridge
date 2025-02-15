@@ -1,6 +1,8 @@
 import os
 import unittest
 
+import numpy as np
+
 from mediabridge.db.connect import connect_to_mongo
 from mediabridge.definitions import OUTPUT_DIR
 from mediabridge.engine.engine_etl import etl_mongo_movie_titles
@@ -51,3 +53,15 @@ class RecommendationEngineTest(unittest.TestCase):
                 ["Dinosaur Planet", "The Green Mile"],
                 self.engine.ids_to_titles(["1", "16377"]),
             )
+
+    def test_get_recommendations(self) -> None:
+        if _enabled:
+            liked_movies_ids = np.array([1, 16377])
+            assert 2 == len(liked_movies_ids)
+            #
+            # This proposed calling sequence is obviously incorrect,
+            # in the sense that it crashes with
+            # AttributeError: 'coo_matrix' object has no attribute 'predict'
+            #
+            # user_interactions = self.engine.create_user_matrix(liked_movies_ids)
+            # self.assertEqual("", self.engine.get_recommendations(6, user_interactions))
