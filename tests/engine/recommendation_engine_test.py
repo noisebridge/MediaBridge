@@ -1,5 +1,8 @@
 import os
+import sys
 import unittest
+from typing import Any
+from unittest.mock import patch
 
 import numpy as np
 
@@ -22,6 +25,7 @@ class RecommendationEngineTest(unittest.TestCase):
 
     def tearDown(self) -> None:
         if _enabled:
+            sys.stdin = sys.__stdin__
             self.engine.db.client.close()
 
     def test_connect_to_mongo(self) -> None:
@@ -65,3 +69,13 @@ class RecommendationEngineTest(unittest.TestCase):
             #
             # user_interactions = self.engine.create_user_matrix(liked_movies_ids)
             # self.assertEqual("", self.engine.get_recommendations(6, user_interactions))
+
+    dino_alien = "Dinosaur Planet,Alien"
+
+    @patch("builtins.input", return_value=dino_alien)
+    def test_get_data(self, _mock_input: Any) -> None:
+        if _enabled:
+            self.assertEqual(
+                self.dino_alien.split(","),
+                self.engine.get_data(),
+            )
