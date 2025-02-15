@@ -6,6 +6,7 @@ from typing import Any
 from unittest.mock import patch
 
 import numpy as np
+from scipy.sparse import coo_matrix
 
 from mediabridge.db.connect import connect_to_mongo
 from mediabridge.definitions import OUTPUT_DIR
@@ -60,10 +61,11 @@ class RecommendationEngineTest(unittest.TestCase):
                 self.engine.ids_to_titles(["1", "16377"]),
             )
 
+    liked_movies_ids = np.array([1, 16377])
+
     def test_get_recommendations(self) -> None:
         if _enabled:
-            liked_movies_ids = np.array([1, 16377])
-            assert 2 == len(liked_movies_ids)
+            assert 2 == len(self.liked_movies_ids)
             #
             # This proposed calling sequence is obviously incorrect,
             # in the sense that it crashes with
@@ -87,3 +89,8 @@ class RecommendationEngineTest(unittest.TestCase):
         if _enabled:
             sys.stdout = io.StringIO()
             self.engine.display_recommendations(["1", "16377"])
+
+    def test_create_user_matrix(self) -> None:
+        matrix = self.engine.create_user_matrix(self.liked_movies_ids)
+        assert isinstance(matrix, coo_matrix)
+        self.assertEqual((1, 16378), matrix.shape)
