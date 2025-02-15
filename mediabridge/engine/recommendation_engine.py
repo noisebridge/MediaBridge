@@ -25,7 +25,7 @@ class RecommendationEngine:
         netflix_ids = []
         for title in titles:
             netflix_id = self.get_movie_id(title)
-            titles.append(netflix_id)
+            netflix_ids.append(netflix_id)
         return netflix_ids
 
     def ids_to_titles(self, netflix_ids):
