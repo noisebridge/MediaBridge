@@ -44,3 +44,10 @@ class RecommendationEngineTest(unittest.TestCase):
         if _enabled:
             self.assertEqual([], self.engine.titles_to_ids([]))
             self.assertEqual(["1"], self.engine.titles_to_ids(["Dinosaur Planet"]))
+
+    def test_ids_to_titles(self) -> None:
+        if _enabled:
+            self.assertEqual(
+                ["Dinosaur Planet", "The Green Mile"],
+                self.engine.ids_to_titles(["1", "16377"]),
+            )
