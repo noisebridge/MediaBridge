@@ -33,3 +33,9 @@ class RecommendationEngineTest(unittest.TestCase):
     def test_get_movie_id(self) -> None:
         if _enabled:
             self.assertEqual("1", self.engine.get_movie_id("Dinosaur Planet"))
+
+    def test_get_movie_title(self) -> None:
+        if _enabled:
+            # NB: passing in the integer 1 instead of the str "1" will definitely fail
+            self.assertEqual("Dinosaur Planet", self.engine.get_movie_title("1"))
+            self.assertEqual("The Green Mile", self.engine.get_movie_title("16377"))
