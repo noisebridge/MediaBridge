@@ -2,6 +2,7 @@ import pickle
 from pathlib import Path
 
 import numpy as np
+from numpy._typing import NDArray
 from scipy import sparse
 
 from mediabridge.db.connect import connect_to_mongo
@@ -32,7 +33,11 @@ class RecommendationEngine:
     def ids_to_titles(self, netflix_ids: list[str]) -> list[str]:
         return [self.get_movie_title(n_id) for n_id in netflix_ids]
 
-    def get_recommendations(self, user_id, user_interactions):
+    def get_recommendations(
+        self,
+        user_id: int,
+        user_interactions: int,
+    ) -> NDArray[np.int64]:
         scores = self.model.predict(
             user_ids=user_id,
             item_ids=self.movie_ids,
@@ -40,7 +45,7 @@ class RecommendationEngine:
         )
         return np.argsort(-scores)
 
-    def get_data(self):
+    def get_data(self) -> list[str]:
         print("Enter liked movies: ")
         return input().split(",")
 
