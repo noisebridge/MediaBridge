@@ -49,7 +49,7 @@ class RecommendationEngine:
         print("Enter liked movies: ")
         return input().split(",")
 
-    def display_recommendations(self, recommendations):
+    def display_recommendations(self, recommendations: list[str]) -> None:
         movie_titles = self.ids_to_titles(recommendations)
         print("Recommended movies: ")
         for title in movie_titles:
