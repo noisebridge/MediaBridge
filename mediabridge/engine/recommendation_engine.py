@@ -1,4 +1,5 @@
 import pickle
+from pathlib import Path
 
 import numpy as np
 from scipy import sparse
@@ -7,20 +8,23 @@ from mediabridge.db.connect import connect_to_mongo
 
 
 class RecommendationEngine:
-    def __init__(self, movie_ids, model_file):
+    def __init__(self, movie_ids: list[str], model_file: Path) -> None:
         self.movie_ids = movie_ids
         self.db = connect_to_mongo()
         with open(model_file, "rb") as f:
             self.model = pickle.load(f)
 
-    def get_movie_id(self, title):
+    def get_movie_id(self, title: str) -> str:
         movies = self.db["movies"]
-        assert movies.find_one({"title": title}), title
-        return movies.find_one({"title": title}).get("netflix_id")
+        movie = movies.find_one({"title": title})
+        assert movie, title
+        return f"{movie.get("netflix_id")}"
 
-    def get_movie_title(self, netflix_id):
+    def get_movie_title(self, netflix_id: str) -> str:
         movies = self.db["movies"]
-        return movies.find_one({"netflix_id": netflix_id}).get("title")
+        movie = movies.find_one({"netflix_id": netflix_id})
+        assert movie, netflix_id
+        return f"{movie.get("title")}"
 
     def titles_to_ids(self, titles):
         netflix_ids = []
