@@ -26,19 +26,11 @@ class RecommendationEngine:
         assert movie, netflix_id
         return f"{movie.get("title")}"
 
-    def titles_to_ids(self, titles):
-        netflix_ids = []
-        for title in titles:
-            netflix_id = self.get_movie_id(title)
-            netflix_ids.append(netflix_id)
-        return netflix_ids
+    def titles_to_ids(self, titles: list[str]) -> list[str]:
+        return [self.get_movie_id(title) for title in titles]
 
-    def ids_to_titles(self, netflix_ids):
-        titles = []
-        for netflix_id in netflix_ids:
-            title = self.get_movie_title(netflix_id)
-            titles.append(title)
-        return titles
+    def ids_to_titles(self, netflix_ids: list[str]) -> list[str]:
+        return [self.get_movie_title(n_id) for n_id in netflix_ids]
 
     def get_recommendations(self, user_id, user_interactions):
         scores = self.model.predict(
