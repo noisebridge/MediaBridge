@@ -104,4 +104,4 @@ class RecommendationEngineTest(unittest.TestCase):
             # numpy.core._exceptions._UFuncNoLoopError: ufunc 'maximum' did not contain
             #   a loop with signature matching types (dtype('<U4'), dtype('<U4')) -> None
             # sys.stdout = io.StringIO()
-            # self.assertEqual("", self.engine.recommend())
+            # self.assertEqual("", self.engine.recommend(798))
