@@ -13,6 +13,7 @@ def etl_mongo_movie_titles() -> None:  # pragma: no cover
 
     db = connect_to_mongo()
     movies_collection = db["movies"]
+    movies_collection.delete_many({})  # actually, this is "delete all"
 
     movies_collection.insert_many(rows)
     db.client.close()
