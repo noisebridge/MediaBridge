@@ -101,4 +101,4 @@ class RecommendationEngineTest(unittest.TestCase):
         if _enabled:
             sys.stdout = io.StringIO()
             self.engine.recommend()
-            self.assertEqual([1, 0], self.engine.recommend())
+            self.assertEqual({0, 1}, self.engine.recommend())

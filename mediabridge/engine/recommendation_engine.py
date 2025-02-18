@@ -67,11 +67,11 @@ class RecommendationEngine:
         data = [1] * len(liked_movies_ids)
         return sparse.coo_matrix((data, (rows, cols)))
 
-    def recommend(self, user_id: int = 0, limit: int = 10) -> list[int]:
+    def recommend(self, user_id: int = 0, limit: int = 10) -> set[int]:
         liked_movies = self.get_data()
         liked_movies_ids = list(map(int, self.titles_to_ids(liked_movies)))
         user_interactions = self.create_user_matrix(liked_movies_ids)
 
         recommendations = self.get_recommendations(user_id, user_interactions)[:limit]
         self.display_recommendations(recommendations)
-        return list(map(int, recommendations))
+        return set(map(int, recommendations))
