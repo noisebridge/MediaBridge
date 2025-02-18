@@ -17,7 +17,6 @@ scipy = "~=1.14"
 sqlalchemy = "~=2.0"
 tqdm = "~=4.66"
 typer = "~=0.12"
-wget = "~=3.2"
 
 [dev-packages]
 mypy = "~=1.14"
