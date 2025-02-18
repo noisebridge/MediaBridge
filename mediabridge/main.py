@@ -63,6 +63,16 @@ def init(force: bool = False):
 
 
 @app.command()
+def clean():
+    """Clean up all downloaded and generated data by removing the /data and /out directories."""
+    prompt = f"\n! Are you sure you want to delete {DATA_DIR} and {OUTPUT_DIR}? y/n !\n"
+    if input(prompt) != "y":
+        print("\nAborting process.")
+        return
+    clean_all()
+
+
+@app.command()
 def load(max_reviews: int = 100_000_000, regen: bool = False):
     if regen:
         prompt = "\n! Are you sure you want to delete ALL existing sqlite data? y/n !\n"
