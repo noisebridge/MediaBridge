@@ -42,7 +42,7 @@ from mediabridge.db.tables import MovieTitle, get_engine
 
 
 def recommend(
-    max_training_user_id: int = 800,
+    max_training_user_id: int = 798,
     large_movie_id: int = 9_770,
 ) -> set[int]:
     """Recommends a set of movies, by netflix_id, for a given user.
@@ -116,7 +116,7 @@ def _get_ratings(
 
             # Blind the model to the movies we want to predict.
             if u == max_user_id and m >= large_movie_id:
-                del matrix[u, m]
+                matrix[u, m] = 0
 
     return coo_matrix(matrix)
 

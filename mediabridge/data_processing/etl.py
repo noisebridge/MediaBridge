@@ -6,18 +6,19 @@ from subprocess import PIPE, Popen
 from time import time
 
 import pandas as pd
-from sqlalchemy.orm import Session, class_mapper
 from sqlalchemy.sql import text
 from tqdm import tqdm
 
 from mediabridge.data_processing.wiki_to_netflix import read_netflix_txt
 from mediabridge.db.tables import (
+    DB_FILE,
     POPULAR_MOVIE_QUERY,
     PROLIFIC_USER_QUERY,
-    Rating,
     get_engine,
 )
 from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR, PROJECT_DIR
+
+RATING_CSV = OUTPUT_DIR / "rating.csv"  # uncompressed, to accommodate sqlite .import
 
 GLOB = "mv_00*.txt"
 
@@ -26,11 +27,17 @@ def etl(max_rows: int) -> None:
     """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table.
 
     If CSV or table have already been computed, we skip repeating that work to save time.
+
+    When doing maintenance on this code, remove the "no cover" pragma and force
+    an eight-minute re-run to exercise changed code, then put the pragma back.
     It is always safe to force a re-run with:
-    $ (cd out && rm -f rating.csv.gz movies.sqlite)
+    $ (cd out && rm -f rating.csv movies.sqlite)
     """
     _etl_movie_title()
     _etl_user_rating(max_rows)
+
+
+# no cover: begin
 
 
 def _etl_movie_title() -> None:
@@ -49,20 +56,15 @@ def _etl_movie_title() -> None:
 
 
 def _etl_user_rating(max_rows: int) -> None:
-    """Writes out/rating.csv.gz if needed, then populates rating table from it."""
+    """Writes out/rating.csv if needed, then populates rating table from it."""
     training_folder = PROJECT_DIR.parent / "Netflix-Dataset/training_set/training_set"
     diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
     assert training_folder.exists(), diagnostic
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
-    out_csv = OUTPUT_DIR / "rating.csv.gz"
-    if not out_csv.exists():
-        with open(out_csv, "wb") as fout:
-            # We don't _need_ a separate gzip child process.
-            # Specifying .to_csv('foo.csz.gz') would suffice.
-            # But then we burn a single core while holding the GIL.
-            # Forking a child lets use burn a pair of cores.
-            gzip_proc = Popen(["gzip", "-c"], stdin=PIPE, stdout=fout)
+    if not RATING_CSV.exists():
+        # Transform to "tidy" data, per Hadley Wickham, with a uniform "movie_id" column.
+        with open(RATING_CSV, "w") as fout:
             for mv_ratings_file in tqdm(
                 sorted(training_folder.glob(GLOB)), smoothing=0.01
             ):
@@ -72,48 +74,74 @@ def _etl_user_rating(max_rows: int) -> None:
                 df = pd.DataFrame(_read_ratings(mv_ratings_file, movie_id))
                 assert not df.empty
                 df["movie_id"] = movie_id
-                with io.BytesIO() as bytes_io:
-                    df.to_csv(bytes_io, index=False, header=is_initial)
-                    bytes_io.seek(0)
-                    assert isinstance(gzip_proc.stdin, io.BufferedWriter)
-                    gzip_proc.stdin.write(bytes_io.read())
-                    is_initial = False
+                df.to_csv(fout, index=False, header=is_initial)
+                is_initial = False
 
-            assert isinstance(gzip_proc.stdin, io.BufferedWriter), gzip_proc.stdin
-            gzip_proc.stdin.close()
-            gzip_proc.wait()
-
-    _insert_ratings(out_csv, max_rows)
+    query = "SELECT *  FROM rating  LIMIT 1"
+    if pd.read_sql_query(query, get_engine()).empty:
+        _insert_ratings(RATING_CSV, max_rows)
 
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
     """Populates rating table from compressed CSV, if needed."""
-    query = "SELECT *  FROM rating  LIMIT 1"
-    if pd.read_sql_query(query, get_engine()).empty:
-        with get_engine().connect() as conn:
-            df = pd.read_csv(csv, nrows=max_rows)
-            conn.execute(text("DELETE FROM rating"))
-            conn.commit()
-            print(f"\n{len(df):_}", end="", flush=True)
-            rows = [
-                {str(k): int(v) for k, v in row.items()}
-                for row in df.to_dict(orient="records")
+    create_rating_csv = """
+        CREATE TABLE rating_csv (
+            user_id   INTEGER  NOT NULL,
+            rating    INTEGER  NOT NULL,
+            movie_id  TEXT     NOT NULL)
+    """
+    ins = "INSERT INTO rating  SELECT user_id, movie_id, rating  FROM rating_csv  ORDER BY 1, 2, 3"
+    with get_engine().connect() as conn:
+        print(f"\n{max_rows:_}", end="", flush=True)
+        t0 = time()
+        conn.execute(text("DROP TABLE  IF EXISTS  rating_csv"))
+        conn.execute(text(create_rating_csv))
+        conn.commit()
+        _run_sqlite_child(
+            [
+                ".mode csv",
+                ".headers on",
+                f".import {_get_input_csv(max_rows)} rating_csv",
             ]
-            print(end=" rating rows ", flush=True)
-            with Session(conn) as sess:
-                t0 = time()
-                sess.bulk_insert_mappings(class_mapper(Rating), rows)
-                sess.commit()
-                print(f"written in {time() - t0:.3f} s")
+        )
+        print(end=" rating rows ", flush=True)
+        conn.execute(text("DELETE FROM rating"))
+        conn.execute(text(ins))
+        conn.execute(text("DROP TABLE rating_csv"))
+        conn.commit()
+        conn.execute(text("VACUUM"))
+        print(f"written in {time() - t0:.3f} s")
 
-                _gen_reporting_tables()
-                #
-                # example elapsed times:
-                # 5_000_000 rating rows written in 16.033 s
-                # 10_000_000 rating rows written in 33.313 s
-                #
-                # 100_480_507 rating rows written in 936.827 s
-                # ETL finished in 1031.222 s (completes in ~ twenty minutes)
+        _gen_reporting_tables()
+        #
+        # example elapsed times:
+        # 10_000_000 rating rows written in 18.560 s
+        #
+        # 101_000_000 rating rows written in 225.923 s (four minutes)
+        # ETL finished in 468.062 s (eight minutes)
+
+
+def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:
+    """Optionally subsets the input prize data, doing work only in the subset case."""
+    csv = RATING_CSV
+    if max_rows < all_rows:
+        df = pd.read_csv(csv, nrows=max_rows)
+        csv = OUTPUT_DIR / "rating-small.csv"
+        df.to_csv(csv, index=False)
+    assert csv.exists(), csv
+    return Path(csv)
+
+
+def _run_sqlite_child(cmds: list[str]) -> None:
+    with Popen(
+        ["sqlite3", DB_FILE],
+        text=True,
+        stdin=PIPE,
+        stdout=PIPE,
+    ) as proc:
+        assert isinstance(proc.stdin, io.TextIOWrapper)
+        for cmd in cmds:
+            proc.stdin.write(f"{cmd}\n")
 
 
 def _read_ratings(
@@ -149,3 +177,6 @@ def _gen_reporting_tables() -> None:
             conn.execute(text(f"DELETE FROM {table}"))
             conn.execute(text(f"INSERT INTO {table}  {query}"))
             conn.commit()
+
+
+# no cover: end
