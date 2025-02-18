@@ -59,7 +59,7 @@ def init(force: bool = False):
     if force or not DATA_DIR.exists():
         download_prize_dataset()
     else:
-        logging.info("Skipping dataset download...")
+        logging.info(f"{DATA_DIR} already exists, skipping download...")
 
 
 @app.command()
