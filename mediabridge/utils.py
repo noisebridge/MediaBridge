@@ -5,7 +5,7 @@ from pathlib import Path
 import requests
 from tqdm import tqdm
 
-from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
+from mediabridge.definitions import DATA_DIR, NETFLIX_DATA_DIR, OUTPUT_DIR
 
 """
 For our scripts to work, we need to download the Netflix prize data. As this file is ~500 MB and the licensing terms are dubious, 
@@ -37,14 +37,15 @@ def download_prize_dataset():
     url = "https://archive.org/download/nf_prize_dataset.tar/nf_prize_dataset.tar.gz"
     compressed_filename = "nf_prize_dataset.tar.gz"
     compressed_file_path = DATA_DIR / compressed_filename
-    dataset_path = DATA_DIR / "nf_prize_dataset"
 
     download_file(url, compressed_file_path)
     extract_file(compressed_file_path, DATA_DIR, compression="gz")
     compressed_file_path.unlink()
     (DATA_DIR / "download").rename(DATA_DIR / "nf_prize_dataset")
-    extract_file(dataset_path / "training_set.tar", dataset_path / "training_set")
-    (dataset_path / "training_set.tar").unlink()
+    extract_file(
+        NETFLIX_DATA_DIR / "training_set.tar", NETFLIX_DATA_DIR / "training_set"
+    )
+    (NETFLIX_DATA_DIR / "training_set.tar").unlink()
 
 
 def clean_all():
