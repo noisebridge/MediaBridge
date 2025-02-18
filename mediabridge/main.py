@@ -5,9 +5,9 @@ from datetime import datetime
 import typer as typer
 
 from mediabridge.data_processing import etl, wiki_to_netflix
-from mediabridge.data_processing.download_data import download_prize_dataset
 from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
 from mediabridge.recommender import make_recommendation
+from mediabridge.utils import clean_all, download_prize_dataset
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 app.add_typer(wiki_to_netflix.app)
@@ -74,6 +74,7 @@ def clean():
 
 @app.command()
 def load(max_reviews: int = 100_000_000, regen: bool = False):
+    """Load all dataset data into the databases for processing"""
     if regen:
         prompt = "\n! Are you sure you want to delete ALL existing sqlite data? y/n !\n"
         if input(prompt) != "y":
