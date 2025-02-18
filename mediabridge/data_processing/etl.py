@@ -20,7 +20,7 @@ from mediabridge.db.tables import (
     create_tables,
     get_engine,
 )
-from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT, OUTPUT_DIR
+from mediabridge.definitions import FULL_TITLES_TXT, NETFLIX_DATA_DIR, OUTPUT_DIR
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +34,9 @@ def etl(max_reviews: int, regen: bool = False) -> None:
     It is always safe to force a re-run with:
     $ (cd out && rm -f rating.csv.gz movies.sqlite)
     """
+    diagnostic = "Please run `pipenv run mb init` to download the necessary dataset"
+    assert NETFLIX_DATA_DIR.exists(), diagnostic
+
     engine = get_engine()
     if regen:
         logging.info("Recreating tables...")
@@ -71,9 +74,7 @@ def _etl_movie_title() -> None:
 
 def _etl_user_rating(max_reviews: int) -> None:
     """Writes out/rating.csv.gz if needed, then populates rating table from it."""
-    training_folder = DATA_DIR / "training_set"
-    diagnostic = "Please run `pipenv run dev init` to download the necessary dataset"
-    assert training_folder.exists(), diagnostic
+    training_folder = NETFLIX_DATA_DIR / "training_set"
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
     out_csv = OUTPUT_DIR / "rating.csv.gz"
