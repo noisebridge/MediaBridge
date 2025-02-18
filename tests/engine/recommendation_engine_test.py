@@ -5,7 +5,6 @@ import unittest
 from typing import Any
 from unittest.mock import patch
 
-import numpy as np
 from scipy.sparse import coo_matrix
 
 from mediabridge.db.connect import connect_to_mongo
@@ -61,7 +60,7 @@ class RecommendationEngineTest(unittest.TestCase):
                 self.engine.ids_to_titles(["1", "16377"]),
             )
 
-    liked_movies_ids = np.array([1, 16377])
+    liked_movies_ids = [1, 16377]
 
     def test_get_recommendations(self) -> None:
         if _enabled:
@@ -103,5 +102,5 @@ class RecommendationEngineTest(unittest.TestCase):
             # I do not yet know how to properly call .recommend()
             # numpy.core._exceptions._UFuncNoLoopError: ufunc 'maximum' did not contain
             #   a loop with signature matching types (dtype('<U4'), dtype('<U4')) -> None
-            # sys.stdout = io.StringIO()
-            # self.assertEqual("", self.engine.recommend(798))
+            sys.stdout = io.StringIO()
+            self.assertEqual("", self.engine.recommend(798))

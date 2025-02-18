@@ -15,7 +15,9 @@ class RecommendationEngine:
         self.movie_ids = movie_ids
         self.db = connect_to_mongo()
         with open(model_file, "rb") as f:
-            self.model = pickle.load(f)
+            self.model: coo_matrix = pickle.load(f)
+            print(type(self.model))
+            assert isinstance(self.model, coo_matrix)
 
     def get_movie_id(self, title: str) -> str:
         movies = self.db["movies"]
@@ -57,7 +59,7 @@ class RecommendationEngine:
         for title in movie_titles:
             print(title)
 
-    def create_user_matrix(self, liked_movies_ids: NDArray[np.int_]) -> coo_matrix:
+    def create_user_matrix(self, liked_movies_ids: list[int]) -> coo_matrix:
         rows = [0] * len(liked_movies_ids)
         cols = liked_movies_ids
         data = [1] * len(liked_movies_ids)
@@ -66,8 +68,11 @@ class RecommendationEngine:
     def recommend(self, user_id: int = 0) -> None:
         liked_movies = self.get_data()
         liked_movies_ids = self.titles_to_ids(liked_movies)
-        user_interactions = self.create_user_matrix(liked_movies_ids)
+        user_interactions = self.create_user_matrix(list(map(int, liked_movies_ids)))
         assert isinstance(user_interactions, coo_matrix), user_interactions
 
         recommendations = self.get_recommendations(user_id, user_interactions)
-        self.display_recommendations(recommendations[:10])
+        from pprint import pp
+
+        pp(dir(recommendations))
+        self.display_recommendations(recommendations[:10].to_list())
