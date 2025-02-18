@@ -9,7 +9,7 @@ import numpy as np
 from scipy.sparse import coo_matrix
 
 from mediabridge.db.connect import connect_to_mongo
-from mediabridge.definitions import OUTPUT_DIR
+from mediabridge.definitions import LIGHTFM_MODEL_PKL
 from mediabridge.engine.engine_etl import etl_mongo_movie_titles
 from mediabridge.engine.recommendation_engine import RecommendationEngine
 
@@ -22,7 +22,7 @@ class RecommendationEngineTest(unittest.TestCase):
         if _enabled:
             self.engine = RecommendationEngine(
                 ["1", "2"],
-                OUTPUT_DIR / "interaction_matrix.pkl",
+                LIGHTFM_MODEL_PKL,
             )
 
     def tearDown(self) -> None:
@@ -99,9 +99,6 @@ class RecommendationEngineTest(unittest.TestCase):
     @patch("builtins.input", return_value=dino_alien)
     def test_recommend(self, _mock_input: Any) -> None:
         if _enabled:
-            pass
-            # I do not yet know how to properly call .recommend()
-            # numpy.core._exceptions._UFuncNoLoopError: ufunc 'maximum' did not contain
-            #   a loop with signature matching types (dtype('<U4'), dtype('<U4')) -> None
             # sys.stdout = io.StringIO()
-            # self.assertEqual("", self.engine.recommend())
+            self.engine.recommend()
+            self.assertEqual([1, 0], self.engine.recommend())
