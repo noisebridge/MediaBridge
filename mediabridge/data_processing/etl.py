@@ -27,6 +27,9 @@ def etl(max_rows: int) -> None:
     """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table.
 
     If CSV or table have already been computed, we skip repeating that work to save time.
+
+    When doing maintenance on this code, remove the "no cover" pragma and force
+    an eight-minute re-run to exercise changed code, then put the pragma back.
     It is always safe to force a re-run with:
     $ (cd out && rm -f rating.csv movies.sqlite)
     """
