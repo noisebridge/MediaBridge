@@ -63,17 +63,6 @@ class RecommendationEngineTest(unittest.TestCase):
 
     liked_movies_ids = np.array([1, 16377])
 
-    def test_get_recommendations(self) -> None:
-        if _enabled:
-            assert 2 == len(self.liked_movies_ids)
-            #
-            # This proposed calling sequence is obviously incorrect,
-            # in the sense that it crashes with
-            # AttributeError: 'coo_matrix' object has no attribute 'predict'
-            #
-            # user_interactions = self.engine.create_user_matrix(liked_movies_ids)
-            # self.assertEqual("", self.engine.get_recommendations(6, user_interactions))
-
     dino_alien = "Dinosaur Planet,Alien Files"
 
     @patch("builtins.input", return_value=dino_alien)
