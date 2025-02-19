@@ -31,14 +31,13 @@ You can view the test output with:
 $ pipenv run python -m unittest tests/*/*_test.py
 """
 
-from warnings import filterwarnings
-
 import numpy as np
 from scipy.sparse import coo_matrix, dok_matrix
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from mediabridge.db.tables import MovieTitle, get_engine
+from mediabridge.recommender.utils import import_lightfm_silently
 
 
 def recommend(
@@ -56,9 +55,7 @@ def recommend(
     while larger IDs are hidden and are fair game to possibly recommend to the user.
     Clearly there is room to improve on this crude method of splitting into subsets.
     """
-    message = "LightFM was compiled without OpenMP support"
-    filterwarnings("ignore", message, category=UserWarning)
-    from lightfm import LightFM
+    LightFM = import_lightfm_silently()
 
     model = LightFM(no_components=30)
     train = _get_ratings(max_training_user_id, large_movie_id)
