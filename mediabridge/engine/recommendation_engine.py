@@ -18,8 +18,9 @@ class RecommendationEngine:
 
     def get_movie_id(self, title):
         movies = self.db["movies"]
-        assert movies.find_one({"title": title}), title
-        return movies.find_one({"title": title}).get("netflix_id")
+        movie = movies.find_one({"title": title})
+        assert movie, title
+        return movie.get("netflix_id")
 
     def get_movie_title(self, netflix_id):
         movies = self.db["movies"]
