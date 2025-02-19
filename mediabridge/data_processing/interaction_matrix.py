@@ -7,7 +7,8 @@ import numpy as np
 from scipy.sparse import coo_matrix, dok_matrix
 from tqdm import tqdm
 
-from mediabridge.definitions import DATA_DIR
+from mediabridge.definitions import DATA_DIR, LIGHTFM_MODEL_PKL, OUTPUT_DIR
+from mediabridge.recommender.utils import import_lightfm_silently
 
 
 def list_rating_files(directory_path: Path) -> Generator[str, None, None]:
@@ -57,7 +58,7 @@ def main() -> None:
     """Main entry point to create and save the interaction matrix."""
 
     # Configurations
-    output_file = DATA_DIR.parent / "output/interaction_matrix.pkl"
+    output_file = OUTPUT_DIR / "interaction_matrix.pkl"
     output_file.parent.mkdir(exist_ok=True)
 
     # Number of users and movies
@@ -68,6 +69,11 @@ def main() -> None:
     interaction_matrix = create_interaction_matrix(DATA_DIR, num_users, num_movies)
 
     # Save Data
+    LightFM = import_lightfm_silently()
+    model = LightFM()
+    model.fit(interaction_matrix)  # This takes ~ 27 seconds.
+    with open(LIGHTFM_MODEL_PKL, "wb") as f:
+        pickle.dump(model, f)
     save_matrix(interaction_matrix, output_file)
 
 
