@@ -100,7 +100,7 @@ def _etl_user_rating(max_reviews: int) -> None:
 
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
-    """Populates rating table from compressed CSV, if needed."""
+    """Populates rating table from CSV, if needed."""
     create_rating_csv = """
         CREATE TABLE rating_csv (
             user_id   INTEGER  NOT NULL,
