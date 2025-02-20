@@ -73,7 +73,7 @@ def clean() -> None:
 
 
 @app.command()
-def load(max_reviews: int = 100_000_000, regen: bool = False) -> None:
+def load(max_reviews: int = 101_000_000, regen: bool = False) -> None:
     """Load all dataset data into the databases for processing"""
     if regen:
         prompt = "\n! Are you sure you want to delete ALL existing sqlite data? y/n !\n"
