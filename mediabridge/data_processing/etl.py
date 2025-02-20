@@ -15,7 +15,6 @@ from mediabridge.db.tables import (
     DB_FILE,
     POPULAR_MOVIE_QUERY,
     PROLIFIC_USER_QUERY,
-    Rating,
     create_tables,
     get_engine,
 )
@@ -58,15 +57,13 @@ def etl(max_reviews: int, regen: bool = False) -> None:
 
 
 def _etl_movie_title() -> None:
-    insp = inspect(get_engine())
-    if insp.has_table("movie_title"):
-        query = "SELECT *  FROM movie_title  LIMIT 1"
-        # if there is already data in movie_title, skip reprocessing
-        if not pd.read_sql_query(query, get_engine()).empty:
-            log.warning(
-                "movie_title table already populated with data, skipping reprocessing..."
-            )
-            return
+    query = "SELECT *  FROM movie_title  LIMIT 1"
+    # if there is already data in movie_title, skip reprocessing
+    if not pd.read_sql_query(query, get_engine()).empty:
+        log.warning(
+            "movie_title table already populated with data, skipping reprocessing..."
+        )
+        return
 
     columns = ["id", "year", "title"]
     df = pd.DataFrame(read_netflix_txt(FULL_TITLES_TXT), columns=columns)
