@@ -12,7 +12,7 @@ import typer
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR
+from mediabridge.definitions import OUTPUT_DIR, TITLES_TXT
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 
 USER_AGENT = "Noisebridge MovieBot 0.0.1/Audiodude <audiodude@gmail.com>"
@@ -222,8 +222,7 @@ def wiki_query(
     log.debug(data)
 
     if data["results"]["bindings"]:
-        log.info(
-            f'Found movie id {movie.netflix_id}: ("{movie.title}", {movie.year})')
+        log.info(f'Found movie id {movie.netflix_id}: ("{movie.title}", {movie.year})')
         return EnrichedMovieData(
             **vars(movie),
             wikidata_id=str(wiki_feature_info(data, "item")),
@@ -345,9 +344,7 @@ def process(
     with nullcontext() if log_to_file else logging_redirect_tqdm():
         num_rows = None if full else num_rows
         try:
-            process_data(
-                FULL_TITLES_TXT, num_rows, output_missing_csv_path=missing_out_path
-            )
+            process_data(TITLES_TXT, num_rows, output_missing_csv_path=missing_out_path)
         except Exception as e:
             # include fatal exceptions with traceback in logs
             if log_to_file:

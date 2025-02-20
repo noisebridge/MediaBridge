@@ -3,7 +3,7 @@ from time import time
 
 from mediabridge.data_processing.etl import etl
 from mediabridge.db.tables import create_tables
-from mediabridge.definitions import FULL_TITLES_TXT
+from mediabridge.definitions import TITLES_TXT
 from mediabridge.recommender.make_recommendation import get_title, recommend
 
 
@@ -32,7 +32,7 @@ class TestTwoMoviesRec(unittest.TestCase):
         # ETL effects persist across test runs, so a failed initial run will let later tests succeed.
 
         create_tables()
-        if FULL_TITLES_TXT.exists():
+        if TITLES_TXT.exists():
             # A million rows corresponds to a four-second ETL.
             t0 = time()
 
@@ -43,7 +43,7 @@ class TestTwoMoviesRec(unittest.TestCase):
             assert x in (True, None)  # we simply evaluated for side effects
 
     def test_recommend(self) -> None:
-        if FULL_TITLES_TXT.exists():
+        if TITLES_TXT.exists():
             ids = _clean(recommend())
 
             self.assertEqual(

@@ -10,7 +10,7 @@ PROJECT_DIR = MODULE_DIR.parent
 
 DATA_DIR = PROJECT_DIR / "data"
 NETFLIX_DATA_DIR = DATA_DIR / "nf_prize_dataset"
-FULL_TITLES_TXT = NETFLIX_DATA_DIR / "movie_titles.txt"
+TITLES_TXT = NETFLIX_DATA_DIR / "movie_titles.txt"
 
 OUTPUT_DIR = PROJECT_DIR / "out"
 LIGHTFM_MODEL_PKL = OUTPUT_DIR / "lightfm_model.pkl"

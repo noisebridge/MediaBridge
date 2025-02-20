@@ -11,11 +11,10 @@ from mediabridge.data_processing.wiki_to_netflix_test_data import (
     EXPECTED_SPARQL_QUERY,
     WIKIDATA_RESPONSE_THE_ROOM,
 )
-from mediabridge.definitions import DATA_DIR, FULL_TITLES_TXT
+from mediabridge.definitions import TITLES_TXT
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 from tests.util.logging_util import silence_logging
 
-TITLES_TXT = DATA_DIR / "movie_titles.txt"
 TITLES_CSV = TITLES_TXT.with_suffix(".csv")
 
 
@@ -60,8 +59,8 @@ class TestWikiToNetflix(unittest.TestCase):
 
         # Sometimes we're in an environment, like CI, where we never downloaded the full dataset.
         # So silently succeed, without attempting to read thousands of non-existent entries.
-        if FULL_TITLES_TXT.exists():
-            movies = list(w_to_n.read_netflix_txt(FULL_TITLES_TXT))
+        if TITLES_TXT.exists():
+            movies = list(w_to_n.read_netflix_txt(TITLES_TXT))
             assert len(movies) == 17_770
             assert movies[-1] == ("17770", "2003", "Alien Hunter")
 
@@ -109,9 +108,9 @@ class TestWikiToNetflix(unittest.TestCase):
         # A subsequent Issue / PR will explore how to better distinguish
         # between "big" production data and a "small" test environment.
 
-        # csv = FULL_TITLES_TXT.with_suffix(".csv")
+        # csv = TITLES_TXT.with_suffix(".csv")
         #
-        # if FULL_TITLES_TXT.exists():
+        # if TITLES_TXT.exists():
         # At this point we're on a developer's laptop, rather than in CI.
         # csv.unlink(missing_ok=True)
         # w_to_n.process(ctx, 2, csv, full=False)

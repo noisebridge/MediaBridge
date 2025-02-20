@@ -18,7 +18,7 @@ from mediabridge.db.tables import (
     create_tables,
     get_engine,
 )
-from mediabridge.definitions import FULL_TITLES_TXT, NETFLIX_DATA_DIR, OUTPUT_DIR
+from mediabridge.definitions import NETFLIX_DATA_DIR, OUTPUT_DIR, TITLES_TXT
 
 log = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ def _etl_movie_title() -> None:
         return
 
     columns = ["id", "year", "title"]
-    df = pd.DataFrame(read_netflix_txt(FULL_TITLES_TXT), columns=columns)
+    df = pd.DataFrame(read_netflix_txt(TITLES_TXT), columns=columns)
     df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
     # At this point there's a df.id value of "1". Maybe it should be "00001"?
 
