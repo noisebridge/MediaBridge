@@ -15,7 +15,8 @@ from mediabridge.definitions import OUTPUT_DIR, TITLES_TXT
 from mediabridge.schemas.movies import EnrichedMovieData, MovieData
 from tests.util.logging_util import silence_logging
 
-TITLES_CSV = OUTPUT_DIR / (TITLES_TXT.with_suffix(".csv").name)
+# This should be defined somewhere else but I just need these to work right now
+TITLES_CSV = OUTPUT_DIR / "matches.csv"
 
 
 class TestWikiToNetflix(unittest.TestCase):
