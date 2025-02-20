@@ -54,7 +54,7 @@ def main(
 
 
 @app.command()
-def init(force: bool = False):
+def init(force: bool = False) -> None:
     """Download all required datasets and initialize all data for recommendations"""
     if force or not DATA_DIR.exists():
         download_prize_dataset()
@@ -63,7 +63,7 @@ def init(force: bool = False):
 
 
 @app.command()
-def clean():
+def clean() -> None:
     """Clean up all downloaded and generated data by removing the /data and /out directories."""
     prompt = f"\n! Are you sure you want to delete {DATA_DIR} and {OUTPUT_DIR}? y/n !\n"
     if input(prompt) != "y":
@@ -73,7 +73,7 @@ def clean():
 
 
 @app.command()
-def load(max_reviews: int = 100_000_000, regen: bool = False):
+def load(max_reviews: int = 100_000_000, regen: bool = False) -> None:
     """Load all dataset data into the databases for processing"""
     if regen:
         prompt = "\n! Are you sure you want to delete ALL existing sqlite data? y/n !\n"
