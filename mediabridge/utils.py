@@ -14,11 +14,12 @@ https://archive.org/details/nf_prize_dataset.tar
 """
 
 
-def download_file(url: str, output_path: Path):
+def download_file(url: str, output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     r = requests.get(url, stream=True)
     with open(output_path, "wb") as f:
-        total_length = int(r.headers.get("content-length"))
+        if content_length := r.headers.get("content-length"):
+            total_length = int(content_length)
         for chunk in tqdm(
             r.iter_content(chunk_size=1024), total=(total_length // 1024) + 1
         ):
@@ -27,19 +28,20 @@ def download_file(url: str, output_path: Path):
                 f.flush()
 
 
-def extract_file(file_path, extract_to_path, compression=""):
+def extract_file(src: Path, dest: Path, gz_compressed: bool = False) -> None:
     print("\nExtracting...")
-    with tarfile.open(file_path, f"r:{compression}") as tar:
-        tar.extractall(path=extract_to_path)
+    mode = "r:gz" if gz_compressed else "r:"
+    with tarfile.open(name=src, mode=mode) as tar:
+        tar.extractall(path=dest)
 
 
-def download_prize_dataset():
+def download_prize_dataset() -> None:
     url = "https://archive.org/download/nf_prize_dataset.tar/nf_prize_dataset.tar.gz"
     compressed_filename = "nf_prize_dataset.tar.gz"
     compressed_file_path = DATA_DIR / compressed_filename
 
     download_file(url, compressed_file_path)
-    extract_file(compressed_file_path, DATA_DIR, compression="gz")
+    extract_file(compressed_file_path, DATA_DIR, gz_compressed=True)
     compressed_file_path.unlink()
     (DATA_DIR / "download").rename(DATA_DIR / "nf_prize_dataset")
     extract_file(
@@ -48,6 +50,6 @@ def download_prize_dataset():
     (NETFLIX_DATA_DIR / "training_set.tar").unlink()
 
 
-def clean_all():
+def clean_all() -> None:
     shutil.rmtree(DATA_DIR)
     shutil.rmtree(OUTPUT_DIR)
