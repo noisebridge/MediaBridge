@@ -11,7 +11,6 @@ log = logging.getLogger(__name__)
 app = Typer()
 
 
-@app.command()
 def load() -> None:
     """
     Load a csv of movie data into the mongo database.

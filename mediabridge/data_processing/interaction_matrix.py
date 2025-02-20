@@ -8,7 +8,7 @@ from scipy.sparse import coo_matrix, dok_matrix
 from tqdm import tqdm
 
 from mediabridge.definitions import DATA_DIR, LIGHTFM_MODEL_PKL, OUTPUT_DIR
-from mediabridge.recommender.utils import import_lightfm_silently
+from mediabridge.recommender.import_utils import import_lightfm_silently
 
 
 def list_rating_files(directory_path: Path) -> Generator[str, None, None]:
