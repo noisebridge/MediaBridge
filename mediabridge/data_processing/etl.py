@@ -37,10 +37,9 @@ def etl(max_reviews: int, regen: bool = False) -> None:
     diagnostic = "Please run `pipenv run mb init` to download the necessary dataset"
     assert NETFLIX_DATA_DIR.exists(), diagnostic
 
-    engine = get_engine()
     if regen:
         logging.info("Recreating tables...")
-        with engine.connect() as conn:
+        with get_engine().connect() as conn:
             conn.execute(text("DROP TABLE IF EXISTS rating"))
             conn.execute(text("DROP TABLE IF EXISTS movie_title"))
             conn.commit()
