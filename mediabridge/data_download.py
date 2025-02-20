@@ -1,3 +1,4 @@
+import logging
 import shutil
 import tarfile
 from pathlib import Path
@@ -12,6 +13,8 @@ For our scripts to work, we need to download the Netflix prize data. As this fil
 we decided early on not to include it as part of the repo. It is however available on the Internet Archive here: 
 https://archive.org/details/nf_prize_dataset.tar
 """
+
+log = logging.getLogger(__name__)
 
 
 def download_file(url: str, output_path: Path) -> None:
@@ -35,7 +38,8 @@ def extract_file(src: Path, dest: Path, gz_compressed: bool = False) -> None:
         tar.extractall(path=dest)
 
 
-def download_prize_dataset() -> None:
+def download_netflix_dataset() -> None:
+    NETFLIX_DATA_DIR.mkdir(parents=True)
     url = "https://archive.org/download/nf_prize_dataset.tar/nf_prize_dataset.tar.gz"
     compressed_filename = "nf_prize_dataset.tar.gz"
     compressed_file_path = DATA_DIR / compressed_filename
@@ -51,5 +55,7 @@ def download_prize_dataset() -> None:
 
 
 def clean_all() -> None:
-    shutil.rmtree(DATA_DIR)
-    shutil.rmtree(OUTPUT_DIR)
+    if DATA_DIR.exists():
+        shutil.rmtree(DATA_DIR)
+    if OUTPUT_DIR.exists():
+        shutil.rmtree(OUTPUT_DIR)

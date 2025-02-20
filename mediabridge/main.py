@@ -6,10 +6,11 @@ import typer as typer
 
 from mediabridge.data_download import (
     clean_all,
-    download_prize_dataset,
+    download_netflix_dataset,
 )
 from mediabridge.data_processing import etl, wiki_to_netflix
-from mediabridge.definitions import DATA_DIR, NETFLIX_DATA_DIR, OUTPUT_DIR
+from mediabridge.db.tables import create_tables
+from mediabridge.definitions import NETFLIX_DATA_DIR, OUTPUT_DIR, PROJECT_DIR
 from mediabridge.recommender import make_recommendation
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
@@ -34,12 +35,14 @@ def main(
 ) -> None:
     if not OUTPUT_DIR.exists():
         print(
-            f"[WARNING] Output directory does not exist, creating new directory at {OUTPUT_DIR}"
+            "[WARNING] Output directory does not exist, "
+            f"creating new directory at {OUTPUT_DIR}"
         )
         OUTPUT_DIR.mkdir()
 
     if log:
         # log all messages to new file
+        # DOESN'T WORK IF REFRESHING OUTPUT DIRECTORY
         logging.basicConfig(
             level=logging.DEBUG,
             filename=OUTPUT_DIR / f"mb_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
@@ -57,22 +60,28 @@ def main(
 
 
 @app.command()
-def init(force: bool = False) -> None:
-    """Download all required datasets and initialize all data for recommendations"""
-    if force or not NETFLIX_DATA_DIR.exists():
-        download_prize_dataset()
-    else:
-        logging.info(f"{NETFLIX_DATA_DIR} already exists, skipping download...")
+def init(
+    refresh: bool = typer.Option(
+        False, help="Deletes data-holding directories before initializing."
+    ),
+) -> None:
+    """Download all required datasets and initialize the database"""
+    if refresh:
+        # prompt = f"\n! This will delete all data in {DATA_DIR} and {OUTPUT_DIR}. Would you like to proceed? y/n !\n"
+        # if input(prompt) != "y":
+        #     print("\nAborting process.")
+        #     return
+        clean_all()
 
-
-@app.command()
-def clean() -> None:
-    """Clean up all downloaded and generated data by removing the /data and /out directories."""
-    prompt = f"\n! Are you sure you want to delete {DATA_DIR} and {OUTPUT_DIR}? y/n !\n"
-    if input(prompt) != "y":
-        print("\nAborting process.")
+    if NETFLIX_DATA_DIR.exists():
+        logging.error(
+            f"The Netflix Prize dataset already exists in {NETFLIX_DATA_DIR.relative_to(PROJECT_DIR)}. "
+            "Please use the --refresh option if you intend to initialize from scratch.",
+        )
         return
-    clean_all()
+
+    download_netflix_dataset()
+    create_tables()
 
 
 @app.command()
