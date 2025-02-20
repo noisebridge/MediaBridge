@@ -7,7 +7,7 @@ import typer as typer
 from mediabridge.data_processing import etl, wiki_to_netflix
 from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
 from mediabridge.recommender import make_recommendation
-from mediabridge.utils import clean_all, download_prize_dataset
+from mediabridge.utils.file_utils import clean_all, download_prize_dataset
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 app.add_typer(wiki_to_netflix.app)
