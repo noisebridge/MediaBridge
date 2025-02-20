@@ -38,7 +38,7 @@ from sqlalchemy.orm import Session
 from typer import Typer
 
 from mediabridge.db.tables import MovieTitle, get_engine
-from MediaBridge.mediabridge.recommender.import_utils import import_lightfm_silently
+from mediabridge.recommender.import_utils import import_lightfm_silently
 
 app = Typer()
 

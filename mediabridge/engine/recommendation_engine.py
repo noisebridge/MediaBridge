@@ -4,7 +4,7 @@ import numpy as np
 from scipy import sparse
 
 from mediabridge.db.connect import connect_to_mongo
-from MediaBridge.mediabridge.recommender.import_utils import import_lightfm_silently
+from mediabridge.recommender.import_utils import import_lightfm_silently
 
 
 class RecommendationEngine:
