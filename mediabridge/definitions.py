@@ -13,6 +13,8 @@ NETFLIX_DATA_DIR = DATA_DIR / "nf_prize_dataset"
 FULL_TITLES_TXT = NETFLIX_DATA_DIR / "movie_titles.txt"
 
 OUTPUT_DIR = PROJECT_DIR / "out"
+LIGHTFM_MODEL_PKL = OUTPUT_DIR / "lightfm_model.pkl"
+
 
 if __name__ == "__main__":
     print(MODULE_DIR)

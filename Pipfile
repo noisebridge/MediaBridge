@@ -36,4 +36,8 @@ browse = "pipenv run datasette serve out/movies.sqlite"
 coverage = "pipenv run bin/coverage.sh"
 lint = "pipenv run bin/lint.sh"
 mb = "pipenv run python -m mediabridge.main"
+
+# These two do the same thing. Some folks prefer the unittest runner. For example,
+# it works better with "tqdm" and with "print" debugging, and offers nicer traces.
 test = "pipenv run python -m pytest"
+unittest = "bash -c 'pipenv run python -m unittest $(find tests mediabridge -name *_test.py)'"

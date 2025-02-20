@@ -31,8 +31,6 @@ You can view the test output with:
 $ pipenv run python -m unittest tests/*/*_test.py
 """
 
-from warnings import filterwarnings
-
 import numpy as np
 from scipy.sparse import coo_matrix, dok_matrix
 from sqlalchemy import text
@@ -40,13 +38,14 @@ from sqlalchemy.orm import Session
 from typer import Typer
 
 from mediabridge.db.tables import MovieTitle, get_engine
+from MediaBridge.mediabridge.recommender.import_utils import import_lightfm_silently
 
 app = Typer()
 
 
 @app.command()
 def recommend(
-    max_training_user_id: int = 800,
+    max_training_user_id: int = 798,
     large_movie_id: int = 9_770,
 ) -> set[int]:
     """Recommends a set of movies, by netflix_id, for a given user.
@@ -60,9 +59,7 @@ def recommend(
     while larger IDs are hidden and are fair game to possibly recommend to the user.
     Clearly there is room to improve on this crude method of splitting into subsets.
     """
-    message = "LightFM was compiled without OpenMP support"
-    filterwarnings("ignore", message, category=UserWarning)
-    from lightfm import LightFM
+    LightFM = import_lightfm_silently()
 
     model = LightFM(no_components=30)
     train = _get_ratings(max_training_user_id, large_movie_id)
@@ -120,7 +117,7 @@ def _get_ratings(
 
             # Blind the model to the movies we want to predict.
             if u == max_user_id and m >= large_movie_id:
-                del matrix[u, m]
+                matrix[u, m] = 0
 
     return coo_matrix(matrix)
 
