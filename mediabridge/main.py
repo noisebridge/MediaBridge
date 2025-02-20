@@ -5,7 +5,7 @@ from datetime import datetime
 import typer as typer
 
 from mediabridge.data_processing import etl, wiki_to_netflix
-from mediabridge.definitions import DATA_DIR, OUTPUT_DIR
+from mediabridge.definitions import DATA_DIR, NETFLIX_DATA_DIR, OUTPUT_DIR
 from mediabridge.recommender import make_recommendation
 from mediabridge.utils.file_utils import clean_all, download_prize_dataset
 
@@ -56,10 +56,10 @@ def main(
 @app.command()
 def init(force: bool = False) -> None:
     """Download all required datasets and initialize all data for recommendations"""
-    if force or not DATA_DIR.exists():
+    if force or not NETFLIX_DATA_DIR.exists():
         download_prize_dataset()
     else:
-        logging.info(f"{DATA_DIR} already exists, skipping download...")
+        logging.info(f"{NETFLIX_DATA_DIR} already exists, skipping download...")
 
 
 @app.command()
