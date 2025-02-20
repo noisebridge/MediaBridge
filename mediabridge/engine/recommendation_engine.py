@@ -71,7 +71,7 @@ class RecommendationEngine:
         data = [1] * len(liked_movies_ids)
         return coo_matrix((data, (rows, cols)))
 
-    def recommend(self, user_id: int = 0, limit: int = 10) -> set[int]:
+    def recommend(self, user_id: int, limit: int = 10) -> set[int]:
         liked_movies = self.get_data()
         liked_movies_ids = list(map(int, self.titles_to_ids(liked_movies)))
         user_interactions = self.create_user_matrix(liked_movies_ids)

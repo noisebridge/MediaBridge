@@ -88,5 +88,5 @@ class RecommendationEngineTest(unittest.TestCase):
     def test_recommend(self, _mock_input: Any) -> None:
         if _enabled:
             sys.stdout = io.StringIO()
-            self.engine.recommend()
+            self.engine.recommend(798)
             self.assertEqual({0, 1}, self.engine.recommend())
