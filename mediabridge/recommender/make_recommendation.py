@@ -70,7 +70,7 @@ def recommend(
     assert isinstance(predictions, np.ndarray)
     assert predictions.shape == (len(test_movie_ids),)  # (8000, )
     mx = round(predictions.max(), 5)
-    thresh = 0.91 * mx  # admit some more recommendations, not just the top one
+    thresh = 0.99 * mx  # admit some more recommendations, not just the top one
     # netflix_id = test_movie_ids[i]  # maps from internal to external netflix ID
 
     return {test_movie_ids[i] for i, p in enumerate(predictions) if p > thresh}
@@ -140,7 +140,7 @@ def _get_test_movie_ids(
     """
     params = {"max_training_user_id": large_movie_id}
     with get_engine().connect() as conn:
-        test_movie_ids = [int(m) for m, in conn.execute(text(query), params)]
+        test_movie_ids = [int(m) for (m,) in conn.execute(text(query), params)]
         return sorted(test_movie_ids)
 
 

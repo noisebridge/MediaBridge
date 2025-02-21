@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from mediabridge.data_processing.etl import etl
 from mediabridge.db.tables import MovieTitle, Rating, create_tables, get_engine
 from mediabridge.definitions import FULL_TITLES_TXT
+from mediabridge.recommender.make_recommendation import recommend
 
 """
 Things I want to do:
@@ -19,6 +20,10 @@ Running this file:
 
     then run the commmand:
     PYTHONPATH=$(pwd) pipenv run python tests/recommender/expermental_recs.py
+
+Things to ask about:
+    i don't know if the test two movies rec actually does anything
+
 """
 
 
@@ -55,13 +60,42 @@ def get_user_ratings(user_id):
     return user_ratings
 
 
+def get_movie_details(movie_ids):
+    engine = get_engine()
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    movie_details = (
+        session.query(MovieTitle.id, MovieTitle.title, MovieTitle.year)
+        .filter(MovieTitle.id.in_(movie_ids))
+        .all()
+    )
+
+    session.close()
+    return movie_details
+
+
 if __name__ == "__main__":
     create_tables()
     etl(1000000)
 
+    # Get a random user ID
     random_user_id = get_random_user()
+    # random_user_id = 2000
+
+    # Fetch user ratings
     user_ratings = get_user_ratings(random_user_id)
 
     print(f"Random User ID: {random_user_id}\n")
     for movie_id, rating, title, year in user_ratings:
         print(f"Title: {title} ({year}), Rating: {rating}")
+
+    # Get recommended movies
+    recommended_movie_ids = recommend(max_training_user_id=random_user_id)
+
+    # Convert movie IDs to titles
+    recommended_movies = get_movie_details(recommended_movie_ids)
+
+    print(f"\nRecommended Movies for User {random_user_id}:")
+    for movie_id, title, year in recommended_movies:
+        print(f"Title: {title} ({year})")

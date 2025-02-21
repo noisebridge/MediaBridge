@@ -44,7 +44,6 @@ class TestTwoMoviesRec(unittest.TestCase):
 
     def test_recommend(self) -> None:
         if FULL_TITLES_TXT.exists():
-
             ids = _clean(recommend())
 
             self.assertEqual(
