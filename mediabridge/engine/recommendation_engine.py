@@ -16,8 +16,7 @@ class RecommendationEngine:
         self.movie_ids = movie_ids
         self.db = connect_to_mongo()
         with open(model_file, "rb") as f:
-            LightFM = import_lightfm_silently()
-            assert f"{type(LightFM)}" == "LightFM"
+            import_lightfm_silently()
             self.model = pickle.load(f)
 
     def get_movie_id(self, title: str) -> str:
