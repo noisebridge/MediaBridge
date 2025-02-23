@@ -5,7 +5,6 @@ import unittest
 from typing import Any
 from unittest.mock import patch
 
-import numpy as np
 from scipy.sparse import coo_matrix
 
 from mediabridge.db.connect import connect_to_mongo
@@ -61,7 +60,7 @@ class RecommendationEngineTest(unittest.TestCase):
                 self.engine.ids_to_titles(["1", "16377"]),
             )
 
-    liked_movies_ids = np.array([1, 16377])
+    liked_movies_ids = [1, 16377]
 
     dino_alien = "Dinosaur Planet,Alien Files"
 
@@ -89,5 +88,7 @@ class RecommendationEngineTest(unittest.TestCase):
     def test_recommend(self, _mock_input: Any) -> None:
         if _enabled:
             sys.stdout = io.StringIO()
-            self.engine.recommend()
-            self.assertEqual({0, 1}, self.engine.recommend())
+            self.assertEqual(
+                {0, 1},
+                self.engine.recommend(user_id=0),
+            )

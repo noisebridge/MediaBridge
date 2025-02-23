@@ -8,9 +8,12 @@ if TYPE_CHECKING:
 
 
 def import_lightfm_silently() -> "LightFM":
-    warnings.filterwarnings(
-        "ignore", "LightFM was compiled without OpenMP support", category=UserWarning
-    )
-    from lightfm import LightFM
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            "LightFM was compiled without OpenMP support",
+            category=UserWarning,
+        )
+        from lightfm import LightFM
 
-    return LightFM
+        return LightFM

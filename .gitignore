@@ -1,5 +1,6 @@
 *~
 .coverage
+.coverage.*
 .env
 .pytest_cache
 __pycache__/
