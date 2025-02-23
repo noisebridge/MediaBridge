@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 from beartype import beartype
+from numpy.typing import NDArray
 from scipy.sparse import coo_matrix
 
 from mediabridge.db.connect import connect_to_mongo
@@ -33,7 +34,7 @@ class RecommendationEngine:
         else:
             return f"no title for {netflix_id=}"
 
-    def titles_to_ids(self, titles: str) -> list[str]:
+    def titles_to_ids(self, titles: list[str]) -> list[str]:
         netflix_ids = []
         for title in titles:
             netflix_id = self.get_movie_id(title)
@@ -47,7 +48,11 @@ class RecommendationEngine:
             titles.append(title)
         return titles
 
-    def get_recommendations(self, user_id, user_interactions):
+    def get_recommendations(
+        self,
+        user_id: int,
+        user_interactions: coo_matrix,
+    ) -> NDArray[np.int_]:
         scores = self.model.predict(
             user_ids=user_id,
             item_ids=self.movie_ids,
