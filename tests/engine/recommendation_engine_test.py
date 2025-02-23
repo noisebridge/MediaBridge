@@ -87,8 +87,8 @@ class RecommendationEngineTest(unittest.TestCase):
     @patch("builtins.input", return_value=dino_alien)
     def test_recommend(self, _mock_input: Any) -> None:
         if _enabled:
-            # sys.stdout = io.StringIO()
+            sys.stdout = io.StringIO()
             self.assertEqual(
                 {0, 1},
-                self.engine.recommend(798),
+                self.engine.recommend(user_id=0),
             )
