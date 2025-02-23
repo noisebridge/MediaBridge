@@ -82,5 +82,4 @@ class RecommendationEngine:
         user_interactions = self.create_user_matrix(liked_movies_ids)
 
         recommendations = self.get_recommendations(user_id, user_interactions)[:limit]
-        self.display_recommendations(recommendations)
         return set(map(int, recommendations))
