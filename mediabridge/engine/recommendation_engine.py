@@ -19,13 +19,13 @@ class RecommendationEngine:
             self.model = pickle.load(f)
             assert isinstance(self.model, LightFM), type(self.model)
 
-    def get_movie_id(self, title:str)->str:
+    def get_movie_id(self, title: str) -> str:
         movies = self.db["movies"]
         movie = movies.find_one({"title": title})
         assert movie, title
         return f"{movie.get("netflix_id")}"
 
-    def get_movie_title(self, netflix_id):
+    def get_movie_title(self, netflix_id: str) -> str:
         movies = self.db["movies"]
         movie = movies.find_one({"netflix_id": f"{netflix_id}"})
         if movie:
