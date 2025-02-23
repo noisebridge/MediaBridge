@@ -33,14 +33,14 @@ class RecommendationEngine:
         else:
             return f"no title for {netflix_id=}"
 
-    def titles_to_ids(self, titles):
+    def titles_to_ids(self, titles: str) -> list[str]:
         netflix_ids = []
         for title in titles:
             netflix_id = self.get_movie_id(title)
             netflix_ids.append(netflix_id)
         return netflix_ids
 
-    def ids_to_titles(self, netflix_ids):
+    def ids_to_titles(self, netflix_ids: list[str]) -> list[str]:
         titles = []
         for netflix_id in netflix_ids:
             title = self.get_movie_title(netflix_id)
