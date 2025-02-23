@@ -16,8 +16,7 @@ class RecommendationEngine:
         self.movie_ids = movie_ids
         self.db = connect_to_mongo()
         with open(model_file, "rb") as f:
-            LightFM = import_lightfm_silently()
-            assert f"{type(LightFM)}" == "LightFM"
+            import_lightfm_silently()
             self.model = pickle.load(f)
 
     def get_movie_id(self, title: str) -> str:
@@ -79,7 +78,10 @@ class RecommendationEngine:
     def recommend(self, user_id: int, limit: int = 10) -> set[int]:
         liked_movies = self.get_data()
         liked_movies_ids = list(map(int, self.titles_to_ids(liked_movies)))
+        print(f"{liked_movies=}")
         user_interactions = self.create_user_matrix(liked_movies_ids)
+        print(f"{user_interactions=}")
+        print(f"{user_interactions.shape=}")
 
         recommendations = self.get_recommendations(user_id, user_interactions)[:limit]
         return set(map(int, recommendations))
