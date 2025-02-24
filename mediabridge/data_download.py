@@ -31,7 +31,7 @@ def download_file(url: str, output_path: Path) -> None:
                 f.flush()
 
 
-def extract_file(src: Path, dest: Path, gz_compressed: bool = False) -> None:
+def extract_file(src: Path, dest: Path) -> None:
     print("\nExtracting...")
     with tarfile.open(name=src) as tar:
         tar.extractall(path=dest)
@@ -44,7 +44,7 @@ def download_netflix_dataset() -> None:
     compressed_file_path = DATA_DIR / compressed_filename
 
     download_file(url, compressed_file_path)
-    extract_file(compressed_file_path, DATA_DIR, gz_compressed=True)
+    extract_file(compressed_file_path, DATA_DIR)
     compressed_file_path.unlink()
     (DATA_DIR / "download").rename(DATA_DIR / "nf_prize_dataset")
     extract_file(
