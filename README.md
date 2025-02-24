@@ -24,17 +24,17 @@ To fix import errors and other Intellisense features, make sure you've let VSCod
 
 ## Running code
 
-For development purposes, you can simply run the dev script:
+For development purposes, you can simply run the CLI script:
 
 ```
-pipenv run dev
+pipenv run mb
 ```
 
-Be sure to specify options such as -v and -l *before* any subcommands (process, load, etc.).
+Be sure to specify options such as -v and -l *before* any subcommands and their arguments (process, load, etc.).
 
 **NOTE:** *If you encounter a ModuleNotFoundError, make sure you are in the root directory of the project, as the `mediabridge` directory is the module Pipenv is trying to reference.*
 
-This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`, but this may change in the future, so using `pipenv run dev` will ensure the correct script is always run.
+This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`, but this may change in the future, so using `pipenv run mb` will ensure the correct script is always run.
 
 ## Testing
 
