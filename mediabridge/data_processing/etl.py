@@ -1,4 +1,5 @@
 import io
+import logging
 import re
 from collections.abc import Generator
 from pathlib import Path
@@ -14,16 +15,19 @@ from mediabridge.db.tables import (
     DB_FILE,
     POPULAR_MOVIE_QUERY,
     PROLIFIC_USER_QUERY,
+    create_tables,
     get_engine,
 )
-from mediabridge.definitions import FULL_TITLES_TXT, OUTPUT_DIR, PROJECT_DIR
+from mediabridge.definitions import NETFLIX_DATA_DIR, OUTPUT_DIR, TITLES_TXT
+
+log = logging.getLogger(__name__)
 
 RATING_CSV = OUTPUT_DIR / "rating.csv"  # uncompressed, to accommodate sqlite .import
 
 GLOB = "mv_00*.txt"
 
 
-def etl(max_rows: int) -> None:
+def etl(max_reviews: int, regen: bool = False) -> None:
     """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table.
 
     If CSV or table have already been computed, we skip repeating that work to save time.
@@ -33,8 +37,20 @@ def etl(max_rows: int) -> None:
     It is always safe to force a re-run with:
     $ (cd out && rm -f rating.csv movies.sqlite)
     """
+    diagnostic = "Please run `pipenv run mb init` to download the necessary dataset"
+    assert NETFLIX_DATA_DIR.exists(), diagnostic
+
+    if regen:
+        logging.info("Recreating tables...")
+        with get_engine().connect() as conn:
+            conn.execute(text("DROP TABLE IF EXISTS rating"))
+            conn.execute(text("DROP TABLE IF EXISTS movie_title"))
+            conn.commit()
+        create_tables()
+
+    log.info("Loading movie info into db...")
     _etl_movie_title()
-    _etl_user_rating(max_rows)
+    _etl_user_rating(max_reviews)
 
 
 # no cover: begin
@@ -42,24 +58,25 @@ def etl(max_rows: int) -> None:
 
 def _etl_movie_title() -> None:
     query = "SELECT *  FROM movie_title  LIMIT 1"
-    if pd.read_sql_query(query, get_engine()).empty:
-        columns = ["id", "year", "title"]
-        df = pd.DataFrame(read_netflix_txt(FULL_TITLES_TXT), columns=columns)
-        df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
-        # At this point there's a df.id value of "1". Maybe it should be "00001"?
+    # if there is already data in movie_title, skip reprocessing
+    if not pd.read_sql_query(query, get_engine()).empty:
+        log.warning(
+            "movie_title table already populated with data, skipping reprocessing..."
+        )
+        return
 
-        with get_engine().connect() as conn:
-            conn.execute(text("DELETE FROM rating"))
-            conn.execute(text("DELETE FROM movie_title"))
-            conn.commit()
-            df.to_sql("movie_title", conn, index=False, if_exists="append")
+    columns = ["id", "year", "title"]
+    df = pd.DataFrame(read_netflix_txt(TITLES_TXT), columns=columns)
+    df["year"] = df.year.replace("NULL", pd.NA).astype("Int16")
+    # At this point there's a df.id value of "1". Maybe it should be "00001"?
+
+    with get_engine().connect() as conn:
+        df.to_sql("movie_title", conn, index=False, if_exists="append")
 
 
-def _etl_user_rating(max_rows: int) -> None:
-    """Writes out/rating.csv if needed, then populates rating table from it."""
-    training_folder = PROJECT_DIR.parent / "Netflix-Dataset/training_set/training_set"
-    diagnostic = "Please clone  https://github.com/deesethu/Netflix-Dataset.git"
-    assert training_folder.exists(), diagnostic
+def _etl_user_rating(max_reviews: int) -> None:
+    """Writes out/rating.csv.gz if needed, then populates rating table from it."""
+    training_folder = NETFLIX_DATA_DIR / "training_set"
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
     if not RATING_CSV.exists():
@@ -79,11 +96,11 @@ def _etl_user_rating(max_rows: int) -> None:
 
     query = "SELECT *  FROM rating  LIMIT 1"
     if pd.read_sql_query(query, get_engine()).empty:
-        _insert_ratings(RATING_CSV, max_rows)
+        _insert_ratings(RATING_CSV, max_reviews)
 
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
-    """Populates rating table from compressed CSV, if needed."""
+    """Populates rating table from CSV, if needed."""
     create_rating_csv = """
         CREATE TABLE rating_csv (
             user_id   INTEGER  NOT NULL,
