@@ -70,7 +70,7 @@ def main() -> None:
 
     # Save Data
     LightFM = import_lightfm_silently()
-    model = LightFM()
+    model = LightFM()  # pyright: ignore
     model.fit(interaction_matrix)  # This takes ~ 27 seconds.
     with open(LIGHTFM_MODEL_PKL, "wb") as f:
         pickle.dump(model, f)
