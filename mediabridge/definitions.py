@@ -7,6 +7,7 @@ if __package__ != "mediabridge":
 
 MODULE_DIR = Path(__file__).parent
 PROJECT_DIR = MODULE_DIR.parent
+LOGGING_DIR = PROJECT_DIR / "logs"
 
 DATA_DIR = PROJECT_DIR / "data"
 NETFLIX_DATA_DIR = DATA_DIR / "nf_prize_dataset"

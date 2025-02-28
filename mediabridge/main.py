@@ -10,7 +10,12 @@ from mediabridge.data_download import (
 )
 from mediabridge.data_processing import etl, wiki_to_netflix
 from mediabridge.db.tables import create_tables
-from mediabridge.definitions import NETFLIX_DATA_DIR, OUTPUT_DIR, PROJECT_DIR
+from mediabridge.definitions import (
+    LOGGING_DIR,
+    NETFLIX_DATA_DIR,
+    OUTPUT_DIR,
+    PROJECT_DIR,
+)
 from mediabridge.recommender import make_recommendation
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
@@ -42,10 +47,10 @@ def main(
 
     if log:
         # log all messages to new file
-        # DOESN'T WORK IF REFRESHING OUTPUT DIRECTORY
+        LOGGING_DIR.mkdir(exist_ok=True)
         logging.basicConfig(
             level=logging.DEBUG,
-            filename=OUTPUT_DIR / f"mb_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
+            filename=LOGGING_DIR / f"mb_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
             filemode="x",
             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
             datefmt="%H:%M:%S",
