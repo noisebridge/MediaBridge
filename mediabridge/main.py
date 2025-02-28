@@ -72,10 +72,6 @@ def init(
 ) -> None:
     """Download all required datasets and initialize the database"""
     if refresh:
-        # prompt = f"\n! This will delete all data in {DATA_DIR} and {OUTPUT_DIR}. Would you like to proceed? y/n !\n"
-        # if input(prompt) != "y":
-        #     print("\nAborting process.")
-        #     return
         clean_all()
 
     if NETFLIX_DATA_DIR.exists():
