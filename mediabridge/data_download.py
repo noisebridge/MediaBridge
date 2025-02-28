@@ -33,7 +33,7 @@ def download_file(url: str, output_path: Path) -> None:
 
 
 def extract_file(src: Path, dest: Path) -> None:
-    print(
+    log.info(
         f"\nExtracting data/{src.relative_to(DATA_DIR)}"
         f" to data/{dest.relative_to(DATA_DIR)}"
     )
