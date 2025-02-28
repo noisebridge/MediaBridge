@@ -27,7 +27,7 @@ RATING_CSV = OUTPUT_DIR / "rating.csv"  # uncompressed, to accommodate sqlite .i
 GLOB = "mv_00*.txt"
 
 
-def etl(max_reviews: int, regen: bool = False) -> None:
+def etl(max_reviews: int, *, regen: bool = False) -> None:
     """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table.
 
     If CSV or table have already been computed, we skip repeating that work to save time.
