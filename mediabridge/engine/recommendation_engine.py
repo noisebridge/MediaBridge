@@ -4,7 +4,7 @@ import numpy as np
 from scipy import sparse
 
 from mediabridge.db.connect import connect_to_mongo
-from mediabridge.recommender.utils import import_lightfm_silently
+from mediabridge.recommender.import_utils import import_lightfm_silently
 
 
 class RecommendationEngine:
@@ -26,7 +26,7 @@ class RecommendationEngine:
         movies = self.db["movies"]
         movie = movies.find_one({"netflix_id": f"{netflix_id}"})
         if movie:
-            return f'{movie.get("title")}'
+            return f"{movie.get('title')}"
         else:
             return f"no title for {netflix_id=}"
 
