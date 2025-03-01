@@ -4,10 +4,18 @@ from datetime import datetime
 
 import typer as typer
 
-from mediabridge.data_download import clean_all, download_netflix_dataset
+from mediabridge.data_download import (
+    clean_all,
+    download_netflix_dataset,
+)
 from mediabridge.data_processing import etl, wiki_to_netflix
 from mediabridge.db.tables import create_tables
-from mediabridge.definitions import NETFLIX_DATA_DIR, OUTPUT_DIR, PROJECT_DIR
+from mediabridge.definitions import (
+    LOGGING_DIR,
+    NETFLIX_DATA_DIR,
+    OUTPUT_DIR,
+    PROJECT_DIR,
+)
 from mediabridge.recommender import make_recommendation
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
@@ -39,10 +47,10 @@ def main(
 
     if log:
         # log all messages to new file
-        # DOESN'T WORK IF REFRESHING OUTPUT DIRECTORY
+        LOGGING_DIR.mkdir(exist_ok=True)
         logging.basicConfig(
             level=logging.DEBUG,
-            filename=OUTPUT_DIR / f"mb_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
+            filename=LOGGING_DIR / f"mb_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
             filemode="x",
             format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
             datefmt="%H:%M:%S",
@@ -64,10 +72,6 @@ def init(
 ) -> None:
     """Download all required datasets and initialize the database"""
     if refresh:
-        # prompt = f"\n! This will delete all data in {DATA_DIR} and {OUTPUT_DIR}. Would you like to proceed? y/n !\n"
-        # if input(prompt) != "y":
-        #     print("\nAborting process.")
-        #     return
         clean_all()
 
     if NETFLIX_DATA_DIR.exists():

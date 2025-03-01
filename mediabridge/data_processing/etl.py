@@ -27,7 +27,7 @@ RATING_CSV = OUTPUT_DIR / "rating.csv"  # uncompressed, to accommodate sqlite .i
 GLOB = "mv_00*.txt"
 
 
-def etl(max_reviews: int, regen: bool = False) -> None:
+def etl(max_reviews: int, *, regen: bool = False) -> None:
     """Extracts, transforms, and loads ratings data into a combined uniform CSV + rating table.
 
     If CSV or table have already been computed, we skip repeating that work to save time.
@@ -75,7 +75,7 @@ def _etl_movie_title() -> None:
 
 
 def _etl_user_rating(max_reviews: int) -> None:
-    """Writes out/rating.csv.gz if needed, then populates rating table from it."""
+    """Writes out/rating.csv if needed, then populates rating table from it."""
     training_folder = NETFLIX_DATA_DIR / "training_set"
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
