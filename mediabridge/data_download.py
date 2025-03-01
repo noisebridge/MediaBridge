@@ -23,6 +23,7 @@ def download_file(url: str, output_path: Path) -> None:
     r = requests.get(url, stream=True)
     r.raise_for_status()
     with open(output_path, "wb") as f:
+        total_length = 0
         if content_length := r.headers.get("content-length"):
             total_length = int(content_length)
         for chunk in tqdm(
