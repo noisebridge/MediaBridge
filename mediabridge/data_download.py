@@ -1,3 +1,9 @@
+"""
+For our scripts to work, we need to download the Netflix prize data. As this file is ~500 MB and the licensing terms are dubious,
+we decided early on not to include it as part of the repo. It is however available on the Internet Archive here:
+https://archive.org/details/nf_prize_dataset.tar
+"""
+
 import logging
 import shutil
 import tarfile
@@ -7,12 +13,6 @@ import requests
 from tqdm import tqdm
 
 from mediabridge.definitions import DATA_DIR, NETFLIX_DATA_DIR, OUTPUT_DIR
-
-"""
-For our scripts to work, we need to download the Netflix prize data. As this file is ~500 MB and the licensing terms are dubious, 
-we decided early on not to include it as part of the repo. It is however available on the Internet Archive here: 
-https://archive.org/details/nf_prize_dataset.tar
-"""
 
 log = logging.getLogger(__name__)
 

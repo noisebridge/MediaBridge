@@ -9,12 +9,12 @@ EXPECTED_SPARQL_QUERY = """
             }
 
             ?item wdt:P31/wdt:P279* wd:Q11424 .
-            
+
             {
                 # Get US release date
                 ?item p:P577 ?releaseDateStatement .
                 ?releaseDateStatement ps:P577 ?releaseDate .
-                ?releaseDateStatement pq:P291 wd:Q30 .  
+                ?releaseDateStatement pq:P291 wd:Q30 .
             }
             UNION
             {
@@ -23,7 +23,7 @@ EXPECTED_SPARQL_QUERY = """
                 ?releaseDateStatement ps:P577 ?releaseDate .
                 FILTER NOT EXISTS { ?releaseDateStatement pq:P291 ?country }
             }
-        
+
             FILTER (YEAR(?releaseDate) = 2003) .
 
             ?item rdfs:label ?itemLabel .
@@ -41,7 +41,6 @@ EXPECTED_SPARQL_QUERY = """
 
             SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
             }
-    
         """
 
 WIKIDATA_RESPONSE_THE_ROOM = {
