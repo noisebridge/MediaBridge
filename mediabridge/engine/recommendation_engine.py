@@ -1,28 +1,31 @@
 import pickle
+from pathlib import Path
 
 import numpy as np
-from scipy import sparse
+from beartype import beartype
+from numpy.typing import NDArray
+from scipy.sparse import coo_matrix
 
 from mediabridge.db.connect import connect_to_mongo
 from mediabridge.recommender.import_utils import import_lightfm_silently
 
 
+@beartype
 class RecommendationEngine:
-    def __init__(self, movie_ids, model_file):
+    def __init__(self, movie_ids: list[str], model_file: Path) -> None:
         self.movie_ids = movie_ids
         self.db = connect_to_mongo()
         with open(model_file, "rb") as f:
-            LightFM = import_lightfm_silently()
+            import_lightfm_silently()
             self.model = pickle.load(f)
-            assert isinstance(self.model, LightFM), type(self.model)
 
-    def get_movie_id(self, title):
+    def get_movie_id(self, title: str) -> str:
         movies = self.db["movies"]
         movie = movies.find_one({"title": title})
         assert movie, title
-        return movie.get("netflix_id")
+        return f"{movie.get("netflix_id")}"
 
-    def get_movie_title(self, netflix_id):
+    def get_movie_title(self, netflix_id: str) -> str:
         movies = self.db["movies"]
         movie = movies.find_one({"netflix_id": f"{netflix_id}"})
         if movie:
@@ -30,21 +33,25 @@ class RecommendationEngine:
         else:
             return f"no title for {netflix_id=}"
 
-    def titles_to_ids(self, titles):
+    def titles_to_ids(self, titles: list[str]) -> list[str]:
         netflix_ids = []
         for title in titles:
             netflix_id = self.get_movie_id(title)
             netflix_ids.append(netflix_id)
         return netflix_ids
 
-    def ids_to_titles(self, netflix_ids):
+    def ids_to_titles(self, netflix_ids: list[str]) -> list[str]:
         titles = []
         for netflix_id in netflix_ids:
             title = self.get_movie_title(netflix_id)
             titles.append(title)
         return titles
 
-    def get_recommendations(self, user_id, user_interactions):
+    def get_recommendations(
+        self,
+        user_id: int,
+        user_interactions: coo_matrix,
+    ) -> NDArray[np.int_]:
         scores = self.model.predict(
             user_ids=user_id,
             item_ids=self.movie_ids,
@@ -52,27 +59,28 @@ class RecommendationEngine:
         )
         return np.argsort(-scores)
 
-    def get_data(self):
+    def get_data(self) -> list[str]:
         print("Enter liked movies: ")
         return input().split(",")
 
-    def display_recommendations(self, recommendations):
+    def display_recommendations(self, recommendations: list[str]) -> None:
         movie_titles = self.ids_to_titles(recommendations)
         print("Recommended movies: ")
         for title in movie_titles:
             print(title)
 
-    def create_user_matrix(self, liked_movies_ids):
+    def create_user_matrix(self, liked_movies_ids: list[int]) -> coo_matrix:
         rows = [0] * len(liked_movies_ids)
         cols = liked_movies_ids
         data = [1] * len(liked_movies_ids)
-        return sparse.coo_matrix((data, (rows, cols)))
+        return coo_matrix((data, (rows, cols)))
 
-    def recommend(self, user_id: int = 0, limit: int = 10) -> set[int]:
+    def recommend(self, user_id: int, limit: int = 10) -> set[int]:
         liked_movies = self.get_data()
         liked_movies_ids = list(map(int, self.titles_to_ids(liked_movies)))
         user_interactions = self.create_user_matrix(liked_movies_ids)
+        print(f"{user_interactions=}")
+        print(f"{user_interactions.shape=}")
 
         recommendations = self.get_recommendations(user_id, user_interactions)[:limit]
-        self.display_recommendations(recommendations)
         return set(map(int, recommendations))

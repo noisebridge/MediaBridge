@@ -4,10 +4,7 @@ from datetime import datetime
 
 import typer as typer
 
-from mediabridge.data_download import (
-    clean_all,
-    download_netflix_dataset,
-)
+from mediabridge.data_download import clean_all, download_netflix_dataset
 from mediabridge.data_processing import etl, wiki_to_netflix
 from mediabridge.db.tables import create_tables
 from mediabridge.definitions import (
