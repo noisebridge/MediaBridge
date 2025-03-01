@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 
 
 def download_file(url: str, output_path: Path) -> None:
+    total_length = 0
     output_path.parent.mkdir(parents=True, exist_ok=True)
     r = requests.get(url, stream=True)
     r.raise_for_status()
