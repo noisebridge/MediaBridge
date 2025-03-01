@@ -78,7 +78,6 @@ class RecommendationEngine:
     def recommend(self, user_id: int, limit: int = 10) -> set[int]:
         liked_movies = self.get_data()
         liked_movies_ids = list(map(int, self.titles_to_ids(liked_movies)))
-        print(f"{liked_movies=}")
         user_interactions = self.create_user_matrix(liked_movies_ids)
         print(f"{user_interactions=}")
         print(f"{user_interactions.shape=}")
