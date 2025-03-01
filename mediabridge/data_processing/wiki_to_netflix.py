@@ -135,12 +135,12 @@ def format_sparql_query(title: str, year: int) -> str:
             }
 
             ?item wdt:P31/wdt:P279* wd:Q11424 .
-            
+
             {
                 # Get US release date
                 ?item p:P577 ?releaseDateStatement .
                 ?releaseDateStatement ps:P577 ?releaseDate .
-                ?releaseDateStatement pq:P291 wd:Q30 .  
+                ?releaseDateStatement pq:P291 wd:Q30 .
             }
             UNION
             {
@@ -149,7 +149,7 @@ def format_sparql_query(title: str, year: int) -> str:
                 ?releaseDateStatement ps:P577 ?releaseDate .
                 FILTER NOT EXISTS { ?releaseDateStatement pq:P291 ?country }
             }
-        
+
             FILTER (YEAR(?releaseDate) = %(Year)d) .
 
             ?item rdfs:label ?itemLabel .
@@ -167,7 +167,6 @@ def format_sparql_query(title: str, year: int) -> str:
 
             SERVICE wikibase:label { bd:serviceParam wikibase:language "en" . }
             }
-    
         """
     return QUERY % {"Title": title, "Year": year}
 
