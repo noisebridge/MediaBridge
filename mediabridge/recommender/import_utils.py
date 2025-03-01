@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from lightfm import LightFM
 
 
-def import_lightfm_silently() -> "LightFM":
+def import_lightfm_silently() -> "type[LightFM]":
     with warnings.catch_warnings():
         warnings.filterwarnings(
             "ignore",
@@ -15,5 +15,7 @@ def import_lightfm_silently() -> "LightFM":
             category=UserWarning,
         )
         from lightfm import LightFM
+
+        assert isinstance(LightFM, type)
 
         return LightFM
