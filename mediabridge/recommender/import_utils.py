@@ -7,10 +7,15 @@ if TYPE_CHECKING:
     from lightfm import LightFM
 
 
-def import_lightfm_silently() -> "LightFM":
-    warnings.filterwarnings(
-        "ignore", "LightFM was compiled without OpenMP support", category=UserWarning
-    )
-    from lightfm import LightFM
+def import_lightfm_silently() -> "type[LightFM]":
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            "LightFM was compiled without OpenMP support",
+            category=UserWarning,
+        )
+        from lightfm import LightFM
 
-    return LightFM
+        assert isinstance(LightFM, type)
+
+        return LightFM

@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+beartype = "~=0.19"
 datasette = "~=0.65"
 numpy = "~=1.26"
 pandas = "~=2.2"
