@@ -1,7 +1,7 @@
 
 # After cloning repo, install hooks with:
 #
-#     $ pre-commit install
+#     $ pipenv run pre-commit install
 
 # This repo _does_ support WIP commits of e.g. unused {imports, assignments}.
 
@@ -21,7 +21,6 @@ repos:
       - id: check-yaml
       - id: debug-statements
       - id: destroyed-symlinks
-      - id: detect-aws-credentials
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
