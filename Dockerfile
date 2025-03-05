@@ -1,6 +1,5 @@
-# build with:
-#
-#   time docker buildx build .
+# build with:   docker buildx build -t media-bridge .
+# run with:     docker run -it media-bridge
 
 FROM python:3.12-alpine
 
@@ -8,11 +7,13 @@ WORKDIR /app
 
 COPY . .
 
-RUN apk add --no-cache gcc libffi-dev musl-dev \
- && pip --root-user-action option install pipenv
+RUN apk add --no-cache bash gcc libffi-dev musl-dev \
+ && pip install --root-user-action ignore pipenv
 
-RUN pipenv lock \
- && pipenv install --dev \
- && pipenv run lint
+CMD ["/bin/bash", "-i"]
 
-CMD ["pipenv", "run", "coverage"]
+#RUN pipenv lock \
+# && pipenv install --dev \
+# && pipenv run lint
+
+#CMD ["pipenv", "run", "coverage"]

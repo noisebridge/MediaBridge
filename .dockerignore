@@ -1,1 +1,7 @@
-mediabridge-frontend
+**/__pycache__/
+.git/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+mediabridge-frontend/
+out/
