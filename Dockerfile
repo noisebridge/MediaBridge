@@ -14,15 +14,17 @@ RUN apk update \
  && chmod 0440 /etc/sudoers.d/media \
  && pwd
 
-ENV PATH="/app/MediaBridge:${PATH}"
-
 USER media
+
+COPY Pipfile .
+
+RUN sudo chown -R media:media /app \
+ && pipenv lock \
+ && pipenv install --dev
 
 COPY . .
 
 RUN sudo chown -R media:media /app \
- && pipenv lock \
- && pipenv install --dev \
- && pipenv run coverage  > /tmp/coverage.log
+ && pipenv run coverage  > /tmp/coveage.log
 
 CMD ["/bin/bash", "-i"]
