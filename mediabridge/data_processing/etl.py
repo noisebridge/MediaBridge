@@ -68,9 +68,7 @@ def _etl_movie_title() -> None:
     columns = ["id", "year", "title"]
     df = pd.DataFrame(read_netflix_txt(TITLES_TXT), columns=columns)
     df["year"] = df.year.replace("NULL", pd.NA)
-    assert df.year
     df["year"] = df.year.astype("Int16")
-    # At this point there's a df.id value of "1". Maybe it should be "00001"?
 
     with get_engine().connect() as conn:
         df.to_sql("movie_title", conn, index=False, if_exists="append")
