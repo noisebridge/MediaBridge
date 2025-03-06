@@ -46,7 +46,8 @@ def etl(max_reviews: int, *, regen: bool = False) -> None:
             conn.execute(text("DROP TABLE IF EXISTS rating"))
             conn.execute(text("DROP TABLE IF EXISTS movie_title"))
             conn.commit()
-        create_tables()
+
+    create_tables()
 
     log.info("Loading movie info into db...")
     _etl_movie_title()
