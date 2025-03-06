@@ -6,7 +6,7 @@ FROM python:3.12-alpine
 WORKDIR /app/MediaBridge
 
 RUN apk update \
- && apk add --no-cache bash clang libffi-dev musl-dev nodejs openmp-dev sudo \
+ && apk add --no-cache bash clang libffi-dev musl-dev nodejs openmp-dev sqlite sudo \
  && pip install --root-user-action ignore pipenv \
  && adduser -D -g '' media \
  && chown -R media:media /app \

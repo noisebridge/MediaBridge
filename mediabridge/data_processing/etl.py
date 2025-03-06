@@ -77,15 +77,15 @@ def _etl_movie_title() -> None:
 
 def _etl_user_rating(max_reviews: int) -> None:
     """Writes out/rating.csv if needed, then populates rating table from it."""
-    training_folder = NETFLIX_DATA_DIR / "training_set"
+    training_folder = NETFLIX_DATA_DIR / "training_set/training_set"
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
     if not RATING_CSV.exists():
         # Transform to "tidy" data, per Hadley Wickham, with a uniform "movie_id" column.
+        in_files = sorted(training_folder.glob(GLOB))  # e.g. mv_0017770.txt
+        assert in_files
         with open(RATING_CSV, "w") as fout:
-            for mv_ratings_file in tqdm(
-                sorted(training_folder.glob(GLOB)), smoothing=0.01
-            ):
+            for mv_ratings_file in tqdm(in_files, smoothing=0.01):
                 m = path_re.search(f"{mv_ratings_file}")
                 assert m
                 movie_id = int(m.group(1))
