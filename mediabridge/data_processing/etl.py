@@ -46,7 +46,8 @@ def etl(max_reviews: int, *, regen: bool = False) -> None:
             conn.execute(text("DROP TABLE IF EXISTS rating"))
             conn.execute(text("DROP TABLE IF EXISTS movie_title"))
             conn.commit()
-        create_tables()
+
+    create_tables()
 
     log.info("Loading movie info into db...")
     _etl_movie_title()
@@ -68,9 +69,7 @@ def _etl_movie_title() -> None:
     columns = ["id", "year", "title"]
     df = pd.DataFrame(read_netflix_txt(TITLES_TXT), columns=columns)
     df["year"] = df.year.replace("NULL", pd.NA)
-    assert df.year
     df["year"] = df.year.astype("Int16")
-    # At this point there's a df.id value of "1". Maybe it should be "00001"?
 
     with get_engine().connect() as conn:
         df.to_sql("movie_title", conn, index=False, if_exists="append")
@@ -78,15 +77,15 @@ def _etl_movie_title() -> None:
 
 def _etl_user_rating(max_reviews: int) -> None:
     """Writes out/rating.csv if needed, then populates rating table from it."""
-    training_folder = NETFLIX_DATA_DIR / "training_set"
+    training_folder = NETFLIX_DATA_DIR / "training_set/training_set"
     path_re = re.compile(r"/mv_(\d{7}).txt$")
     is_initial = True
     if not RATING_CSV.exists():
         # Transform to "tidy" data, per Hadley Wickham, with a uniform "movie_id" column.
+        in_files = sorted(training_folder.glob(GLOB))  # e.g. mv_0017770.txt
+        assert in_files
         with open(RATING_CSV, "w") as fout:
-            for mv_ratings_file in tqdm(
-                sorted(training_folder.glob(GLOB)), smoothing=0.01
-            ):
+            for mv_ratings_file in tqdm(in_files, smoothing=0.01):
                 m = path_re.search(f"{mv_ratings_file}")
                 assert m
                 movie_id = int(m.group(1))
