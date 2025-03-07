@@ -24,7 +24,11 @@ RUN sudo chown -R media:media /app \
 
 COPY . .
 
-RUN sudo chown -R media:media /app \
- && pipenv run coverage  > /tmp/coveage.log
+RUN sudo chown -R media:media /app
+
+# At this point you can execute commands like
+# $ docker run media-bridge  pipenv run coverage
+# $ docker run media-bridge  pipenv run lint
+# $ docker run -p 8001:8001 media-bridge  pipenv run browse
 
 CMD ["/bin/bash", "-i"]
