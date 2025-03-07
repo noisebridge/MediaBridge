@@ -14,6 +14,13 @@ To install the project dependencies, first install pipenv globally with `pip ins
 
 To run code in the pipenv virtual environment, prefix your command with `pipenv run` (ex. `pipenv run python` runs the python interpreter in the pipenv environment).
 
+Once you have a new mediabridge environment set up, here are the first commands you should run:
+
+1. `pipenv run mb init` -- downloads 100 M ratings from the Netflix prize dataset
+2. `pipenv run mb load` -- fills several indexed sqlite tables with the ratings data
+
+You may find it convenient to work on the project in a linux docker [container](doc/container.md).
+
 ### Using the pipenv environment in VSCode
 
 To fix import errors and other Intellisense features, make sure you've let VSCode know about your pipenv environment. To do that:
