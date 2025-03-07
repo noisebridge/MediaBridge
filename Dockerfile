@@ -1,5 +1,5 @@
 # build with:   docker buildx build -t media-bridge .
-# run with:     docker run -it media-bridge
+# run with:     docker run -it -p 8001:8001 media-bridge
 
 FROM python:3.12-alpine
 
@@ -27,8 +27,10 @@ COPY . .
 RUN sudo chown -R media:media /app
 
 # At this point you can execute commands like
-# $ docker run media-bridge  pipenv run coverage
 # $ docker run media-bridge  pipenv run lint
+# $ docker run media-bridge  pipenv run mb init
+# $ docker run media-bridge  pipenv run mb load
+# $ docker run media-bridge  pipenv run coverage
 # $ docker run -p 8001:8001 media-bridge  pipenv run browse
 
 CMD ["/bin/bash", "-i"]
