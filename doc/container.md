@@ -66,4 +66,8 @@ real    4m51.340s
 user    4m15.926s
 sys     0m17.315s
 bin/build-container.sh  0.35s user 0.44s system 0% cpu 8:39.39 total
+INFO:     Started server process [52]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
 ```

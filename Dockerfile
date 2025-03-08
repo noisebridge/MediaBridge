@@ -25,12 +25,9 @@ COPY . .
 
 RUN sudo chown -R media:media /app
 
-# At this point you can execute commands like
-# $ docker run media-bridge  pipenv run lint
-# $ docker run media-bridge  pipenv run mb init
-# $ docker run media-bridge  pipenv run mb load
-# $ docker run media-bridge  pipenv run coverage
-# $ docker run -p 8001:8001 media-bridge  pipenv run browse
-# $ docker run -p 8001:8001 -it media-bridge  # gives an interactive bash prompt
+CMD ["bin/webserver-entrypoint.sh"]
 
-CMD ["pipenv", "run", "browse"]
+# Once the webserver is running, you can execute commands like
+# $ docker exec media-bridge  pipenv run lint
+# $ docker exec media-bridge  pipenv run coverage
+# $ docker exec -it media-bridge  bash  # gives an interactive shell prompt
