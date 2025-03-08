@@ -33,4 +33,4 @@ RUN sudo chown -R media:media /app
 # $ docker run -p 8001:8001 media-bridge  pipenv run browse
 # $ docker run -p 8001:8001 -it media-bridge  # gives an interactive bash prompt
 
-CMD ["/bin/bash", "-i"]
+CMD ["pipenv", "run", "browse"]

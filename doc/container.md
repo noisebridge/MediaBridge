@@ -48,7 +48,6 @@ View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux
 
 
 + docker rm -f media-bridge
-Error response from daemon: No such container: media-bridge
 + docker run --name media-bridge -t media-bridge-image bash -c '
     time pipenv run mb init &&
     time pipenv run mb load
