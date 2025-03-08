@@ -1,5 +1,4 @@
-# build with:   docker buildx build -t media-bridge .
-# run with:     docker run -it -p 8001:8001 media-bridge
+# build with:  bin/build-container.sh
 
 FROM python:3.12-alpine
 
@@ -32,5 +31,6 @@ RUN sudo chown -R media:media /app
 # $ docker run media-bridge  pipenv run mb load
 # $ docker run media-bridge  pipenv run coverage
 # $ docker run -p 8001:8001 media-bridge  pipenv run browse
+# $ docker run -p 8001:8001 -it media-bridge  # gives an interactive bash prompt
 
 CMD ["/bin/bash", "-i"]

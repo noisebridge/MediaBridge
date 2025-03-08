@@ -13,11 +13,12 @@ explains how to obtain and run the Docker Desktop app.
 You will want to see it running in your task bar
 when you're working with containers.
 
-To build an image from a cloned repo, cd to top-level MediaBridge and run
+To build a container from a cloned repo, cd to top-level MediaBridge and run
 ```
-bin/build-image.sh
+bin/build-container.sh
 ```
-This should complete within ~ twenty minutes.
+This should complete within ~ ten minutes.
+Longer if downloaded files are not yet cached.
 
 Please refer to comments in the
 [Dockerfile](https://github.com/noisebridge/MediaBridge/blob/main/Dockerfile)
