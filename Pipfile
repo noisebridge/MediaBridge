@@ -34,7 +34,7 @@ types-tqdm = "~=4.67"
 python_version = "3.12"
 
 [scripts]
-browse = "pipenv run datasette serve out/movies.sqlite"
+browse = "pipenv run datasette serve --host 0.0.0.0 out/movies.sqlite"
 coverage = "pipenv run bin/coverage.sh"
 lint = "pipenv run bin/lint.sh"
 mb = "pipenv run python -m mediabridge.main"
