@@ -1,5 +1,4 @@
-# build with:   docker buildx build -t media-bridge .
-# run with:     docker run -it media-bridge
+# build with:  bin/build-container.sh
 
 FROM python:3.12-alpine
 
@@ -24,7 +23,11 @@ RUN sudo chown -R media:media /app \
 
 COPY . .
 
-RUN sudo chown -R media:media /app \
- && pipenv run coverage  > /tmp/coveage.log
+RUN sudo chown -R media:media /app
 
-CMD ["/bin/bash", "-i"]
+CMD ["bin/webserver-entrypoint.sh"]
+
+# Once the webserver is running, you can execute commands like
+# $ docker exec media-bridge  pipenv run lint
+# $ docker exec media-bridge  pipenv run coverage
+# $ docker exec -it media-bridge  bash  # gives an interactive shell prompt
