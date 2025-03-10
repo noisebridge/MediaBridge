@@ -25,7 +25,7 @@ Please refer to comments in the
 for ways to use the resulting image.
 For example you can get a bash prompt using
 ```
-docker run -it -p 8001:8001 media-bridge
+docker exec -it media-bridge  bash
 ```
 
 ----

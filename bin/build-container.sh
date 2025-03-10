@@ -3,7 +3,7 @@
 set -x
 
 # approximate elapsed times are
-# buildx: 5 minutes (longer for initial downloads + caching)
+# buildx: < 1 minute (longer for initial downloads + caching)
 # mb init: 4 minutes
 # mb load: 5 minutes
 
