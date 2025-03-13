@@ -92,7 +92,7 @@ def _etl_user_rating(max_reviews: int) -> None:
                 df = pd.DataFrame(_read_ratings(mv_ratings_file, movie_id))
                 assert not df.empty
                 df["movie_id"] = movie_id
-                df.to_csv(fout, index=False, header=is_initial)
+                df.to_csv(fout, index=False, header=False)
                 is_initial = False
 
     query = "SELECT *  FROM rating  LIMIT 1"
