@@ -79,7 +79,6 @@ def _etl_user_rating(max_reviews: int) -> None:
     """Writes out/rating.csv if needed, then populates rating table from it."""
     training_folder = NETFLIX_DATA_DIR / "training_set/training_set"
     path_re = re.compile(r"/mv_(\d{7}).txt$")
-    is_initial = True
     if not RATING_CSV.exists():
         # Transform to "tidy" data, per Hadley Wickham, with a uniform "movie_id" column.
         in_files = sorted(training_folder.glob(GLOB))  # e.g. mv_0017770.txt
@@ -93,7 +92,6 @@ def _etl_user_rating(max_reviews: int) -> None:
                 assert not df.empty
                 df["movie_id"] = movie_id
                 df.to_csv(fout, index=False, header=False)
-                is_initial = False
 
     query = "SELECT *  FROM rating  LIMIT 1"
     if pd.read_sql_query(query, get_engine()).empty:
