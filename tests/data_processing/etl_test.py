@@ -6,7 +6,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 
 from mediabridge.data_processing.etl import run_sqlite_child
-from mediabridge.db.tables import get_engine
+from mediabridge.db.tables import create_tables, get_engine
 
 
 class EtlTest(unittest.TestCase):
@@ -15,6 +15,7 @@ class EtlTest(unittest.TestCase):
         df = pd.DataFrame([{"num": 123, "alpha": "abc"}])
         csv = Path("/tmp/foo.csv")
         df.to_csv(csv, index=False)
+        create_tables()
         run_sqlite_child(
             [
                 "DROP TABLE  IF EXISTS  foo;",
