@@ -48,3 +48,15 @@ class EtlTest(unittest.TestCase):
                 list(sess.query(Foo).all()),
             )
         csv.unlink()
+
+        # https://sqlite.org/cli.html
+        # 7.5. Importing files as CSV or other formats
+        # When .import is run, its treatment of the first input row depends upon
+        # whether the target table already exists. If it does not exist, the table
+        # is automatically created and the content of the first input row is used
+        # to set the name of all the columns in the table. In this case, the table
+        # data content is taken from the second and subsequent input rows. If the
+        # target table already exists, every row of the input, including the
+        # first, is taken to be actual data content. If the input file contains an
+        # initial row of column labels, you can make the .import command skip that
+        # initial row using the "--skip 1" option.
