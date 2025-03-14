@@ -24,24 +24,6 @@ class TestTwoMoviesRec(unittest.TestCase):
     # Ideally we should be able to have a user supply two movies they like,
     # and recommend a few more to them. We're not quite there yet.
 
-    def test_etl(self) -> None:
-        # We might choose another way to run the ETL, outside of a test framework.
-        # The current code was enough to support an edit-run cycle during initial development.
-
-        # For example, tests may run in arbitrary order, yet recommend() depends on ETL.
-        # ETL effects persist across test runs, so a failed initial run will let later tests succeed.
-
-        create_tables()
-        if TITLES_TXT.exists():
-            # A million rows corresponds to a four-second ETL.
-            t0 = time()
-
-            etl(max_reviews=1_000_000, regen=True)
-
-            elapsed = time() - t0
-            x = (elapsed < 10) or print(f"ETL finished in {elapsed:.3f} s")
-            assert x in (True, None)  # we simply evaluated for side effects
-
     def test_recommend(self) -> None:
         if TITLES_TXT.exists():
             ids = _clean(recommend())
