@@ -155,7 +155,6 @@ def run_sqlite_child(cmds: list[str]) -> None:
         ["sqlite3", DB_FILE],
         text=True,
         stdin=PIPE,
-        stdout=PIPE,
     ) as proc:
         assert isinstance(proc.stdin, io.TextIOWrapper)
         for cmd in cmds:
