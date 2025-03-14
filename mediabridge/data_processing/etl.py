@@ -140,7 +140,7 @@ def _validate_rating_table() -> None:
     with Session(get_engine()) as sess:
         # We expect strictly numeric data here, not a column heading text label.
         q = sess.query(Rating).filter(Rating.user_id == "user_id")
-        assert 0 == len(list(q.all()))
+        assert 0 == len(list(q.all())), "Rating table contained header row"
 
 
 def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:
