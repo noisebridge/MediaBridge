@@ -102,21 +102,14 @@ def _etl_user_rating(max_reviews: int) -> None:
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
     """Populates rating table from CSV, if needed."""
-    create_rating_csv = """
-        CREATE TABLE rating_csv (
-            user_id   INTEGER  NOT NULL,
-            rating    INTEGER  NOT NULL,
-            movie_id  TEXT     NOT NULL)
-    """
+
     ins = "INSERT INTO rating  SELECT user_id, movie_id, rating  FROM rating_csv  ORDER BY 1, 2, 3"
     with get_engine().connect() as conn:
         print(f"\n{max_rows:_}", end="", flush=True)
         t0 = time()
-        conn.execute(text("DROP TABLE  IF EXISTS  rating_csv"))
-        conn.execute(text(create_rating_csv))
-        conn.commit()
         run_sqlite_child(
             [
+                "DROP TABLE  IF EXISTS  rating_csv;",
                 ".mode csv",
                 ".headers on",
                 f".import {_get_input_csv(max_rows)} rating_csv",
