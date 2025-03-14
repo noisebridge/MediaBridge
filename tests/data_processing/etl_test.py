@@ -3,12 +3,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from mediabridge.data_processing.etl import _run_sqlite_child
+from mediabridge.data_processing.etl import run_sqlite_child
 
 
 class EtlTest(unittest.TestCase):
     def test_run_sqlite_child(self) -> None:
-        _run_sqlite_child(
+        run_sqlite_child(
             [
                 "DROP TABLE  IF EXISTS  temp_table;",
                 "CREATE TABLE temp_table AS SELECT 123 AS num, 'abc' AS alpha;",
@@ -20,7 +20,7 @@ class EtlTest(unittest.TestCase):
         foo = pd.DataFrame([{"num": 123, "alpha": "abc"}])
         csv = Path("/tmp/foo.csv")
         foo.to_csv(csv, index=False)
-        _run_sqlite_child(
+        run_sqlite_child(
             [
                 "DROP TABLE  IF EXISTS  foo;",
                 ".mode csv",

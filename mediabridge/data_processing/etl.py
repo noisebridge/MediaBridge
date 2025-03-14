@@ -115,7 +115,7 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
         conn.execute(text("DROP TABLE  IF EXISTS  rating_csv"))
         conn.execute(text(create_rating_csv))
         conn.commit()
-        _run_sqlite_child(
+        run_sqlite_child(
             [
                 ".mode csv",
                 ".headers on",
@@ -150,7 +150,7 @@ def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:
     return Path(csv)
 
 
-def _run_sqlite_child(cmds: list[str]) -> None:
+def run_sqlite_child(cmds: list[str]) -> None:
     with Popen(
         ["sqlite3", DB_FILE],
         text=True,
