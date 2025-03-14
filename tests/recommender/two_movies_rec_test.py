@@ -1,8 +1,5 @@
 import unittest
-from time import time
 
-from mediabridge.data_processing.etl import etl
-from mediabridge.db.tables import create_tables
 from mediabridge.definitions import TITLES_TXT
 from mediabridge.recommender.make_recommendation import get_title, recommend
 
