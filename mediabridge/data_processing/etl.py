@@ -7,6 +7,7 @@ from subprocess import PIPE, Popen
 from time import time
 
 import pandas as pd
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from tqdm import tqdm
 
@@ -15,6 +16,7 @@ from mediabridge.db.tables import (
     DB_FILE,
     POPULAR_MOVIE_QUERY,
     PROLIFIC_USER_QUERY,
+    Rating,
     create_tables,
     get_engine,
 )
@@ -121,6 +123,7 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
         conn.execute(text("DROP TABLE rating_csv"))
         conn.commit()
         conn.execute(text("VACUUM"))
+        _validate_rating_table()
         print(f"written in {time() - t0:.3f} s")
 
         _gen_reporting_tables()
@@ -130,6 +133,14 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
         #
         # 101_000_000 rating rows written in 225.923 s (four minutes)
         # ETL finished in 468.062 s (eight minutes)
+
+
+def _validate_rating_table() -> None:
+    """Verifies that the code defect of Issue 110 never crops up again."""
+    with Session(get_engine()) as sess:
+        # We expect strictly numeric data here, not a column heading text label.
+        q = sess.query(Rating).filter(Rating.user_id == "user_id")
+        assert 0 == len(list(q.all()))
 
 
 def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:
