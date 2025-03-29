@@ -7,6 +7,7 @@ from subprocess import PIPE, Popen
 from time import time
 
 import pandas as pd
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from tqdm import tqdm
 
@@ -15,6 +16,7 @@ from mediabridge.db.tables import (
     DB_FILE,
     POPULAR_MOVIE_QUERY,
     PROLIFIC_USER_QUERY,
+    Rating,
     create_tables,
     get_engine,
 )
@@ -102,21 +104,14 @@ def _etl_user_rating(max_reviews: int) -> None:
 
 def _insert_ratings(csv: Path, max_rows: int) -> None:
     """Populates rating table from CSV, if needed."""
-    create_rating_csv = """
-        CREATE TABLE rating_csv (
-            user_id   INTEGER  NOT NULL,
-            rating    INTEGER  NOT NULL,
-            movie_id  TEXT     NOT NULL)
-    """
+
     ins = "INSERT INTO rating  SELECT user_id, movie_id, rating  FROM rating_csv  ORDER BY 1, 2, 3"
     with get_engine().connect() as conn:
         print(f"\n{max_rows:_}", end="", flush=True)
         t0 = time()
-        conn.execute(text("DROP TABLE  IF EXISTS  rating_csv"))
-        conn.execute(text(create_rating_csv))
-        conn.commit()
-        _run_sqlite_child(
+        run_sqlite_child(
             [
+                "DROP TABLE  IF EXISTS  rating_csv;",
                 ".mode csv",
                 ".headers on",
                 f".import {_get_input_csv(max_rows)} rating_csv",
@@ -128,6 +123,7 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
         conn.execute(text("DROP TABLE rating_csv"))
         conn.commit()
         conn.execute(text("VACUUM"))
+        _validate_rating_table()
         print(f"written in {time() - t0:.3f} s")
 
         _gen_reporting_tables()
@@ -137,6 +133,14 @@ def _insert_ratings(csv: Path, max_rows: int) -> None:
         #
         # 101_000_000 rating rows written in 225.923 s (four minutes)
         # ETL finished in 468.062 s (eight minutes)
+
+
+def _validate_rating_table() -> None:
+    """Verifies that the code defect of Issue 110 never crops up again."""
+    with Session(get_engine()) as sess:
+        # We expect strictly numeric data here, not a column heading text label.
+        q = sess.query(Rating).filter(Rating.user_id == "user_id")
+        assert 0 == len(list(q.all())), "Rating table contained header row"
 
 
 def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:
@@ -150,12 +154,11 @@ def _get_input_csv(max_rows: int, all_rows: int = 100_480_507) -> Path:
     return Path(csv)
 
 
-def _run_sqlite_child(cmds: list[str]) -> None:
+def run_sqlite_child(cmds: list[str]) -> None:
     with Popen(
         ["sqlite3", DB_FILE],
         text=True,
         stdin=PIPE,
-        stdout=PIPE,
     ) as proc:
         assert isinstance(proc.stdin, io.TextIOWrapper)
         for cmd in cmds:
