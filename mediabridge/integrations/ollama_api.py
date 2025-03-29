@@ -1,43 +1,24 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-"""
-run main with:
-PYTHONPATH=$(pwd) pipenv run python mediabridge/integrations/ollama_api.py
-"""
-
-AUTH = HTTPBasicAuth("ollamauser", "INPUT_PASSWORD_HERE")
+AUTH = HTTPBasicAuth("ollamauser", "INSERT_PASSWORD_HERE")
+api_base_url = "https://ollama.tomato-pepper.uk/api"
 
 
-def get_headers() -> dict:
+def _get_headers() -> dict[str, str]:
     """Generates the headers required for making HTTP requests to the Ollama API"""
     return {"Content-Type": "application/json"}
 
 
-def generate_prompt_response(model: str, prompt: str, url: str) -> str:
+def generate_prompt_response(
+    model: str = "llama3",
+    prompt: str = "",
+    url: str = f"{api_base_url}/generate",
+) -> str:
     """Sends a prompt to the Ollama API and returns the response as plain text"""
     payload = {"model": model, "prompt": prompt, "stream": False}
-    response = requests.post(url, headers=get_headers(), auth=AUTH, json=payload)
+    headers = _get_headers()
+    response = requests.post(url, json=payload, headers=headers, auth=AUTH)
     response.raise_for_status()
     response_json = response.json()
-    return response_json.get("response", "")
-
-
-if __name__ == "__main__":
-    api_base_url = "https://ollama.tomato-pepper.uk/api"
-
-    tags_url = f"{api_base_url}/tags"
-    response = requests.get(tags_url, headers=get_headers(), auth=AUTH)
-    models_data = response.json().get("models", [])
-
-    print("Available models:")
-    for model in models_data:
-        print("-", model["name"])
-
-    model_name = "llama3:latest"
-    input_prompt = "please say only the word 'Hello'"
-
-    output_text = generate_prompt_response(
-        model_name, input_prompt, f"{api_base_url}/generate"
-    )
-    print("Model response:", output_text)
+    return response_json["response"]
