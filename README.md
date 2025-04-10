@@ -10,7 +10,9 @@ Currently, we are only accepting contributions from members of the project who m
 
 This code uses Python 3. It is tested on Python 3.12, but will probably work on versions back to 3.10.
 
-To install the project dependencies, first install pipenv globally with `pip install pipenv`. Then create a virtual env/install dependencies with `pipenv install --dev`.
+To install the project Python dependencies, first install pipenv globally with `pip install pipenv`. Then create a virtual env/install dependencies with `pipenv install --dev`.
+
+To install the frontend dependencies, cd into `mediabridge-frontend` and run `npm install`.
 
 To run code in the pipenv virtual environment, prefix your command with `pipenv run` (ex. `pipenv run python` runs the python interpreter in the pipenv environment).
 
@@ -50,7 +52,7 @@ This is currently just an alias to run the main script using `pipenv run python 
 Change directory into `mediabridge-frontend` and run:
 
 ```bash
-yarn dev
+npm run dev
 ```
 
 ## Testing
