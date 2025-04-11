@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from mediabridge.definitions import PROJECT_DIR
 from mediabridge.integrations.ollama_api import generate_prompt_response
 
