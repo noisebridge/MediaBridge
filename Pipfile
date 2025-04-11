@@ -18,6 +18,7 @@ scipy = "~=1.14"
 sqlalchemy = "~=2.0"
 tqdm = "~=4.66"
 typer = "~=0.12"
+scikit-learn = "*"
 
 [dev-packages]
 mypy = "~=1.14"
@@ -38,7 +39,6 @@ browse = "pipenv run datasette serve --host 0.0.0.0 out/movies.sqlite"
 coverage = "pipenv run bin/coverage.sh"
 lint = "pipenv run bin/lint.sh"
 mb = "pipenv run python -m mediabridge.main"
-
 # These two do the same thing. Some folks prefer the unittest runner. For example,
 # it works better with "tqdm" and with "print" debugging, and offers nicer traces.
 test = "pipenv run python -m pytest"
