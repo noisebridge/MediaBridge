@@ -52,21 +52,22 @@ def etl(max_reviews: int, *, regen: bool = False) -> None:
     create_tables()
 
     log.info("Loading movie info into db...")
-    _etl_movie_title()
+    etl_movie_title()
     _etl_user_rating(max_reviews)
 
 
 # no cover: begin
 
 
-def _etl_movie_title() -> None:
+def etl_movie_title() -> bool:
+    """Returns whether or not loading took place (False if already loaded)."""
     query = "SELECT *  FROM movie_title  LIMIT 1"
-    # if there is already data in movie_title, skip reprocessing
+    # If there is already data in movie_title, skip reprocessing
     if not pd.read_sql_query(query, get_engine()).empty:
         log.warning(
             "movie_title table already populated with data, skipping reprocessing..."
         )
-        return
+        return False
 
     columns = ["id", "year", "title"]
     df = pd.DataFrame(read_netflix_txt(TITLES_TXT), columns=columns)
@@ -75,6 +76,7 @@ def _etl_movie_title() -> None:
 
     with get_engine().connect() as conn:
         df.to_sql("movie_title", conn, index=False, if_exists="append")
+    return True
 
 
 def _etl_user_rating(max_reviews: int) -> None:

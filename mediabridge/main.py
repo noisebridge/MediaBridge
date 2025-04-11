@@ -6,6 +6,8 @@ import typer as typer
 
 from mediabridge.data_download import clean_all, download_netflix_dataset
 from mediabridge.data_processing import etl, wiki_to_netflix
+from mediabridge.data_processing.etl import etl_movie_title
+from mediabridge.db.load import load_from_sql
 from mediabridge.db.tables import create_tables
 from mediabridge.definitions import (
     LOGGING_DIR,
@@ -91,6 +93,18 @@ def load(max_reviews: int = 101_000_000, regen: bool = False) -> None:
             print("\nAborting process.")
             return
     etl.etl(max_reviews=max_reviews, regen=regen)
+
+
+@app.command()
+def load_mongo(regen: bool = False) -> None:
+    """Load data from SQLite into MongoDB"""
+    if regen:
+        prompt = "\n! Are you sure you want to delete all MongoDB data in the movies collection? y/n !\n"
+        if input(prompt) != "y":
+            print("\nAborting process.")
+            return
+    etl_movie_title()
+    load_from_sql(regen=regen)
 
 
 if __name__ == "__main__":
