@@ -1,7 +1,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 
-AUTH = HTTPBasicAuth("ollamauser", "INSERT_PASSWORD_HERE")
+AUTH = HTTPBasicAuth("ollamauser", "xray")
 api_base_url = "https://ollama.tomato-pepper.uk/api"
 
 
