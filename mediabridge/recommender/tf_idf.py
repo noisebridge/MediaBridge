@@ -1,114 +1,81 @@
-import sqlite3
+import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Database setup
-DB_FILE = "movies.db"
+from mediabridge.definitions import DATA_DIR
+
+""" Run file with: PYTHONPATH=$(pwd) python mediabridge/recommender/tf_idf.py """
 
 
-def create_database():
-    """Create the SQLite database and movies table if they don't exist."""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
+def recommend_multiple_items(
+    titles, data, similarity_matrix, top_k=5, alpha=0.5, beta=0.7, gamma=2.0
+):
+    """
+    Recommend movies based on multiple input titles.
 
-    # Create the movies table
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS movies (
-            movie_id INTEGER PRIMARY KEY,
-            title TEXT NOT NULL,
-            genres TEXT NOT NULL,
-            description TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()
+    Parameters:
+    - titles: list of input movie titles
+    - data: DataFrame containing all movie data
+    - similarity_matrix: 2D numpy array of pairwise similarities
+    - top_k: number of recommendations to return
+    - alpha (float): Weight applied to the minimum similarity score across input titles.
+        Higher alpha encourages recommendations that are consistently similar to all input titles,
+        helping to avoid items that only relate to a single input.
+    - beta (float): Weight applied to the maximum similarity score across input titles.
+        This acts as a penalty for recommendations that are only strongly similar to one input title.
+        Higher beta discourages one-sided matches.
+    - gamma (float): Weight applied to the standard deviation of similarity scores across input titles.
+        A higher gamma penalizes candidates with uneven similarity — i.e., very similar to one input and
+        dissimilar to others. This promotes more balanced, blended recommendations.
+    """
 
-
-def insert_movies(data):
-    """Insert movie data into the database."""
-    conn = sqlite3.connect(DB_FILE)
-    cursor = conn.cursor()
-
-    # Insert data into the movies table
-    cursor.executemany(
-        """
-        INSERT INTO movies (movie_id, title, genres, description)
-        VALUES (?, ?, ?, ?)
-    """,
-        data,
-    )
-    conn.commit()
-    conn.close()
-
-
-def fetch_movies():
-    """Fetch all movies from the database as a DataFrame."""
-    conn = sqlite3.connect(DB_FILE)
-    df = pd.read_sql_query("SELECT * FROM movies", conn)
-    conn.close()
-    return df
-
-
-def compute_similarity_matrix(data):
-    """Compute the TF-IDF similarity matrix for movie descriptions."""
-    vectorizer = TfidfVectorizer(stop_words="english")
-    tfidf_matrix = vectorizer.fit_transform(data["description"])
-    similarity_matrix = cosine_similarity(tfidf_matrix)
-    return similarity_matrix
-
-
-def recommend_multiple_items(titles, data, similarity_matrix, top_k=3):
-    """Recommend movies based on input titles."""
     # Find indices for all input movies
     indices = [data[data["title"] == title].index[0] for title in titles]
 
-    # Compute the mean similarity scores across the selected movies
-    aggregated_scores = np.mean(similarity_matrix[indices, :], axis=0)
+    # Compute similarity scores for all inputs
+    similarity_scores = similarity_matrix[indices, :]  # shape: (num_inputs, num_movies)
 
-    # Rank items by aggregated similarity scores, excluding input movies
-    similar_items = aggregated_scores.argsort()[::-1]
-    similar_items = [i for i in similar_items if i not in indices]
+    # Compute mean, min, and max similarity per candidate
+    mean_sim = np.mean(similarity_scores, axis=0)
+    min_sim = np.min(similarity_scores, axis=0)
+    max_sim = np.max(similarity_scores, axis=0)
 
-    # Return top-k recommendations
-    recommendations = data.iloc[similar_items[:top_k]]
-    return recommendations[["title", "genres", "description"]]
+    # Hybrid score: prioritize candidates with decent similarity to *all* inputs
+    std_sim = np.std(similarity_scores, axis=0)
+    scores = mean_sim + (alpha * min_sim) - (beta * max_sim) - (gamma * std_sim)
+
+    # Exclude input titles from results
+    scores[indices] = -1  # Or any low number to push them to bottom
+
+    # Get top-k recommendation indices
+    top_indices = np.argsort(scores)[::-1][:top_k]
+    recommendations = data.iloc[top_indices]
+
+    # Format corrections
+    recommendations["year"] = recommendations["year"].astype("Int64")
+    recommendations["description"] = recommendations["description"].apply(
+        lambda d: d[:75] + "..." if isinstance(d, str) and len(d) > 75 else d
+    )
+    return recommendations[["title", "year", "description"]]
 
 
-# Main script
-if __name__ == "__main__":
-    # Create the database and table
-    create_database()
+def transform(data):
+    """Expects a pandas Dataframe with a 'description' column. Returns a TF-IDF matrix and the cosine similarity matrix."""
+    vectorizer = TfidfVectorizer(stop_words="english")
+    tfidf_matrix = vectorizer.fit_transform(data["description"])
+    return cosine_similarity(tfidf_matrix)
 
-    # Fetch movies from the database
-    data = fetch_movies()
 
-    # Compute the similarity matrix
-    similarity_matrix = compute_similarity_matrix(data)
+def createDataframe():
+    """Function that generates a dataframe from movie_titles_plus Descriptions.jsonl"""
+    input_path = DATA_DIR / "movie_titles_plus_descriptions.jsonl"
 
-    # Prompt the user for recommendations
-    while True:
-        movie_names = input(
-            "Enter movie name(s) for recommendations separated by commas (or type 'exit' to quit): "
-        )
+    with open(input_path, "r", encoding="utf-8") as f:
+        data = [json.loads(line) for line in f]
 
-        if movie_names.lower() == "exit":
-            break
-
-        # Split input into individual movie titles and remove any extra spaces
-        titles = [name.strip() for name in movie_names.split(",")]
-
-        # Check if all movies exist in the dataset
-        missing_movies = [
-            title for title in titles if title not in data["title"].values
-        ]
-        if missing_movies:
-            print(
-                f"These movie(s) were not found: {', '.join(missing_movies)}. Please try again."
-            )
-        else:
-            print("\nRecommendations based on your input movies:")
-            recommendations = recommend_multiple_items(titles, data, similarity_matrix)
-            print(recommendations, "\n")
+    df = pd.DataFrame(data)
+    return df
