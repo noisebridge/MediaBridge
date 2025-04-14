@@ -8,8 +8,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from mediabridge.definitions import DATA_DIR
 
-""" Run file with: PYTHONPATH=$(pwd) python mediabridge/recommender/tf_idf.py """
-
 
 def recommend_multiple_items(
     titles, data, similarity_matrix, top_k=5, alpha=0.5, beta=0.7, gamma=2.0
