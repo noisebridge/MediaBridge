@@ -67,7 +67,7 @@ def transform(data):
     return cosine_similarity(tfidf_matrix)
 
 
-def createDataframe():
+def create_dataframe():
     """Function that generates a dataframe from movie_titles_plus Descriptions.jsonl"""
     input_path = DATA_DIR / "movie_titles_plus_descriptions.jsonl"
 

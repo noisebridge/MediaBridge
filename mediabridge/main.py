@@ -18,9 +18,10 @@ from mediabridge.definitions import (
     OUTPUT_DIR,
     PROJECT_DIR,
 )
+from mediabridge.integrations.ollama_api import generate_prompt_response
 from mediabridge.recommender import make_recommendation
 from mediabridge.recommender.tf_idf import (
-    createDataframe,
+    create_dataframe,
     recommend_multiple_items,
     transform,
 )
@@ -139,7 +140,7 @@ def tf_idf(
         df = pd.read_csv(df_path)
     else:
         typer.echo("Creating DataFrame from raw data...")
-        df = createDataframe()
+        df = create_dataframe()
         df.to_csv(df_path, index=False)
 
     if sim_matrix_path.exists():
@@ -166,6 +167,23 @@ def tf_idf(
 
     typer.echo(f"Recommendations for {movies} ")
     typer.echo(recommendations.to_string(index=False))
+
+
+@app.command()
+def chat(
+    prompt: str = typer.Argument(..., help="The prompt to send to the Ollama API."),
+    model: str = typer.Option(
+        "llama3", "--model", "-m", help="The model to use for generating the response."
+    ),
+) -> None:
+    """Chat with the Ollama API."""
+    typer.echo(f"Generating response to '{prompt}' using model '{model}'...")
+    try:
+        response = generate_prompt_response(model=model, prompt=prompt)
+        typer.echo("\nResponse:")
+        typer.echo(response)
+    except Exception as e:
+        typer.echo(f"Error: {e}", err=True)
 
 
 if __name__ == "__main__":

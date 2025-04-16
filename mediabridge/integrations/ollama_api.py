@@ -1,7 +1,16 @@
+import os
+
 import requests
+from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 
-AUTH = HTTPBasicAuth("ollamauser", "xray")
+load_dotenv()
+
+OLLAMA_PASSWORD = os.getenv("OLLAMA_PASSWORD")
+if not OLLAMA_PASSWORD:
+    raise ValueError("OLLAMA_PASSWORD is not set in the environment or .env file.")
+
+AUTH = HTTPBasicAuth("ollamauser", OLLAMA_PASSWORD)
 api_base_url = "https://ollama.tomato-pepper.uk/api"
 
 
