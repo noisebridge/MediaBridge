@@ -7,3 +7,4 @@ data/
 logs/
 myenv/
 out/
+.DS_Store
