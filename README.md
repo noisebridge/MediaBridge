@@ -21,7 +21,7 @@ Once you have a new mediabridge environment set up, here are the first commands 
 1. `pipenv run mb init` -- downloads 100 M ratings from the Netflix prize dataset
 2. `pipenv run mb load` -- fills several indexed sqlite tables with the ratings data
 
-To run Term Frequency - Inverse Term Frequency (TF-IDF) recommender:
+To run Term Frequency - Inverse Document Frequency (TF-IDF) recommender:
 
 `pipenv run mb load "MOVIE_NAME_1" ?"MOVIE_NAME_2"... ?--options`
 
