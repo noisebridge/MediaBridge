@@ -51,6 +51,9 @@ def etl(max_reviews: int, *, regen: bool = False) -> None:
 
     create_tables()
 
+    with get_engine().connect() as conn:
+        conn.execute(text("ALTER TABLE movie_title ADD COLUMN description TEXT"))
+
     log.info("Loading movie info into db...")
     etl_movie_title()
     _etl_user_rating(max_reviews)
@@ -71,6 +74,7 @@ def etl_movie_title() -> bool:
 
     columns = ["id", "year", "title"]
     df = pd.DataFrame(read_netflix_txt(TITLES_TXT), columns=columns)
+    df["description"] = df["description"].fillna("No description available")
     df["year"] = df.year.replace("NULL", pd.NA)
     df["year"] = df.year.astype("Int16")
 
