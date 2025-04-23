@@ -1,30 +1,16 @@
 import { useState } from "react";
-import "./App.css";
-
 import SelectMovies from "./pages/SelectMovies";
-import Recommendations from "./pages/Recommendations";
-
-const movies = [
-  {
-    id: "1",
-    title: "Movie 1",
-    year: 2003,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: "2",
-    title: "Movie 2",
-    year: 2004,
-    image: "https://via.placeholder.com/150",
-  },
-];
+import { Movie } from "./types/Movie.ts";
 
 function App() {
+  const [movies, setMovies] = useState<Movie[]>([]);
+
   return (
-    <>
-      <SelectMovies movies={movies} />
-    </>
+    <div className="min-h-screen w-full flex items-center justify-center">
+      <div className="mx-auto w-96 bg-gray-100 p-6 rounded-lg shadow-lg">
+        <SelectMovies movies={movies} setMovies={setMovies} />
+      </div>
+    </div>
   );
 }
-
 export default App;

@@ -2,10 +2,16 @@ import MovieList from "../components/MovieList";
 import MovieSearch from "../components/MovieSearch";
 import { Movie } from "../types/Movie.ts";
 
-const SelectMovies = ({ movies }: { movies: Movie[] }) => {
+const SelectMovies = ({
+  movies,
+  setMovies,
+}: {
+  movies: Movie[];
+  setMovies: React.Dispatch<React.SetStateAction<Movie[]>>;
+}) => {
   return (
-    <div className="flex flex-col justify-start h-screen">
-      <MovieSearch />
+    <div className="flex flex-col items-center space-y-6">
+      <MovieSearch setMovies={setMovies} />
       <MovieList movies={movies} />
     </div>
   );
