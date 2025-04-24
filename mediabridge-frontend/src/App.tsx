@@ -4,12 +4,13 @@ import { Movie } from "./types/Movie.ts";
 
 function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const removeMovie = (id: string) => {
+    setMovies((prev) => prev.filter((movie) => movie.id !== id));
+  };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center">
-      <div className="mx-auto w-96 bg-gray-100 p-6 rounded-lg shadow-lg">
-        <SelectMovies movies={movies} setMovies={setMovies} />
-      </div>
+    <div className="min-h-screen bg-white px-4 pt-8">
+      <SelectMovies movies={movies} setMovies={setMovies} removeMovie={removeMovie} />
     </div>
   );
 }

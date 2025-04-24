@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Movie } from "../types/Movie"; // adjust path if needed
+import { Movie } from "../types/Movie"; 
 
 type Props = {
   setMovies: React.Dispatch<React.SetStateAction<Movie[]>>;
@@ -27,7 +27,7 @@ const MovieSearch = ({ setMovies }: Props) => {
         id: crypto.randomUUID(),
         title,
         year: new Date().getFullYear(),
-        image: "https://via.placeholder.com/150",
+        image: `https://picsum.photos/seed/${crypto.randomUUID()}/200/300`,
       },
     ]);
 
@@ -41,7 +41,7 @@ const MovieSearch = ({ setMovies }: Props) => {
         <CardDescription>Add liked movies</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex w-full items-center space-x-2">
+        <div className="flex w-full items-center space-x-4">
           <Input
             type="text"
             placeholder="The Room"
