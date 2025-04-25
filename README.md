@@ -51,6 +51,17 @@ Be sure to specify options such as -v and -l *before* any subcommands and their 
 
 This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`, but this may change in the future, so using `pipenv run mb` will ensure the correct script is always run.
 
+#### API web server
+
+The API server powers the frontend, and connects it to the backend recommendation code. To run it, use pipenv:
+
+```bash
+pipenv run mb serve
+```
+
+You will have to leave the shell where you ran that command running and open. You can see requests that go to the API server in the same window. If you visit `http://localhost:5000`, you will see a hello world message.
+
+
 ### Frontend (React.js)
 
 Change directory into `mediabridge-frontend` and run:
