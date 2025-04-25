@@ -23,7 +23,7 @@ Once you have a new mediabridge environment set up, here are the first commands 
 
 To run Term Frequency - Inverse Document Frequency (TF-IDF) recommender:
 
-`pipenv run mb load "MOVIE_NAME_1" ?"MOVIE_NAME_2"... ?--options`
+`pipenv run mb tf-idf "MOVIE_NAME_1" ?"MOVIE_NAME_2"... ?--options`
 
 You may find it convenient to work on the project in a linux docker [container](doc/container.md).
 
