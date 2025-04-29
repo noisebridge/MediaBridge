@@ -18,6 +18,18 @@ type Props = {
   setMovies: React.Dispatch<React.SetStateAction<Movie[]>>;
 };
 
+const isMovieAlreadyAdded = (movies: Movie[], title: string) => {
+  return movies.some((movie) => movie.title.toLowerCase() === title.toLowerCase());
+};
+
+const showErrorToast = (title: string, description?: string) => {
+  toast({
+    title,
+    description,
+    variant: "destructive",
+  });
+};
+
 const MovieSearch = ({ setMovies }: Props) => {
   const [title, setTitle] = useState("");
 
@@ -25,31 +37,21 @@ const MovieSearch = ({ setMovies }: Props) => {
     if (!title.trim()) return;
   
     try {
-      const data = await searchMovies(title);
+      const data = await searchMovies(title); 
   
       const foundMovie = data.find(
         (movie: { title: string }) => movie.title.toLowerCase() === title.toLowerCase()
       );
   
       if (!foundMovie) {
-        toast({
-          title: "Movie not found in database",
-          variant: "destructive",
-        });
+        showErrorToast("Movie not found", "Please check your spelling.");
         return;
       }
   
       setMovies((prev) => {
-        const alreadyAdded = prev.some(
-          (movie) => movie.title.toLowerCase() === foundMovie.title.toLowerCase()
-        );
-  
-        if (alreadyAdded) {
-          toast({
-            title: "Movie already added",
-            variant: "destructive",
-          });
-          return prev; 
+        if (isMovieAlreadyAdded(prev, foundMovie.title)) {
+          showErrorToast("Movie already added");
+          return prev;
         }
   
         return [
@@ -63,17 +65,12 @@ const MovieSearch = ({ setMovies }: Props) => {
         ];
       });
   
-      setTitle("");
+      setTitle(""); 
     } catch (error) {
       console.error("Error searching for movie:", error);
-      toast({
-        title: "Failed to Search for movie",
-        description: "Database might be down",
-        variant: "destructive",
-      });
+      showErrorToast("Failed to search for movie", "Database might be down.");
     }
   };
-
   return (
     <Card className="w-full max-w-md flex flex-col items-center mb-4">
       <CardHeader>
