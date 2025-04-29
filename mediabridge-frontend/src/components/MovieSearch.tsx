@@ -10,6 +10,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Movie } from "../types/Movie"; 
+import { toast } from "@/hooks/use-toast";
+
+
+import axios from "axios"; 
 
 type Props = {
   setMovies: React.Dispatch<React.SetStateAction<Movie[]>>;
@@ -18,20 +22,60 @@ type Props = {
 const MovieSearch = ({ setMovies }: Props) => {
   const [title, setTitle] = useState("");
 
-  const handleAddMovie = () => {
+  const handleAddMovie = async () => {
     if (!title.trim()) return;
-
-    setMovies((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        title,
-        year: new Date().getFullYear(),
-        image: `https://picsum.photos/seed/${crypto.randomUUID()}/200/300`,
-      },
-    ]);
-
-    setTitle(""); 
+  
+    try {
+      const response = await axios.get("http://127.0.0.1:5000/api/v1/movie/search", {
+        params: { q: title },
+      });
+      const data = response.data;
+  
+      const foundMovie = data.find(
+        (movie: { title: string }) => movie.title.toLowerCase() === title.toLowerCase()
+      );
+  
+      if (!foundMovie) {
+        toast({
+          title: "Movie not found in database",
+          variant: "destructive",
+        });
+        return;
+      }
+  
+      setMovies((prev) => {
+        const alreadyAdded = prev.some(
+          (movie) => movie.title.toLowerCase() === foundMovie.title.toLowerCase()
+        );
+  
+        if (alreadyAdded) {
+          toast({
+            title: "Movie already added",
+            variant: "destructive",
+          });
+          return prev; 
+        }
+  
+        return [
+          ...prev,
+          {
+            id: foundMovie.id.toString(),
+            title: foundMovie.title,
+            year: foundMovie.year || new Date().getFullYear(),
+            image: `https://picsum.photos/seed/${foundMovie.id}/200/300`,
+          },
+        ];
+      });
+  
+      setTitle("");
+    } catch (error) {
+      console.error("Error searching for movie:", error);
+      toast({
+        title: "Failed to Search for movie",
+        description: "Database might be down",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -47,6 +91,12 @@ const MovieSearch = ({ setMovies }: Props) => {
             placeholder="The Room"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddMovie();
+              }
+            }}
           />
           <Button onClick={handleAddMovie}>Add Movie</Button>
         </div>

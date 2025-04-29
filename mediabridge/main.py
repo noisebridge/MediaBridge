@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import typer as typer
 
+from mediabridge.api import main as api_main
 from mediabridge.data_download import clean_all, download_file, download_netflix_dataset
 from mediabridge.data_processing import etl, wiki_to_netflix
 from mediabridge.data_processing.etl import etl_movie_title
@@ -29,6 +30,7 @@ from mediabridge.recommender.tf_idf import (
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 app.add_typer(wiki_to_netflix.app)
 app.add_typer(make_recommendation.app)
+app.add_typer(api_main.typer_app)
 
 
 @dataclass

@@ -23,7 +23,7 @@ Once you have a new mediabridge environment set up, here are the first commands 
 
 To run Term Frequency - Inverse Document Frequency (TF-IDF) recommender:
 
-`pipenv run mb load "MOVIE_NAME_1" ?"MOVIE_NAME_2"... ?--options`
+`pipenv run mb tf-idf "MOVIE_NAME_1" ?"MOVIE_NAME_2"... ?--options`
 
 You may find it convenient to work on the project in a linux docker [container](doc/container.md).
 
@@ -50,6 +50,17 @@ Be sure to specify options such as -v and -l *before* any subcommands and their 
 **NOTE:** *If you encounter a ModuleNotFoundError, make sure you are in the root directory of the project, as the `mediabridge` directory is the module Pipenv is trying to reference.*
 
 This is currently just an alias to run the main script using `pipenv run python -m mediabridge.main`, but this may change in the future, so using `pipenv run mb` will ensure the correct script is always run.
+
+#### API web server
+
+The API server powers the frontend, and connects it to the backend recommendation code. To run it, use pipenv:
+
+```bash
+pipenv run mb serve
+```
+
+You will have to leave the shell where you ran that command running and open. You can see requests that go to the API server in the same window. If you visit `http://localhost:5000`, you will see a hello world message.
+
 
 ### Frontend (React.js)
 

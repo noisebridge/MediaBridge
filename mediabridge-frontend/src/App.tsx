@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SelectMovies from "./pages/SelectMovies";
 import { Movie } from "./types/Movie.ts";
+import { Toaster } from "@/components/ui/toaster"; 
 
 function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -11,6 +12,7 @@ function App() {
   return (
     <div className="min-h-screen bg-white px-4 pt-8">
       <SelectMovies movies={movies} setMovies={setMovies} removeMovie={removeMovie} />
+      <Toaster />
     </div>
   );
 }
