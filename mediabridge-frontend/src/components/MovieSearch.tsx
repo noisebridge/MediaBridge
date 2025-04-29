@@ -59,7 +59,7 @@ const MovieSearch = ({ setMovies }: Props) => {
           {
             id: foundMovie.id.toString(),
             title: foundMovie.title,
-            year: foundMovie.year || new Date().getFullYear(),
+            year: foundMovie.year,
             image: `https://picsum.photos/seed/${foundMovie.id}/200/300`,
           },
         ];
@@ -73,7 +73,7 @@ const MovieSearch = ({ setMovies }: Props) => {
   };
   return (
     <Card className="w-full max-w-md flex flex-col items-center mb-4">
-      <CardHeader>
+      <CardHeader className="flex flex-col items-center text-center">
         <CardTitle>Mediabridge</CardTitle>
         <CardDescription>Add liked movies</CardDescription>
       </CardHeader>
