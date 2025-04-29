@@ -11,9 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Movie } from "../types/Movie"; 
 import { toast } from "@/hooks/use-toast";
+import { searchMovies } from "@/api/movie"; 
 
-
-import axios from "axios"; 
 
 type Props = {
   setMovies: React.Dispatch<React.SetStateAction<Movie[]>>;
@@ -26,10 +25,7 @@ const MovieSearch = ({ setMovies }: Props) => {
     if (!title.trim()) return;
   
     try {
-      const response = await axios.get("http://127.0.0.1:5000/api/v1/movie/search", {
-        params: { q: title },
-      });
-      const data = response.data;
+      const data = await searchMovies(title);
   
       const foundMovie = data.find(
         (movie: { title: string }) => movie.title.toLowerCase() === title.toLowerCase()
