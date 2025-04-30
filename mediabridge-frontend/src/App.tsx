@@ -1,19 +1,20 @@
-import { useState } from "react";
 import SelectMovies from "./pages/SelectMovies";
-import { Movie } from "./types/Movie.ts";
 import { Toaster } from "@/components/ui/toaster"; 
+import { useMovieList } from "@/hooks/useMovieList";
 
 function App() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const removeMovie = (id: string) => {
-    setMovies((prev) => prev.filter((movie) => movie.id !== id));
-  };
+  const { movies, addMovie, removeMovie } = useMovieList();
 
   return (
     <div className="min-h-screen bg-white px-4 pt-8">
-      <SelectMovies movies={movies} setMovies={setMovies} removeMovie={removeMovie} />
+      <SelectMovies
+        movies={movies}
+        addMovie={addMovie}
+        removeMovie={removeMovie}
+      />
       <Toaster />
     </div>
   );
 }
+
 export default App;

@@ -15,10 +15,11 @@ import { searchMovies } from "@/api/movie";
 
 
 type Props = {
-  setMovies: React.Dispatch<React.SetStateAction<Movie[]>>;
+  movies: Movie[];
+  addMovie: (movie: Movie) => void;
 };
 
-const isMovieAlreadyAdded = (movies: Movie[], title: string) => {
+const isMoviePresent = (movies: Movie[], title: string) => {
   return movies.some((movie) => movie.title.toLowerCase() === title.toLowerCase());
 };
 
@@ -30,7 +31,7 @@ const showErrorToast = (title: string, description?: string) => {
   });
 };
 
-const MovieSearch = ({ setMovies }: Props) => {
+const MovieSearch = ({ movies, addMovie }: Props) => {
   const [title, setTitle] = useState("");
 
   const handleAddMovie = async () => {
@@ -47,22 +48,17 @@ const MovieSearch = ({ setMovies }: Props) => {
         showErrorToast("Movie not found", "Please check your spelling.");
         return;
       }
+
+      if (isMoviePresent(movies, foundMovie.title)) {
+        showErrorToast("Movie already added");
+        return;
+      }
   
-      setMovies((prev) => {
-        if (isMovieAlreadyAdded(prev, foundMovie.title)) {
-          showErrorToast("Movie already added");
-          return prev;
-        }
-  
-        return [
-          ...prev,
-          {
-            id: foundMovie.id.toString(),
-            title: foundMovie.title,
-            year: foundMovie.year,
-            image: `https://picsum.photos/seed/${foundMovie.id}/200/300`,
-          },
-        ];
+      addMovie({
+        id: foundMovie.id.toString(),
+        title: foundMovie.title,
+        year: foundMovie.year,
+        image: `https://picsum.photos/seed/${foundMovie.id}/200/300`,
       });
   
       setTitle(""); 

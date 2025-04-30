@@ -10,6 +10,7 @@ typer_app = typer.Typer()
 
 def create_app():
     app = flask.Flask(__name__)
+    CORS(app)
 
     @app.route("/")
     def hello_world():
@@ -39,5 +40,4 @@ def serve(ctx: typer.Context, debug: bool = True):
     Serve the Flask app.
     """
     app = create_app()
-    CORS(app)
     app.run(debug=debug)

@@ -4,11 +4,11 @@ import { Movie } from "../types/Movie.ts";
 
 const SelectMovies = ({
   movies,
-  setMovies,
+  addMovie,
   removeMovie,
 }: {
   movies: Movie[];
-  setMovies: React.Dispatch<React.SetStateAction<Movie[]>>;
+  addMovie: (movie: Movie) => void;
   removeMovie: (id: string) => void;
 }) => {
   return (
@@ -16,7 +16,7 @@ const SelectMovies = ({
       {/* Top full-width section */}
       <div className="w-screen">
         <div className="max-w-screen-mx flex justify-center">
-          <MovieSearch setMovies={setMovies} />
+          <MovieSearch movies={movies} addMovie={addMovie} />
         </div>
       </div>
 

@@ -20,6 +20,7 @@ tqdm = "~=4.66"
 typer = "~=0.12"
 scikit-learn = "~=1.6.1"
 flask = "~=3.1.0"
+flask-cors = "~=4.0"
 
 [dev-packages]
 mypy = "~=1.14"
