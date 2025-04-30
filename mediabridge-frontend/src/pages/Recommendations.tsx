@@ -4,7 +4,7 @@ import { Movie } from "../types/Movie.ts";
 const Recommendations = ({ movies }: { movies: Movie[] }) => {
   return (
     <div>
-      <MovieList movies={movies} removeMovie={function (id: string): void {} } />
+      <MovieList movies={movies} removeMovie={() => {}} />
     </div>
   );
 };
