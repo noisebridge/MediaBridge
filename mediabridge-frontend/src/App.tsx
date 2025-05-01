@@ -1,29 +1,17 @@
-import { useState } from "react";
-import "./App.css";
-
 import SelectMovies from "./pages/SelectMovies";
-import Recommendations from "./pages/Recommendations";
-
-const movies = [
-  {
-    id: "1",
-    title: "Movie 1",
-    year: 2003,
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: "2",
-    title: "Movie 2",
-    year: 2004,
-    image: "https://via.placeholder.com/150",
-  },
-];
+import { useMovieList } from "@/hooks/useMovieList";
 
 function App() {
+  const { movies, addMovie, removeMovie } = useMovieList();
+
   return (
-    <>
-      <SelectMovies movies={movies} />
-    </>
+    <div className="min-h-screen bg-white px-4 pt-8">
+      <SelectMovies
+        movies={movies}
+        addMovie={addMovie}
+        removeMovie={removeMovie}
+      />
+    </div>
   );
 }
 

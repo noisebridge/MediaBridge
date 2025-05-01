@@ -1,5 +1,6 @@
 import flask
 import typer
+from flask_cors import CORS
 from sqlalchemy import text
 
 from mediabridge.db.tables import get_engine
@@ -9,6 +10,7 @@ typer_app = typer.Typer()
 
 def create_app():
     app = flask.Flask(__name__)
+    CORS(app)
 
     @app.route("/")
     def hello_world():
