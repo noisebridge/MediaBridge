@@ -1,5 +1,4 @@
 import SelectMovies from "./pages/SelectMovies";
-import { Toaster } from "@/components/ui/toaster"; 
 import { useMovieList } from "@/hooks/useMovieList";
 
 function App() {
@@ -12,7 +11,6 @@ function App() {
         addMovie={addMovie}
         removeMovie={removeMovie}
       />
-      <Toaster />
     </div>
   );
 }

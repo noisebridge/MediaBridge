@@ -10,7 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Movie } from "../types/Movie"; 
-import { toast } from "@/hooks/use-toast";
 import { searchMovies } from "@/api/movie"; 
 
 
@@ -23,16 +22,9 @@ const isMoviePresent = (movies: Movie[], title: string) => {
   return movies.some((movie) => movie.title.toLowerCase() === title.toLowerCase());
 };
 
-const showErrorToast = (title: string, description?: string) => {
-  toast({
-    title,
-    description,
-    variant: "destructive",
-  });
-};
-
 const MovieSearch = ({ movies, addMovie }: Props) => {
   const [title, setTitle] = useState("");
+  const [warning, setWarning] = useState("");
 
   const handleAddMovie = async () => {
     if (!title.trim()) return;
@@ -45,12 +37,12 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
       );
   
       if (!foundMovie) {
-        showErrorToast("Movie not found", "Please check your spelling.");
+        setWarning(`‘${title}’ not found. Please check your spelling.`);
         return;
       }
 
       if (isMoviePresent(movies, foundMovie.title)) {
-        showErrorToast("Movie already added");
+        setWarning(`‘${title}’ already added.`);
         return;
       }
   
@@ -60,15 +52,15 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
         year: foundMovie.year,
         image: `https://picsum.photos/seed/${foundMovie.id}/200/300`,
       });
-  
+      setWarning("");
       setTitle(""); 
     } catch (error) {
+      setWarning(`failed to search for movie: database might be down`);
       console.error("Error searching for movie:", error);
-      showErrorToast("Failed to search for movie", "Database might be down.");
     }
   };
   return (
-    <Card className="w-full max-w-md flex flex-col items-center mb-4">
+    <Card className="w-full max-w-md flex flex-col items-center">
       <CardHeader className="flex flex-col items-center text-center">
         <CardTitle>Mediabridge</CardTitle>
         <CardDescription>Add liked movies</CardDescription>
@@ -89,6 +81,15 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
           />
           <Button onClick={handleAddMovie}>Add Movie</Button>
         </div>
+        <div
+        className={`mt-4 bg-red-500 text-white px-4 py-2 rounded-md text-sm text-center transition-opacity ${
+          warning ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
+        }`}
+        role="alert"
+        aria-live="polite"
+      >
+        {warning}
+      </div>
       </CardContent>
       <CardFooter>
         <Button type="submit">Get Recommendations</Button>
