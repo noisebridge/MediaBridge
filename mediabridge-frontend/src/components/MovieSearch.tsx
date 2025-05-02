@@ -84,8 +84,7 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
         >
           {warning}
         </div>
-      </CardContent>`
-
+      </CardContent>
       <CardFooter>
         <Button type="submit">Get Recommendations</Button>
       </CardFooter>
