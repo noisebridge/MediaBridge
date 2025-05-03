@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import SearchBar  from "@/components/ui/searchbar";
 import { Movie } from "../types/Movie"; 
 import { searchMovies } from "@/api/movie"; 
 
@@ -25,6 +25,8 @@ const isMoviePresent = (movies: Movie[], title: string) => {
 const MovieSearch = ({ movies, addMovie }: Props) => {
   const [title, setTitle] = useState("");
   const [warning, setWarning] = useState("");
+  const [suggestions, setSuggestions] = useState<Movie[]>([]);
+
 
   const handleAddMovie = async () => {
     if (!title.trim()) return;
@@ -65,31 +67,23 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
         <CardTitle>Mediabridge</CardTitle>
         <CardDescription>Add liked movies</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex w-full items-center space-x-4">
-          <Input
-            type="text"
-            placeholder="The Room"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddMovie();
-              }
-            }}
-          />
-          <Button onClick={handleAddMovie}>Add Movie</Button>
-        </div>
+`      <CardContent className="w-full">
+        <SearchBar
+          title={title}
+          setTitle={setTitle}
+          handleAddMovie={handleAddMovie}
+          setSuggestions={setSuggestions}
+          suggestions={suggestions}
+        />
         <div
-        className={`mt-4 bg-red-500 text-white px-4 py-2 rounded-md text-sm text-center transition-opacity ${
-          warning ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
-        }`}
-        role="alert"
-        aria-live="polite"
-      >
-        {warning}
-      </div>
+          className={`mt-4 bg-red-500 text-white px-4 py-2 rounded-md text-sm text-center transition-opacity ${
+            warning ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
+          }`}
+          role="alert"
+          aria-live="polite"
+        >
+          {warning}
+        </div>
       </CardContent>
       <CardFooter>
         <Button type="submit">Get Recommendations</Button>
