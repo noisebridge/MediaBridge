@@ -25,7 +25,9 @@ def create_app():
         with get_engine().connect() as conn:
             pattern = f"%{query}%"
             movies = conn.execute(
-                text("SELECT * FROM movie_title WHERE title LIKE :pattern LIMIT 10"),
+                text(
+                    "SELECT * FROM movie_title WHERE LOWER(title) LIKE LOWER(:pattern) LIMIT 10"
+                ),
                 {"pattern": pattern},
             ).fetchall()
             movies_list = [row._asdict() for row in movies]
