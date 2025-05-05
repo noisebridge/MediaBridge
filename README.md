@@ -18,8 +18,9 @@ To run code in the pipenv virtual environment, prefix your command with `pipenv 
 
 Once you have a new mediabridge environment set up, here are the first commands you should run:
 
-1. `pipenv run mb init` -- downloads 100 M ratings from the Netflix prize dataset
-2. `pipenv run mb load` -- fills several indexed sqlite tables with the ratings data
+1. `pipenv run pre-commit install` -- does sanity checks on each commit
+2. `pipenv run mb init` -- downloads 100 M ratings from the Netflix prize dataset
+3. `pipenv run mb load` -- fills several indexed sqlite tables with the ratings data
 
 To run Term Frequency - Inverse Document Frequency (TF-IDF) recommender:
 
