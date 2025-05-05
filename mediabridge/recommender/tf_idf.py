@@ -2,6 +2,7 @@ import json
 
 import numpy as np
 import pandas as pd
+from numpy.typing import NDArray
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -9,8 +10,14 @@ from mediabridge.definitions import DATA_DIR
 
 
 def recommend_multiple_items(
-    titles, data, similarity_matrix, top_k=5, alpha=0.5, beta=0.7, gamma=2.0
-):
+    titles: list[str],
+    data: pd.DataFrame,
+    similarity_matrix: NDArray[np.float64],
+    top_k: int = 5,
+    alpha: float = 0.5,
+    beta: float = 0.7,
+    gamma: float = 2.0,
+) -> pd.DataFrame:
     """
     Recommend movies based on multiple input titles.
 
