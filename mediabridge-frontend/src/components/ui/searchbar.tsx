@@ -7,13 +7,15 @@ import { searchMovies } from "@/api/movie";
 type Props = {
     title: string;
     setTitle: (val: string) => void;
-    handleAddMovie: () => void;
+    handleAddMovie: (Movie?: Movie) => void;
     setSuggestions: (movies: Movie[]) => void;
     suggestions: Movie[];
 };
 
 const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestions }: Props) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
+
     const fetchSuggestions = async (query: string) => {
         if (!query.trim()) return setSuggestions([]);
         try {
@@ -37,6 +39,7 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
                     onChange={(e) => {
                         const value = e.target.value;
                         setTitle(value);
+                        setHighlightedIndex(0);
                         fetchSuggestions(value);
                     }}
                     onFocus={() => setIsFocused(true)}
@@ -46,16 +49,35 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
                             e.preventDefault();
-                            handleAddMovie();
+                            if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
+                                const selected = suggestions[highlightedIndex];
+                                handleAddMovie(selected);
+                                setSuggestions([]);
+                            } else {
+                                handleAddMovie();
+                            }
+                        } else if (e.key === "ArrowDown") {
+                            e.preventDefault();
+                            if (suggestions.length > 0) {
+                                setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
+                            }
+                        }
+                        else if (e.key === "ArrowUp") {
+                            e.preventDefault();
+                            if (suggestions.length > 0) {
+                                setHighlightedIndex((prev) => (prev - 1 + suggestions.length) % suggestions.length);
+                            }
                         }
                     }}
                 />
-                <Button onClick={handleAddMovie}>Add Movie</Button>
+                <Button onClick={() => {
+                    handleAddMovie()
+                }}>Add Movie</Button>
             </div>
             {/* Render dropdown */}
             {isFocused && suggestions.length > 0 && (
                 <div className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md z-10">
-                    {suggestions.map((movie) => (
+                    {suggestions.map((movie, index) => (
                         <div
                             key={movie.id}
                             onClick={() => {
@@ -63,7 +85,9 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
                                 setSuggestions([]);
                             }}
                             title={`Released in ${movie.year}`}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-left"
+                            className={`px-4 py-2 cursor-pointer text-left ${
+                                index === highlightedIndex ? "bg-gray-200" : "hover:bg-gray-100"
+                            }`}
                         >
                             {movie.title}
                         </div>
