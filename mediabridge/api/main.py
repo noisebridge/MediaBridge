@@ -1,3 +1,5 @@
+from typing import Any
+
 import flask
 import typer
 from flask_cors import CORS
@@ -12,13 +14,13 @@ app = flask.Flask(__name__)
 CORS(app)
 
 
-@app.route("/")
+@app.route("/")  # type: ignore
 def hello_world() -> str:
     return "MediaBridge API is running!"
 
 
-@app.route("/api/v1/movie/search")
-def search_movies() -> int:
+@app.route("/api/v1/movie/search")  # type: ignore
+def search_movies() -> tuple[Any, int]:
     query = flask.request.args.get("q")
     if not query:
         return flask.jsonify({"error": "Query parameter 'q' is required."}), 400
