@@ -67,14 +67,15 @@ def recommend_multiple_items(
     return recommendations[["title", "year", "description"]]
 
 
-def transform(data):
+def transform(data: pd.DataFrame) -> NDArray[np.float64]:
     """Expects a pandas Dataframe with a 'description' column. Returns a TF-IDF matrix and the cosine similarity matrix."""
     vectorizer = TfidfVectorizer(stop_words="english")
     tfidf_matrix = vectorizer.fit_transform(data["description"])
-    return cosine_similarity(tfidf_matrix)
+    sim = cosine_similarity(tfidf_matrix)
+    return np.ndarray(sim)
 
 
-def create_dataframe():
+def create_dataframe() -> pd.DataFrame:
     """Function that generates a dataframe from movie_titles_plus Descriptions.jsonl"""
     input_path = DATA_DIR / "movie_titles_plus_descriptions.jsonl"
 
