@@ -1,4 +1,3 @@
-from typing import Any
 
 import flask
 import typer
@@ -20,21 +19,20 @@ def hello_world() -> str:
 
 
 @app.route("/api/v1/movie/search")  # type: ignore
-def search_movies() -> tuple[Any, int]:
+def search_movies() -> tuple[str, int]:
     query = flask.request.args.get("q")
     if not query:
         return flask.jsonify({"error": "Query parameter 'q' is required."}), 400
 
     with get_engine().connect() as conn:
+        select = "SELECT id, year, title FROM movie_title WHERE LOWER(title) LIKE LOWER(:pattern) LIMIT 10"
         pattern = f"%{query}%"
         movies = conn.execute(
-            text(
-                "SELECT * FROM movie_title WHERE LOWER(title) LIKE LOWER(:pattern) LIMIT 10"
-            ),
+            text(select),
             {"pattern": pattern},
         ).fetchall()
         movies_list = [row._asdict() for row in movies]
-        return flask.jsonify(movies_list)
+        return flask.jsonify(movies_list), 200
 
 
 @typer_app.command()
