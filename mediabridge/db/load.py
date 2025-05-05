@@ -1,7 +1,6 @@
 import csv
 import dataclasses
 import logging
-from typing import List
 
 from pymongo import InsertOne
 from sqlalchemy import text
@@ -44,7 +43,7 @@ def load() -> None:
             # TODO: Needs implementation, bulk inserts for performance
 
 
-def _make_movie_dict(movie: List) -> dict:
+def _make_movie_dict(movie: list[str]) -> dict[str, str]:
     return {
         "netflix_id": movie[0],
         "title": movie[1],
