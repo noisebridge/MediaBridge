@@ -13,12 +13,12 @@ CORS(app)
 
 
 @app.route("/")
-def hello_world():
+def hello_world() -> str:
     return "MediaBridge API is running!"
 
 
 @app.route("/api/v1/movie/search")
-def search_movies():
+def search_movies() -> int:
     query = flask.request.args.get("q")
     if not query:
         return flask.jsonify({"error": "Query parameter 'q' is required."}), 400
@@ -36,7 +36,7 @@ def search_movies():
 
 
 @typer_app.command()
-def serve(ctx: typer.Context, debug: bool = True):
+def serve(ctx: typer.Context, debug: bool = True) -> None:
     """
     Serve the Flask app.
     """
