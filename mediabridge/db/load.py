@@ -1,9 +1,10 @@
 import csv
 import dataclasses
 import logging
+from collections.abc import Generator
 
 from pymongo import InsertOne
-from sqlalchemy import text
+from sqlalchemy import Connection, text
 from typer import Typer
 
 from mediabridge.db.connect import connect_to_mongo
@@ -51,6 +52,12 @@ def _make_movie_dict(movie: list[str]) -> dict[str, str]:
     }
 
 
+def _all_movie_titles(conn: Connection) -> Generator[list[str]]:
+    select = "SELECT id, title, year FROM movie_title"
+    for movie in conn.execute(text(select)):
+        yield list(map(str, movie))
+
+
 def load_from_sql(regen: bool) -> None:
     """Load movies into the movies collection based on data in the sqlite database.
 
@@ -62,8 +69,7 @@ def load_from_sql(regen: bool) -> None:
         mongo_movies.delete_many({})
     with get_engine().connect() as conn:
         operations = [
-            InsertOne(_make_movie_dict(movie))
-            for movie in conn.execute(text("SELECT id, title, year FROM movie_title"))
+            InsertOne(_make_movie_dict(movie)) for movie in _all_movie_titles(conn)
         ]
         mongo_movies.bulk_write(operations)
 
