@@ -16,6 +16,7 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
     const [isFocused, setIsFocused] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
 
+
     const fetchSuggestions = async (query: string) => {
         if (!query.trim()) return setSuggestions([]);
         try {
@@ -25,6 +26,29 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
         } catch (err) {
             console.error("Failed to fetch suggestions", err);
             setSuggestions([]);
+        }
+    };
+
+    const onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
+                const selected = suggestions[highlightedIndex];
+                handleAddMovie(selected);
+                setSuggestions([]);
+            } else {
+                handleAddMovie();
+            }
+        } else if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (suggestions.length > 0) {
+                setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
+            }
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (suggestions.length > 0) {
+                setHighlightedIndex((prev) => (prev - 1 + suggestions.length) % suggestions.length);
+            }
         }
     };
 
@@ -46,29 +70,7 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
                     onBlur={() => {
                         setTimeout(() => setIsFocused(false), 100);
                     }}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
-                                const selected = suggestions[highlightedIndex];
-                                handleAddMovie(selected);
-                                setSuggestions([]);
-                            } else {
-                                handleAddMovie();
-                            }
-                        } else if (e.key === "ArrowDown") {
-                            e.preventDefault();
-                            if (suggestions.length > 0) {
-                                setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
-                            }
-                        }
-                        else if (e.key === "ArrowUp") {
-                            e.preventDefault();
-                            if (suggestions.length > 0) {
-                                setHighlightedIndex((prev) => (prev - 1 + suggestions.length) % suggestions.length);
-                            }
-                        }
-                    }}
+                    onKeyDown={onInputKeyDown}
                 />
                 <Button onClick={() => {
                     handleAddMovie()
@@ -77,21 +79,23 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
             {/* Render dropdown */}
             {isFocused && suggestions.length > 0 && (
                 <div className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md z-10">
-                    {suggestions.map((movie, index) => (
-                        <div
-                            key={movie.id}
-                            onClick={() => {
-                                setTitle(movie.title);
-                                setSuggestions([]);
-                            }}
-                            title={`Released in ${movie.year}`}
-                            className={`px-4 py-2 cursor-pointer text-left ${
-                                index === highlightedIndex ? "bg-gray-200" : "hover:bg-gray-100"
-                            }`}
-                        >
-                            {movie.title}
-                        </div>
-                    ))}
+                    {suggestions.map((movie, index) => {
+                        const suggestionClassName = `px-4 py-2 cursor-pointer text-left ${index === highlightedIndex ? "bg-gray-200" : "hover:bg-gray-100"
+                            }`;
+                        return (
+                            <div
+                                key={movie.id}
+                                onClick={() => {
+                                    setTitle(movie.title);
+                                    setSuggestions([]);
+                                }}
+                                title={`Released in ${movie.year}`}
+                                className={suggestionClassName}
+                            >
+                                {movie.title}
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>
