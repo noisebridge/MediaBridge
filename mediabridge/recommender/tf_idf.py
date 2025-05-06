@@ -2,6 +2,7 @@ import json
 
 import numpy as np
 import pandas as pd
+from numpy.typing import NDArray
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -9,8 +10,14 @@ from mediabridge.definitions import DATA_DIR
 
 
 def recommend_multiple_items(
-    titles, data, similarity_matrix, top_k=5, alpha=0.5, beta=0.7, gamma=2.0
-):
+    titles: list[str],
+    data: pd.DataFrame,
+    similarity_matrix: NDArray[np.float64],
+    top_k: int = 5,
+    alpha: float = 0.5,
+    beta: float = 0.7,
+    gamma: float = 2.0,
+) -> pd.DataFrame:
     """
     Recommend movies based on multiple input titles.
 
@@ -60,14 +67,15 @@ def recommend_multiple_items(
     return recommendations[["title", "year", "description"]]
 
 
-def transform(data):
+def transform(data: pd.DataFrame) -> NDArray[np.float64]:
     """Expects a pandas Dataframe with a 'description' column. Returns a TF-IDF matrix and the cosine similarity matrix."""
     vectorizer = TfidfVectorizer(stop_words="english")
     tfidf_matrix = vectorizer.fit_transform(data["description"])
-    return cosine_similarity(tfidf_matrix)
+    sim = cosine_similarity(tfidf_matrix)
+    return np.ndarray(sim)
 
 
-def create_dataframe():
+def create_dataframe() -> pd.DataFrame:
     """Function that generates a dataframe from movie_titles_plus Descriptions.jsonl"""
     input_path = DATA_DIR / "movie_titles_plus_descriptions.jsonl"
 

@@ -1,5 +1,5 @@
-import flask
 import typer
+from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import text
 
@@ -7,20 +7,22 @@ from mediabridge.db.tables import get_engine
 
 typer_app = typer.Typer()
 
-
-def create_app():
-    app = flask.Flask(__name__)
+# Please consider the arguments in
+# https://flask.palletsprojects.com/en/stable/patterns/appfactories
+# when making edits to the create_app() function.
+def create_app() -> Flask:
+    app = Flask(__name__)
     CORS(app)
 
-    @app.route("/")
-    def hello_world():
+    @app.route("/")  # type: ignore
+    def hello_world() -> str:
         return "MediaBridge API is running!"
 
-    @app.route("/api/v1/movie/search")
-    def search_movies():
-        query = flask.request.args.get("q")
+    @app.route("/api/v1/movie/search")  # type: ignore
+    def search_movies() -> tuple[Response, int]:
+        query = request.args.get("q")
         if not query:
-            return flask.jsonify({"error": "Query parameter 'q' is required."}), 400
+            return jsonify({"error": "Query parameter 'q' is required."}), 400
 
         with get_engine().connect() as conn:
             pattern = f"%{query}%"
@@ -31,13 +33,13 @@ def create_app():
                 {"pattern": pattern},
             ).fetchall()
             movies_list = [row._asdict() for row in movies]
-            return flask.jsonify(movies_list)
+            return jsonify(movies_list), 200
 
     return app
 
 
 @typer_app.command()
-def serve(ctx: typer.Context, debug: bool = True):
+def serve(ctx: typer.Context, debug: bool = True) -> None:
     """
     Serve the Flask app.
     """

@@ -37,4 +37,4 @@ def generate_prompt_response(
     response = requests.post(url, json=payload, headers=headers, auth=auth)
     response.raise_for_status()
     response_json = response.json()
-    return response_json["response"]
+    return f'{response_json["response"]}'
