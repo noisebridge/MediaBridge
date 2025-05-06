@@ -28,23 +28,25 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
   const [suggestions, setSuggestions] = useState<Movie[]>([]);
 
 
-  const handleAddMovie = async () => {
-    if (!title.trim()) return;
+  const handleAddMovie = async (selectedMovie?: Movie) => {
+    const movieToAdd = selectedMovie ?? null;
+  
+    if (!title.trim() && !movieToAdd) return;
   
     try {
-      const data = await searchMovies(title); 
-  
-      const foundMovie = data.find(
-        (movie: { title: string }) => movie.title.toLowerCase() === title.toLowerCase()
-      );
+      const data = await searchMovies(title);
+      
+      const foundMovie =
+        movieToAdd ||
+        data.find((movie: Movie) => movie.title === title);
   
       if (!foundMovie) {
         setWarning(`‘${title}’ not found. Please check your spelling.`);
         return;
       }
-
+  
       if (isMoviePresent(movies, foundMovie.title)) {
-        setWarning(`‘${title}’ already added.`);
+        setWarning(`‘${foundMovie.title}’ already added.`);
         return;
       }
   
@@ -54,10 +56,11 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
         year: foundMovie.year,
         image: `https://picsum.photos/seed/${foundMovie.id}/200/300`,
       });
+  
       setWarning("");
-      setTitle(""); 
+      setTitle("");
     } catch (error) {
-      setWarning(`failed to search for movie: database might be down`);
+      setWarning("Failed to search for movie: database might be down");
       console.error("Error searching for movie:", error);
     }
   };
@@ -67,7 +70,7 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
         <CardTitle>Mediabridge</CardTitle>
         <CardDescription>Add liked movies</CardDescription>
       </CardHeader>
-`      <CardContent className="w-full">
+      <CardContent className="w-full">
         <SearchBar
           title={title}
           setTitle={setTitle}
