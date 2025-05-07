@@ -1,7 +1,5 @@
 from typing import Dict, Type
 
-from flask import Config
-
 from mediabridge.definitions import SQL_CONNECT_STRING
 
 

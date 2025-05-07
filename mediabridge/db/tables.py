@@ -4,7 +4,7 @@ from sqlalchemy import REAL, ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from mediabridge.definitions import DB_FILE, OUTPUT_DIR, SQL_CONNECT_STRING
+from mediabridge.definitions import DB_FILE, SQL_CONNECT_STRING
 
 
 class Base(DeclarativeBase):
