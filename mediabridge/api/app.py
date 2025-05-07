@@ -7,9 +7,10 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
 from mediabridge.config.backend import ENV_TO_CONFIG
+from mediabridge.db.tables import Base
 
 typer_app = typer.Typer()
-db = SQLAlchemy()
+db = SQLAlchemy(model_class=Base)
 
 
 # Please consider the arguments in
