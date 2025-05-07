@@ -16,6 +16,8 @@ TITLES_TXT = NETFLIX_DATA_DIR / "movie_titles.txt"
 OUTPUT_DIR = PROJECT_DIR / "out"
 LIGHTFM_MODEL_PKL = OUTPUT_DIR / "lightfm_model.pkl"
 
+DB_FILE = OUTPUT_DIR / "movies.sqlite"
+SQL_CONNECT_STRING = f"sqlite:///{DB_FILE}"
 
 if __name__ == "__main__":
     print(MODULE_DIR)

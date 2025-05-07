@@ -4,9 +4,7 @@ from sqlalchemy import REAL, ForeignKey, Integer, String, create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from mediabridge.definitions import OUTPUT_DIR
-
-DB_FILE = OUTPUT_DIR / "movies.sqlite"
+from mediabridge.definitions import DB_FILE, OUTPUT_DIR, SQL_CONNECT_STRING
 
 
 class Base(DeclarativeBase):
@@ -79,7 +77,7 @@ GROUP BY user_id
 @cache
 def get_engine() -> Engine:
     DB_FILE.parent.mkdir(exist_ok=True)
-    return create_engine(f"sqlite:///{DB_FILE}")
+    return create_engine(SQL_CONNECT_STRING)
 
 
 def create_tables() -> None:
