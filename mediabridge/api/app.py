@@ -15,7 +15,7 @@ db = SQLAlchemy()
 # Please consider the arguments in
 # https://flask.palletsprojects.com/en/stable/patterns/appfactories
 # when making edits to the create_app() function.
-def create_app(config_name=None) -> Flask:
+def create_app(config_name: str | None = None) -> Flask:
     if config_name is None:
         config_name = os.environ.get("FLASK_ENV", "development")
     config = ENV_TO_CONFIG.get(config_name)
