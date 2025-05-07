@@ -1,10 +1,11 @@
+from flask.testing import FlaskClient
 from sqlalchemy import text
 
 from mediabridge.api.app import create_app, db
 
 
 class MovieSearchTest:
-    def _insert_movies(self):
+    def _insert_movies(self) -> None:
         with db.engine.connect() as conn:
             conn.execute(
                 text("""
@@ -17,20 +18,18 @@ class MovieSearchTest:
             )
             conn.commit()
 
-    def test_create_app_cleanly(self):
+    def test_create_app_cleanly(self) -> None:
         create_app("testing")
 
-    def test_movie_search(self, client):
+    def test_movie_search(self, client: FlaskClient) -> None:
         self._insert_movies()
-        # Test the search_movies endpoint
         response = client.get("/api/v1/movie/search?q=Inception")
         assert response.status_code == 200
         data = response.get_json()
         assert data == [{"id": "1", "year": 2010, "title": "Inception"}]
 
-    def test_movie_search_multiple_results(self, client):
+    def test_movie_search_multiple_results(self, client: FlaskClient) -> None:
         self._insert_movies()
-        # Test the search_movies endpoint
         response = client.get("/api/v1/movie/search?q=tion")
         assert response.status_code == 200
         data = response.get_json()
@@ -39,15 +38,14 @@ class MovieSearchTest:
             {"id": "3", "year": 1994, "title": "The Shawshank Redemption"},
         ]
 
-    def test_movie_search_no_results(self, client):
+    def test_movie_search_no_results(self, client: FlaskClient) -> None:
         self._insert_movies()
-        # Test the search_movies endpoint with no results
         response = client.get("/api/v1/movie/search?q=NonExistentMovie")
         assert response.status_code == 200
         data = response.get_json()
         assert data == []
 
-    def test_movie_search_missing_query(self, client):
+    def test_movie_search_missing_query(self, client: FlaskClient) -> None:
         response = client.get("/api/v1/movie/search")
         assert response.status_code == 400
         data = response.get_json()

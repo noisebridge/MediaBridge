@@ -1,10 +1,13 @@
+from typing import Generator
+
 import pytest
+from flask import Flask
+from flask.testing import FlaskClient
 
 from mediabridge.api.app import create_app, db
 
 
-@pytest.fixture
-def app():
+def app() -> Generator[Flask, None, None]:
     """Instantiate the Flask app for testing and yield it.
 
     This fixture creates a new Flask app instance for each test, sets up the
@@ -26,7 +29,7 @@ def app():
 
 
 @pytest.fixture
-def client(app):
+def client(app: Flask) -> Generator[FlaskClient, None, None]:
     """Create a test client for the Flask app and yield it.
 
     By using yield, we ensure that the test using this fixture is running
