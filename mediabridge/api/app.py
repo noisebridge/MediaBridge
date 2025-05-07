@@ -7,6 +7,7 @@ from mediabridge.db.tables import get_engine
 
 typer_app = typer.Typer()
 
+
 # Please consider the arguments in
 # https://flask.palletsprojects.com/en/stable/patterns/appfactories
 # when making edits to the create_app() function.
