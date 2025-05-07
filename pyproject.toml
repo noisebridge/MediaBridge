@@ -33,3 +33,10 @@ select = [
     "LOG", "N", "NPY", "PERF", "PIE", "PTH", "PYI", "Q", "RET", "RSE", "RUF",
     "SIM", "SLF", "SLOT", "TCH", "TID", "TRY", "UP", "W", "YTT",
 ]
+
+[tool.mypy]
+strict = true
+show_traceback = true
+warn_unreachable = true
+ignore_missing_imports = true 
+no_namespace_packages = true
