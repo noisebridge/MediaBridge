@@ -7,6 +7,7 @@ from flask.testing import FlaskClient
 from mediabridge.api.app import create_app, db
 
 
+@pytest.fixture
 def app() -> Generator[Flask, None, None]:
     """Instantiate the Flask app for testing and yield it.
 
