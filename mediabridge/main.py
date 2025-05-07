@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import typer as typer
 
-from mediabridge.api import main as api_main
+from mediabridge.api import app as api_main
 from mediabridge.data_download import clean_all, download_file, download_netflix_dataset
 from mediabridge.data_processing import etl, wiki_to_netflix
 from mediabridge.data_processing.etl import etl_movie_title
