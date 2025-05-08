@@ -7,6 +7,6 @@ source bin/util.sh
 
 ${ENV} ruff check .
 
-${ENV} mypy --strict --show-traceback --warn-unreachable --ignore-missing-imports --no-namespace-packages --exclude=mediabridge/main.py .
+${ENV} mypy --strict --show-traceback --warn-unreachable --ignore-missing-imports --no-namespace-packages .
 
 ${ENV} pyright .
