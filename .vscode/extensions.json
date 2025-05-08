@@ -1,9 +1,8 @@
 {
-	"recommendations": [
-		"charliermarsh.ruff",
-		"mechatroner.rainbow-csv"
-	],
-	"unwantedRecommendations": [
-		
-	]
+  "recommendations": [
+    "charliermarsh.ruff",
+    "mechatroner.rainbow-csv",
+    "matangover.mypy"
+  ],
+  "unwantedRecommendations": []
 }
