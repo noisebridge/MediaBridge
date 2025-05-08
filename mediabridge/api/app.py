@@ -7,15 +7,16 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
 from mediabridge.config.backend import ENV_TO_CONFIG
+from mediabridge.db.tables import Base
 
 typer_app = typer.Typer()
-db = SQLAlchemy()
+db = SQLAlchemy(model_class=Base)
 
 
 # Please consider the arguments in
 # https://flask.palletsprojects.com/en/stable/patterns/appfactories
 # when making edits to the create_app() function.
-def create_app(config_name=None) -> Flask:
+def create_app(config_name: str | None = None) -> Flask:
     if config_name is None:
         config_name = os.environ.get("FLASK_ENV", "development")
     config = ENV_TO_CONFIG.get(config_name)

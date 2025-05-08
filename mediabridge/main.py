@@ -125,7 +125,7 @@ def tf_idf(
     beta: float = typer.Option(0.7),
     gamma: float = typer.Option(2.0),
     top_k: int = typer.Option(5),
-):
+) -> None:
     url = "http://ollama.tomato-pepper.uk/movie_titles_plus_descriptions.jsonl"
     raw_data_path = DATA_DIR / "movie_titles_plus_descriptions.jsonl"
     df_path = DATA_DIR / "tf_idf_dataframe.csv"
