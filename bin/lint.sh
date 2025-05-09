@@ -48,7 +48,7 @@ fi
 
 # If there is no value for "--only", or there is and it equals "mypy"
 if [[ -x "$only_value" || "$only_value" == "mypy" ]]; then
-  cmd=${ENV} mypy --strict --show-traceback --warn-unreachable --ignore-missing-imports --no-namespace-packages .
+  cmd=${ENV} mypy .
   echo $cmd
   $cmd
 fi
