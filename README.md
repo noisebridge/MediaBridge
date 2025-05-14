@@ -79,6 +79,12 @@ To run unittests:
 pipenv run test
 ```
 
+To run Cypress:
+
+```bash
+npx cypress open
+```
+
 These tests are also evaluated via a GitHub action when opening or updating a PR and must pass before merging.
 
 ## Code formatting
