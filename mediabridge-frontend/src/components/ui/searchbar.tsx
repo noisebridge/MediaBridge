@@ -58,6 +58,7 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
             <div className="flex w-full items-center space-x-4">
                 <Input
                     type="text"
+                    name="movie-search"
                     placeholder="The Room"
                     value={title}
                     onChange={(e) => {
