@@ -73,13 +73,19 @@ npm run dev
 
 ## Testing
 
-To run unittests:
+To run Python unit tests:
 
 ```
 pipenv run test
 ```
 
 These tests are also evaluated via a GitHub action when opening or updating a PR and must pass before merging.
+
+To run Cypress (frontend/Typescript tests):
+
+```bash
+npx cypress open
+```
 
 ## Code formatting
 
