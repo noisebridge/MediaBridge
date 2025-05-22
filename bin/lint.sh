@@ -40,21 +40,21 @@ while true; do
 done
 
 # If there is no value for "--only", or there is and it equals "ruff"
-if [[ -x "$only_value" || "$only_value" == "ruff" ]]; then
+if [[ -z "$only_value" || "$only_value" == "ruff" ]]; then
   cmd="${ENV} ruff check ."
   echo $cmd
   $cmd
 fi
 
 # If there is no value for "--only", or there is and it equals "mypy"
-if [[ -x "$only_value" || "$only_value" == "mypy" ]]; then
+if [[ -z "$only_value" || "$only_value" == "mypy" ]]; then
   cmd=${ENV} mypy .
   echo $cmd
   $cmd
 fi
 
 # If there is no value for "--only", or there is and it equals "pyright"
-if [[ -x "$only_value" || "$only_value" == "pyright" ]]; then
+if [[ -z "$only_value" || "$only_value" == "pyright" ]]; then
   cmd=${ENV} pyright .
   echo $cmd
   $cmd
