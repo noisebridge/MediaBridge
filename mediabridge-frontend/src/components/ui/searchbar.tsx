@@ -75,7 +75,11 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
                 />
                 <Button onClick={() => {
                     handleAddMovie()
-                }}>Add Movie</Button>
+                    }}
+                    name="add-movie-button"
+                >
+                    Add Movie
+                </Button>
             </div>
             {/* Render dropdown */}
             {isFocused && suggestions.length > 0 && (

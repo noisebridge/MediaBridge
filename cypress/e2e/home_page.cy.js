@@ -7,30 +7,51 @@ describe('The Home Page', () => {
 describe('Movie Search using fixture', () => {
 
   beforeEach(() => {
-    // Intercept the search API and return fixture data
     cy.intercept('GET', '/api/v1/movie/search*', { fixture: 'movies.json' }).as('movieSearch');
+    cy.visit('/');
   });
 
   it('should display movies from fixture', () => {
-    cy.visit('/')
-
     cy.get('input[name="movie-search"]').type('Inception{enter}');
-
     cy.wait('@movieSearch');
-
     cy.contains('Inception').should('exist');
   });
 
-//   it('should correctly handle searches with no matches', () => {
-//     // You can dynamically adjust the intercepted response
-//     cy.intercept('GET', '/api/v1/movie/search*', []).as('emptySearch');
+  it('should trigger the warning movie already added', () => {
+    cy.get('input[name="movie-search"]').type('Inception{enter}');
+    cy.wait('@movieSearch');
+    cy.get('input[name="movie-search"]').type('Inception{enter}');
+    cy.wait('@movieSearch');
+    cy.contains('already added.').should('exist');
+  });
 
-//     cy.visit('http://localhost:5000');
-    
-//     cy.get('input[name="search"]').type('NonExistentMovie{enter}');
+  it('should delete movie after adding it', () => {
+    cy.get('input[name="movie-search"]').type('Inception{enter}');
+    cy.wait('@movieSearch');
+    cy.contains('Inception').should('exist');
 
-//     cy.wait('@emptySearch');
+    cy.fixture('movies.json').then((movies) => {
+      const inception = movies.find(movie => movie.title === 'Inception');
+      cy.get(`button[name="remove-Inception"]`).click();
+    });
 
-//     cy.contains('No movies found').should('exist');
-//   });
+    cy.contains('Inception').should('not.exist');
+  });
+
+  it('should select movie using autocomplete navigation', () => {
+    cy.get('input[name="movie-search"]').type('Inc');
+    cy.wait('@movieSearch');
+
+    cy.get('input[name="movie-search"]').type('{downarrow}{downarrow}{enter}');
+
+    cy.contains('The Shawshank Redemption').should('exist');
+  });
+
+  it('typing a title not found in the database, pressing the add movie button', () => {
+    cy.get('input[name="movie-search"]').type('Shrek');
+    cy.get('button[name="add-movie-button"]').click();
+    cy.wait('@movieSearch');
+    cy.contains('not found').should('exist');
+  });
+
 });
