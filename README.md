@@ -28,6 +28,8 @@ To run Term Frequency - Inverse Document Frequency (TF-IDF) recommender:
 
 You may find it convenient to work on the project in a linux docker [container](doc/container.md).
 
+Please use `pipenv run lint` before git pushes, to keep the codebase clean.
+
 ### Using the pipenv environment in VSCode
 
 To fix import errors and other Intellisense features, make sure you've let VSCode know about your pipenv environment. To do that:
