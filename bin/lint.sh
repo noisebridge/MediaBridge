@@ -2,6 +2,8 @@
 
 # usage: bin/lint.sh [--only <tool>]
 set -e
+
+# shellcheck source=bin/util.sh disable=SC1091
 source bin/util.sh
 
 # Turn off tracing, we explicitly echo the commands below.
@@ -44,20 +46,20 @@ done
 # If there is no value for "--only", or there is and it equals "ruff"
 if [[ -z "$only_value" || "$only_value" == "ruff" ]]; then
   cmd="${ENV} ruff check ."
-  echo $cmd
+  echo "$cmd"
   $cmd
 fi
 
 # If there is no value for "--only", or there is and it equals "mypy"
 if [[ -z "$only_value" || "$only_value" == "mypy" ]]; then
-  cmd=${ENV} mypy .
-  echo $cmd
+  cmd="${ENV} mypy ."
+  echo "$cmd"
   $cmd
 fi
 
 # If there is no value for "--only", or there is and it equals "pyright"
 if [[ -z "$only_value" || "$only_value" == "pyright" ]]; then
-  cmd=${ENV} pyright .
-  echo $cmd
+  cmd="${ENV} pyright ."
+  echo "$cmd"
   $cmd
 fi
