@@ -8,6 +8,8 @@ source bin/util.sh
 set +x
 
 # Define the valid options.
+# Note that this is non-portable, behaving differently on macos and linux.
+# The target environment we care about is github CI/CD under linux.
 OPTIONS=$(getopt --long "only:" -- "$@")
 
 # Check if getopt was successful
