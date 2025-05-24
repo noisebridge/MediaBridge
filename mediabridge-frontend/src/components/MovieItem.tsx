@@ -23,6 +23,7 @@ const MovieItem = ({
             onClick={onRemove}
             className="w-6 h-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600 transition-colors"
             aria-label="Remove movie"
+            name={`remove-${movie.title}`}
           >
             ✕
           </button>
