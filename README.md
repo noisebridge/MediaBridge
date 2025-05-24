@@ -10,7 +10,7 @@ Currently, we are only accepting contributions from members of the project who m
 
 This code uses Python 3. It is tested on Python 3.12, but will probably work on versions back to 3.10.
 
-To install the project Python dependencies, first install pipenv globally with `pip install pipenv`. Then create a virtual env/install dependencies with `pipenv install --dev`.
+To install the project Python dependencies, first install [pipenv](https://docs.pipenv.org/basics/#example-pipenv-upgrade-workflow) globally with `pip install pipenv`. Then create a virtual env/install dependencies with `pipenv install --dev`.
 
 To install the frontend dependencies, cd into `mediabridge-frontend` and run `npm install`.
 
@@ -28,6 +28,8 @@ To run Term Frequency - Inverse Document Frequency (TF-IDF) recommender:
 
 You may find it convenient to work on the project in a linux docker [container](doc/container.md).
 
+Please use `pipenv run lint` before git pushes, to keep the codebase clean.
+
 ### Using the pipenv environment in VSCode
 
 To fix import errors and other Intellisense features, make sure you've let VSCode know about your pipenv environment. To do that:
@@ -35,6 +37,16 @@ To fix import errors and other Intellisense features, make sure you've let VSCod
 1. Open the VSCode command palette (Control/Command+SHIFT+P)
 2. Search for and select the "Python: Select Interpreter" command
 3. Choose the option that starts with `MediaBridge`
+
+### Rebuilding pipenv environment
+
+When debugging it's sometimes convenient to discard a venv and start from scratch.
+
+1. `pipenv --rm`  # discards existing venv, if there is one
+2. `pipenv lock --dev`  # queries pypi.org to re-write the Pipenv.lock file
+3. `pipenv install --dev`  # installs the locked versions, and yes `--dev` is needed
+
+You may also find `pipenv update --dev` useful, if a dep is down-rev.
 
 ## Running code
 
