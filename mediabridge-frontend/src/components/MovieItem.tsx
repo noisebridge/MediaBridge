@@ -7,6 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Movie } from "@/types/Movie";
 
+const slugify = (text: string) =>
+  text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
 const MovieItem = ({
   movie,
   onRemove,
@@ -15,7 +18,10 @@ const MovieItem = ({
   onRemove: () => void;
 }) => {
   return (
-    <Card className="flex flex-col items-center mx-2 w-64 text-center break-words">
+    <Card
+      className="flex flex-col items-center mx-2 w-64 text-center break-words"
+      data-testid={`movie-card-${slugify(movie.title)}-${movie.year}`}
+    >
       <CardHeader className="w-full px-4">
         <div className="flex justify-between items-center w-full">
           <CardTitle className="text-base text-left">{movie.title}</CardTitle>
@@ -23,8 +29,8 @@ const MovieItem = ({
             onClick={onRemove}
             className="w-6 h-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600 transition-colors"
             aria-label="Remove movie"
-            name={`remove-${movie.title}`}
-          >
+            name={`remove-${slugify(movie.title)}-${movie.year}`}
+          > 
             ✕
           </button>
         </div>
