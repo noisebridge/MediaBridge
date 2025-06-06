@@ -50,7 +50,7 @@ describe('Movie Search', () => {
     cy.contains('The Shawshank Redemption').should('exist');
   });
 
-  it('typing a title not found in the database, pressing the add movie button', () => {
+  it("shows a 'not found' message when typing a title not in the database", () => {
     cy.get('input[id="movie-search"]').type('Shrek');
     cy.get('button[id="add-movie-button"]').click();
     cy.wait('@movieSearch');
