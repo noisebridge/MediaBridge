@@ -17,7 +17,7 @@ const MovieItem = ({
   return (
     <Card
       className="flex flex-col items-center mx-2 w-64 text-center break-words"
-      data-testid={`movie-card`}
+      id={`movie-card`}
     >
       <CardHeader className="w-full px-4">
         <div className="flex justify-between items-center w-full">

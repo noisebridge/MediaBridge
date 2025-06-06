@@ -14,8 +14,8 @@ describe('Movie Search', () => {
     cy.get('input[id="movie-search"]').type('Inception{enter}');
     cy.wait('@movieSearch');
 
-    cy.get('[data-testid="movie-card"]').should('have.length.at.least', 1);
-    cy.get('[data-testid="movie-card"]').first().contains('Inception');
+    cy.get('[id="movie-card"]').should('have.length.at.least', 1);
+    cy.get('[id="movie-card"]').first().contains('Inception');
   });
 
   it('triggers the warning movie already added', () => {
@@ -25,16 +25,18 @@ describe('Movie Search', () => {
     cy.get('input[id="movie-search"]').type('Inception{enter}');
     cy.wait('@movieSearch');
 
-    cy.get('[data-testid="movie-warning"]').should('contain', 'already added');
+    cy.get('[id="movie-warning"]').should('contain', 'already added');
   });
 
   it('deletes movie after adding it', () => {
     cy.get('input[id="movie-search"]').type('Inception{enter}');
     cy.wait('@movieSearch');
 
-    cy.get('[data-testid="movie-card"]').should('exist');
+    cy.get('[id="movie-card"]').should('exist');
 
-    cy.get('button[id="remove-movie"]').first().click();
+    cy.contains('[id="movie-card"]', 'Inception')
+      .find('button[id="remove-movie"]')
+      .click();
 
     cy.contains('Inception').should('not.exist');
   });
@@ -53,6 +55,6 @@ describe('Movie Search', () => {
     cy.get('button[id="add-movie-button"]').click();
     cy.wait('@movieSearch');
 
-    cy.get('[data-testid="movie-warning"]').should('contain', 'not found');
+    cy.get('[id="movie-warning"]').should('contain', 'not found');
   });
 });
