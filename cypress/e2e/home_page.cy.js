@@ -39,7 +39,7 @@ describe('Movie Search', () => {
       .click();
 
     cy.contains('Inception').should('not.exist');
-  });
+});
 
   it('selects movie using autocomplete navigation', () => {
     cy.get('input[id="movie-search"]').type('Inc');
