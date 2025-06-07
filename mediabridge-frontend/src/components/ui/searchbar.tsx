@@ -58,6 +58,7 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
             <div className="flex w-full items-center space-x-4">
                 <Input
                     type="text"
+                    id="movie-search"
                     placeholder="The Room"
                     value={title}
                     onChange={(e) => {
@@ -74,7 +75,11 @@ const SearchBar = ({ title, setTitle, handleAddMovie, setSuggestions, suggestion
                 />
                 <Button onClick={() => {
                     handleAddMovie()
-                }}>Add Movie</Button>
+                    }}
+                    id="add-movie-button"
+                >
+                    Add Movie
+                </Button>
             </div>
             {/* Render dropdown */}
             {isFocused && suggestions.length > 0 && (

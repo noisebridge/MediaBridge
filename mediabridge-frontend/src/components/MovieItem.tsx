@@ -15,7 +15,10 @@ const MovieItem = ({
   onRemove: () => void;
 }) => {
   return (
-    <Card className="flex flex-col items-center mx-2 w-64 text-center break-words">
+    <Card
+      className="flex flex-col items-center mx-2 w-64 text-center break-words"
+      id={`movie-card`}
+    >
       <CardHeader className="w-full px-4">
         <div className="flex justify-between items-center w-full">
           <CardTitle className="text-base text-left">{movie.title}</CardTitle>
@@ -23,7 +26,8 @@ const MovieItem = ({
             onClick={onRemove}
             className="w-6 h-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600 transition-colors"
             aria-label="Remove movie"
-          >
+            id={`remove-movie`}
+          > 
             ✕
           </button>
         </div>
