@@ -1,4 +1,5 @@
 import pickle
+from abc import ABC, abstractmethod
 from pathlib import Path
 
 import numpy as np
@@ -10,8 +11,18 @@ from mediabridge.db.connect import connect_to_mongo
 from mediabridge.recommender.import_utils import import_lightfm_silently
 
 
+class RecommendationEngine(ABC):
+    @abstractmethod
+    def train(self, ratings):
+        raise NotImplementedError
+
+    @abstractmethod
+    def recommend(self, ratings):
+        raise NotImplementedError
+
+
 @beartype
-class RecommendationEngine:
+class LightFMEngine(RecommendationEngine):
     def __init__(self, movie_ids: list[str], model_file: Path) -> None:
         self.movie_ids = movie_ids
         self.db = connect_to_mongo()
@@ -82,5 +93,6 @@ class RecommendationEngine:
         print(f"{user_interactions=}")
         print(f"{user_interactions.shape=}")
 
-        recommendations = self.get_recommendations(user_id, user_interactions)[:limit]
+        recommendations = self.get_recommendations(
+            user_id, user_interactions)[:limit]
         return set(map(int, recommendations))
