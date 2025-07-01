@@ -13,7 +13,6 @@ const SelectMovies = ({
   removeMovie: (id: string) => void;
 }) => {
   const [recommendations, setRecommendations] = useState<string[]>([]);
-  console.log(recommendations);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -27,7 +26,7 @@ const SelectMovies = ({
       {/* Content section below */}
       {
         recommendations.length > 0 ?
-        <div>
+        <div style={{display: "flex", flexDirection: "column", gap: "10px", alignItems: "center"}}>
           {recommendations.map(recommendation => (<div key={recommendation}>{recommendation}</div>))}
           </div>
         :
