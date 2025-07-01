@@ -51,22 +51,14 @@ def create_app(config_name: str | None = None) -> Flask:
             movies_list = [row._asdict() for row in movies]
             return jsonify(movies_list), 200
 
-    @app.route("/api/v1/movie/recommend")  # type: ignore
+    @app.route("/api/v1/movie/recommend", methods=["POST"])  # type: ignore
     def recommend_movies() -> tuple[Response, int]:
-        query = request.args.get("q")
-        if not query:
-            return jsonify({"error": "Query parameter 'q' is required."}), 400  # type: ignore
-
-        with db.engine.connect() as conn:
-            pattern = f"%{query}%"
-            movies = conn.execute(
-                text(
-                    "SELECT * FROM movie_title WHERE LOWER(title) LIKE LOWER(:pattern) LIMIT 10"
-                ),
-                {"pattern": pattern},
-            ).fetchall()
-            movies_list = [row._asdict() for row in movies]
-            return jsonify(movies_list), 200
+        data = request.get_json()
+        if not data or "movies" not in data:
+            return jsonify({"error": "JSON body with 'movies' array is required."}), 400
+        movies = data["movies"]
+        # Placeholder: echo back the received movies as recommendations
+        return jsonify({"recommendations": movies}), 200
 
     return app
 

@@ -8,3 +8,10 @@ export const searchMovies = async (query: string) => {
   });
   return response.data;
 };
+
+export const getRecommendations = async (movies: string[]) => {
+  const response = await axios.post(`${API_ENDPOINT}/v1/movie/recommend`, {
+    movies,
+  });
+  return response.data;
+};
