@@ -8,6 +8,7 @@ from sqlalchemy import text
 
 from mediabridge.config.backend import ENV_TO_CONFIG
 from mediabridge.db.tables import Base
+from mediabridge.recommender.make_recommendation import get_title, recommend
 
 typer_app = typer.Typer()
 db = SQLAlchemy(model_class=Base)
@@ -50,6 +51,23 @@ def create_app(config_name: str | None = None) -> Flask:
             ).fetchall()
             movies_list = [row._asdict() for row in movies]
             return jsonify(movies_list), 200
+
+    @app.route("/api/v1/movie/recommend", methods=["POST"])  # type: ignore
+    def recommend_movies() -> tuple[Response, int]:
+        data = request.get_json()
+        if not data or "movies" not in data:
+            return jsonify({"error": "JSON body with 'movies' array is required."}), 400
+        movies = data["movies"]
+        if not isinstance(movies, list) or not all(isinstance(m, str) for m in movies):
+            return jsonify({"error": "'movies' must be a list of strings."}), 400
+
+        try:
+            rec_ids = recommend()
+            rec_titles = [get_title(int(mid)) for mid in rec_ids]
+        except Exception as e:
+            return jsonify({"error": f"Recommendation failed: {str(e)}"}), 500
+
+        return jsonify({"recommendations": rec_titles}), 200
 
     return app
 

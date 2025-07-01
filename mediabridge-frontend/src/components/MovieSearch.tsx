@@ -9,54 +9,57 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SearchBar  from "@/components/ui/searchbar";
-import { Movie } from "../types/Movie"; 
-import { searchMovies } from "@/api/movie"; 
+import { Movie } from "../types/Movie";
+import { getRecommendations, searchMovies } from "@/api/movie";
 
 
 type Props = {
   movies: Movie[];
   addMovie: (movie: Movie) => void;
+  setRecommendations: (movies: string[]) => void;
 };
 
 const isMoviePresent = (movies: Movie[], title: string) => {
   return movies.some((movie) => movie.title.toLowerCase() === title.toLowerCase());
 };
 
-const MovieSearch = ({ movies, addMovie }: Props) => {
+
+
+
+const MovieSearch = ({ movies, addMovie, setRecommendations }: Props) => {
   const [title, setTitle] = useState("");
   const [warning, setWarning] = useState("");
   const [suggestions, setSuggestions] = useState<Movie[]>([]);
 
-
   const handleAddMovie = async (selectedMovie?: Movie) => {
     const movieToAdd = selectedMovie ?? null;
-  
+
     if (!title.trim() && !movieToAdd) return;
-  
+
     try {
       const data = await searchMovies(title);
-      
+
       const foundMovie =
         movieToAdd ||
         data.find((movie: Movie) => movie.title === title);
-  
+
       if (!foundMovie) {
-        setWarning(`‘${title}’ not found. Please check your spelling.`);
+        setWarning(`'${title}' not found. Please check your spelling.`);
         return;
       }
-  
+
       if (isMoviePresent(movies, foundMovie.title)) {
-        setWarning(`‘${foundMovie.title}’ already added.`);
+        setWarning(`'${foundMovie.title}' already added.`);
         return;
       }
-  
+
       addMovie({
         id: foundMovie.id.toString(),
         title: foundMovie.title,
         year: foundMovie.year,
         image: `https://picsum.photos/seed/${foundMovie.id}/200/300`,
       });
-  
+
       setWarning("");
       setTitle("");
     } catch (error) {
@@ -64,6 +67,13 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
       console.error("Error searching for movie:", error);
     }
   };
+
+  const handleRecommendations = async () => {
+    const movieTitles = movies.map((movie: Movie) => movie.title);
+    const data = await getRecommendations(movieTitles);
+    setRecommendations(data.recommendations);
+  };
+
   return (
     <Card className="w-full max-w-md flex flex-col items-center">
       <CardHeader className="flex flex-col items-center text-center">
@@ -90,7 +100,7 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
         </div>
       </CardContent>
       <CardFooter>
-        <Button type="submit">Get Recommendations</Button>
+        <Button type="submit" onClick={handleRecommendations}>Get Recommendations</Button>
       </CardFooter>
     </Card>
   );
