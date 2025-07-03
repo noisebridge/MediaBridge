@@ -23,7 +23,7 @@ class RecommendationEngine:
         movies = self.db["movies"]
         movie = movies.find_one({"title": title})
         assert movie, title
-        return f"{movie.get("netflix_id")}"
+        return f"{movie.get('netflix_id')}"
 
     def get_movie_title(self, netflix_id: str) -> str:
         movies = self.db["movies"]
