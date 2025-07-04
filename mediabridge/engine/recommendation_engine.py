@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 from beartype import beartype
+from lightfm import LightFM
 from numpy.typing import NDArray
 from scipy.sparse import coo_matrix
 
@@ -84,3 +85,14 @@ class RecommendationEngine:
 
         recommendations = self.get_recommendations(user_id, user_interactions)[:limit]
         return set(map(int, recommendations))
+
+
+class LightFMRecommendationEngine(RecommendationEngine):
+    def __init__(self, matrix_path: Path):
+        self.matrix_path = matrix_path
+
+    def train(self) -> None:
+        matrix = pickle.load(self.matrix_path)
+
+        model = LightFM(no_components=30)
+        model.fit(matrix, epochs=10, num_threads=4)
