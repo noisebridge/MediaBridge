@@ -77,7 +77,7 @@ def recommend(
     return {test_movie_ids[i] for i, p in enumerate(predictions) if p > thresh}
 
 
-def _normalize_rating(rating: int) -> float:
+def normalize_rating(rating: int) -> float:
     """Maps a star rating to the interval [-1, 1], for a logistic loss model."""
     # The inputs skew toward positive ratings, so the overall mean will be positive.
     # We may need to defer normalization until the sample mean is known.
@@ -113,7 +113,7 @@ def _get_ratings(
     )
     with get_engine().connect() as conn:
         for u, m, r in conn.execute(text(query), params):
-            matrix[u, m] = _normalize_rating(r)
+            matrix[u, m] = normalize_rating(r)
 
             # Blind the model to the movies we want to predict.
             if u == max_user_id and m >= large_movie_id:
