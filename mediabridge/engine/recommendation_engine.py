@@ -3,7 +3,6 @@ from pathlib import Path
 
 import numpy as np
 from beartype import beartype
-from lightfm import LightFM
 from numpy.typing import NDArray
 from scipy.sparse import coo_matrix
 
