@@ -85,14 +85,3 @@ class RecommendationEngine:
 
         recommendations = self.get_recommendations(user_id, user_interactions)[:limit]
         return set(map(int, recommendations))
-
-
-class LightFMRecommendationEngine(RecommendationEngine):
-    def __init__(self, matrix_path: Path):
-        self.matrix_path = matrix_path
-
-    def train(self) -> None:
-        matrix = pickle.load(self.matrix_path)
-
-        model = LightFM(no_components=30)
-        model.fit(matrix, epochs=10, num_threads=4)
