@@ -7,13 +7,12 @@ import {
 } from "@/components/ui/card";
 import { Movie } from "@/types/Movie";
 
-const MovieItem = ({
-  movie,
-  onRemove,
-}: {
+type Props = {
   movie: Movie;
-  onRemove: () => void;
-}) => {
+  onRemove?: () => void;
+};
+
+const MovieItem = ({ movie, onRemove }: Props) => {
   return (
     <Card
       className="flex flex-col items-center mx-2 w-64 text-center break-words"
@@ -22,14 +21,16 @@ const MovieItem = ({
       <CardHeader className="w-full px-4">
         <div className="flex justify-between items-center w-full">
           <CardTitle className="text-base text-left">{movie.title}</CardTitle>
-          <button
-            onClick={onRemove}
-            className="w-6 h-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600 transition-colors"
-            aria-label="Remove movie"
-            id={`remove-movie`}
-          > 
-            ✕
-          </button>
+          {onRemove && (
+            <button
+              onClick={onRemove}
+              className="w-6 h-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600 transition-colors"
+              aria-label="Remove movie"
+              id={`remove-movie`}
+            >
+              ✕
+            </button>
+          )}
         </div>
       </CardHeader>
       <CardContent>

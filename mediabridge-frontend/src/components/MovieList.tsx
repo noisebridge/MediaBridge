@@ -1,17 +1,20 @@
 import { Movie } from "../types/Movie";
 import MovieItem from "./MovieItem";
 
-const MovieList = ({
-  movies,
-  removeMovie,
-}: {
+type Props = {
   movies: Movie[];
-  removeMovie: (id: string) => void;
-}) => {
+  removeMovie?: (id: string) => void;
+};
+
+const MovieList = ({ movies, removeMovie }: Props) => {
   return (
     <div className="flex flex-wrap justify-center gap-4 w-full">
       {movies.map((movie) => (
-        <MovieItem movie={movie} key={movie.id} onRemove={() => removeMovie(movie.id)} />
+        <MovieItem
+          movie={movie}
+          key={movie.id}
+          {...(removeMovie ? { onRemove: () => removeMovie(movie.id) } : {})}
+        />
       ))}
     </div>
   );

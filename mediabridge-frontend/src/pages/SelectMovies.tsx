@@ -28,7 +28,7 @@ const SelectMovies = ({
         recommendations.length > 0 ?
         <div style={{display: "flex", flexDirection: "column", gap: "10px", alignItems: "center"}}>
           <h2>Recommendations:</h2>
-          <MovieList movies={recommendations} removeMovie={() => {}} />
+          <MovieList movies={recommendations}  />
        </div>
         :
         <div className="px-4 py-8">

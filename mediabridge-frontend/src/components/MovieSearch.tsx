@@ -73,7 +73,8 @@ const MovieSearch = ({ movies, addMovie, setRecommendations }: Props) => {
           return await getMovieById(id);
         })
       )
-    ).filter(Boolean);
+    );
+    recommendedMovies.map(movie => movie.image = `https://picsum.photos/seed/${movie.id}/200/300`)
     setRecommendations(recommendedMovies);
   };
 
