@@ -6,13 +6,5 @@
       "source.organizeImports": "explicit"
     }
   },
-  "[javascript]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
-  "[typescript]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
   "editor.indentSize": "tabSize"
 }
