@@ -12,7 +12,7 @@ const SelectMovies = ({
   addMovie: (movie: Movie) => void;
   removeMovie: (id: string) => void;
 }) => {
-  const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [recommendations, setRecommendations] = useState<Movie[]>([]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -27,8 +27,9 @@ const SelectMovies = ({
       {
         recommendations.length > 0 ?
         <div style={{display: "flex", flexDirection: "column", gap: "10px", alignItems: "center"}}>
-          {recommendations.map(recommendation => (<div key={recommendation}>{recommendation}</div>))}
-          </div>
+          <h2>Recommendations:</h2>
+          <MovieList movies={recommendations} removeMovie={() => {}} />
+       </div>
         :
         <div className="px-4 py-8">
         <MovieList movies={movies} removeMovie={removeMovie} />

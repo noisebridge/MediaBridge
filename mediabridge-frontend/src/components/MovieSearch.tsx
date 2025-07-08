@@ -10,21 +10,17 @@ import {
 import { Button } from "@/components/ui/button";
 import SearchBar  from "@/components/ui/searchbar";
 import { Movie } from "../types/Movie";
-import { getRecommendations, searchMovies } from "@/api/movie";
-
+import { getRecommendations, searchMovies, getMovieById } from "@/api/movie";
 
 type Props = {
   movies: Movie[];
   addMovie: (movie: Movie) => void;
-  setRecommendations: (movies: string[]) => void;
+  setRecommendations: (movies: Movie[]) => void;
 };
 
 const isMoviePresent = (movies: Movie[], title: string) => {
   return movies.some((movie) => movie.title.toLowerCase() === title.toLowerCase());
 };
-
-
-
 
 const MovieSearch = ({ movies, addMovie, setRecommendations }: Props) => {
   const [title, setTitle] = useState("");
@@ -69,9 +65,16 @@ const MovieSearch = ({ movies, addMovie, setRecommendations }: Props) => {
   };
 
   const handleRecommendations = async () => {
-    const movieTitles = movies.map((movie: Movie) => movie.title);
-    const data = await getRecommendations(movieTitles);
-    setRecommendations(data.recommendations);
+    const movieIds = movies.map((movie: Movie) => movie.id);
+    const data = await getRecommendations(movieIds);
+    const recommendedMovies = (
+      await Promise.all(
+        data.recommendations.map(async (id: string) => {
+          return await getMovieById(id);
+        })
+      )
+    ).filter(Boolean);
+    setRecommendations(recommendedMovies);
   };
 
   return (

@@ -52,22 +52,35 @@ def create_app(config_name: str | None = None) -> Flask:
             movies_list = [row._asdict() for row in movies]
             return jsonify(movies_list), 200
 
+    @app.route("/api/v1/movie/<movie_id>")
+    def get_movie_by_id(movie_id):
+        with db.engine.connect() as conn:
+            movie = conn.execute(
+                text("SELECT * FROM movie_title WHERE id = :id"),
+                {"id": movie_id},
+            ).fetchone()
+            if not movie:
+                return jsonify({"error": "Movie not found"}), 404
+            return jsonify(dict(movie._mapping)), 200
+
     @app.route("/api/v1/movie/recommend", methods=["GET"])  # type: ignore
     def recommend_movies() -> tuple[Response, int]:
-        data = request.get_json()
-        if not data or "movies" not in data:
-            return jsonify({"error": "JSON body with 'movies' array is required."}), 400
-        movies = data["movies"]
-        if not isinstance(movies, list) or not all(isinstance(m, int) for m in movies):
+        movies = request.args.getlist("movies[]", type=int)
+        if not movies:
+            return jsonify(
+                {
+                    "error": "Query parameter 'movies[]' is required and must be a list of integers."
+                }
+            ), 400
+        if not all(isinstance(m, int) for m in movies):
             return jsonify({"error": "'movies' must be a list of integers."}), 400
 
         try:
             rec_ids = recommend()
-            rec_titles = [get_title(int(mid)) for mid in rec_ids]
         except Exception as e:
             return jsonify({"error": f"Recommendation failed: {str(e)}"}), 500
 
-        return jsonify({"recommendations": rec_titles}), 200
+        return jsonify({"recommendations": list(rec_ids)}), 200
 
     return app
 

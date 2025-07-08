@@ -10,8 +10,13 @@ export const searchMovies = async (query: string) => {
 };
 
 export const getRecommendations = async (movies: string[]) => {
-  const response = await axios.post(`${API_ENDPOINT}/v1/movie/recommend`, {
-    movies,
+  const response = await axios.get(`${API_ENDPOINT}/v1/movie/recommend`, {
+    params: { movies },
   });
+  return response.data;
+};
+
+export const getMovieById = async (id: string) => {
+  const response = await axios.get(`${API_ENDPOINT}/v1/movie/${id}`);
   return response.data;
 };
