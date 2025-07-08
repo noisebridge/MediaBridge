@@ -8,7 +8,7 @@ from sqlalchemy import text
 
 from mediabridge.config.backend import ENV_TO_CONFIG
 from mediabridge.db.tables import Base
-from mediabridge.recommender.make_recommendation import get_title, recommend
+from mediabridge.recommender.make_recommendation import recommend
 
 typer_app = typer.Typer()
 db = SQLAlchemy(model_class=Base)
