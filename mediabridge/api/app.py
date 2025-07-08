@@ -52,14 +52,14 @@ def create_app(config_name: str | None = None) -> Flask:
             movies_list = [row._asdict() for row in movies]
             return jsonify(movies_list), 200
 
-    @app.route("/api/v1/movie/recommend", methods=["POST"])  # type: ignore
+    @app.route("/api/v1/movie/recommend", methods=["GET"])  # type: ignore
     def recommend_movies() -> tuple[Response, int]:
         data = request.get_json()
         if not data or "movies" not in data:
             return jsonify({"error": "JSON body with 'movies' array is required."}), 400
         movies = data["movies"]
-        if not isinstance(movies, list) or not all(isinstance(m, str) for m in movies):
-            return jsonify({"error": "'movies' must be a list of strings."}), 400
+        if not isinstance(movies, list) or not all(isinstance(m, int) for m in movies):
+            return jsonify({"error": "'movies' must be a list of integers."}), 400
 
         try:
             rec_ids = recommend()
