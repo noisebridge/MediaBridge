@@ -65,10 +65,7 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
     }
   };
   const handleRecommendations = async () => {
-    if (movies.length === 0) {
-      setWarning("Please add at least one movie before getting recommendations.");
-      return;
-    } 
+      // no-op for now
   };
 
   return (
@@ -97,7 +94,7 @@ const MovieSearch = ({ movies, addMovie }: Props) => {
         </div>
       </CardContent>
       <CardFooter>
-        <Button type="submit" onClick={handleRecommendations}>Get Recommendations</Button>
+        <Button type="submit" onClick={handleRecommendations} disabled={movies.length === 0} >Get Recommendations</Button>
       </CardFooter>
     </Card>
   );
