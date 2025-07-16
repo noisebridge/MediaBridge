@@ -7,12 +7,13 @@ from mediabridge.api.app import create_app, db
 class MovieSearchTest:
     def _insert_movies(self) -> None:
         ins = """
-                INSERT INTO movie_title (id, year, title)
-                VALUES ('1', 2010, 'Inception'),
-                       ('2', 1999, 'The Matrix'),
-                       ('3', 1994, 'The Shawshank Redemption'),
-                       ('4', 1994, 'Toy Story')
-                """
+        INSERT INTO movie_title (id, year, title)
+        VALUES
+            ('1', 2010, 'Inception'),
+            ('2', 1999, 'The Matrix'),
+            ('3', 1994, 'The Shawshank Redemption'),
+            ('4', 1994, 'Toy Story')
+        """
         with db.engine.connect() as conn:
             conn.execute(text(ins))
             conn.commit()
