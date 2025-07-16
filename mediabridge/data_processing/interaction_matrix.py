@@ -2,7 +2,7 @@ import pickle
 
 import numpy as np
 import typer
-from scipy.sparse import coo_matrix, dok_matrix
+from scipy.sparse import coo_array, dok_matrix
 from sqlalchemy import text
 from tqdm import tqdm
 
@@ -16,7 +16,7 @@ NUM_MOVIES = 17_770
 app = typer.Typer()
 
 
-def create_matrix() -> coo_matrix:
+def create_matrix() -> coo_array:
     query = """
     SELECT
         user_id,
