@@ -2,7 +2,7 @@ import pickle
 
 import numpy as np
 import typer
-from scipy.sparse import coo_array, dok_matrix
+from scipy.sparse import coo_matrix, dok_matrix
 from sqlalchemy import text
 from tqdm import tqdm
 
@@ -16,7 +16,7 @@ NUM_MOVIES = 17_770
 app = typer.Typer()
 
 
-def create_matrix() -> coo_array:
+def create_matrix() -> coo_matrix:
     query = """
     SELECT
         user_id,
@@ -35,7 +35,9 @@ def create_matrix() -> coo_array:
         for u, m, r in tqdm(conn.execute(text(query)), total=71669260):
             matrix[u, m] = normalize_rating(r)
 
-    return matrix.tocoo()
+    m = matrix.tocoo()
+    assert isinstance(m, coo_matrix)
+    return m
 
 
 @app.command()
