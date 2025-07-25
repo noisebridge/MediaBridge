@@ -9,6 +9,17 @@ import { Movie } from "@/types/Movie";
 import { useState } from "react";
 import { ThumbsUp, ThumbsDown, Trash2 } from "lucide-react";
 
+const pastelBackgrounds = [
+  "bg-pink-100",
+  "bg-blue-100",
+  "bg-green-100",
+  "bg-yellow-100",
+  "bg-purple-100",
+  "bg-indigo-100",
+  "bg-rose-100",
+  "bg-orange-100",
+];
+
 
 const MovieItem = ({
   movie,
@@ -18,9 +29,10 @@ const MovieItem = ({
   onRemove: () => void;
 }) => {
   const [liked, setLiked] = useState<"up" | "down" | null>(null);
+  const randomBg = pastelBackgrounds[Math.floor(Math.random() * pastelBackgrounds.length)];
   return (
     <Card
-      className="flex flex-col items-center mx-2 w-64 text-center break-words"
+      className={`flex flex-col items-center mx-2 w-64 text-center break-words ${randomBg}`}
       id={`movie-card`}
     >
       <CardHeader className="w-full px-3 pt-2 pb-2">
@@ -32,9 +44,9 @@ const MovieItem = ({
             className="p-1 transition-transform hover:scale-110 bg-transparent"
           >
             {liked === "down" ? (
-              <ThumbsDown className="w-5 h-5" stroke="red" fill="#f87171" strokeWidth={2}/>
+              <ThumbsDown className="w-5 h-5" stroke="red" fill="#f87171" strokeWidth={2} />
             ) : (
-              <ThumbsUp className="w-5 h-5" stroke="green" fill="#4ade80" strokeWidth={2}/>
+              <ThumbsUp className="w-5 h-5" stroke="green" fill="#4ade80" strokeWidth={2} />
             )}
           </button>
           <button
@@ -43,7 +55,7 @@ const MovieItem = ({
             aria-label="Remove movie"
           >
             <Trash2 className="w-5 h-5" stroke="red" fill="#f87171" strokeWidth={2} />
-          </button> 
+          </button>
         </div>
         <CardTitle className="text-base text-center mt-2 mb-3 w-full">
           {movie.title}
