@@ -29,10 +29,11 @@ const MovieItem = ({
   onRemove: () => void;
 }) => {
   const [liked, setLiked] = useState<"up" | "down" | null>(null);
-  const randomBg = pastelBackgrounds[Math.floor(Math.random() * pastelBackgrounds.length)];
+  const pastelIndex = movie.year % pastelBackgrounds.length;
+  const pastelBg = pastelBackgrounds[pastelIndex];
   return (
     <Card
-      className={`flex flex-col items-center mx-2 w-64 text-center break-words ${randomBg}`}
+      className={`flex flex-col items-center mx-2 w-64 text-center break-words ${pastelBg}`}
       id={`movie-card`}
     >
       <CardHeader className="w-full px-3 pt-2 pb-2">
