@@ -42,20 +42,20 @@ const MovieItem = ({
             type="button"
             aria-label="Toggle like/dislike"
             onClick={() => setLiked((prev) => (prev === "up" ? "down" : "up"))}
-            className="p-1 transition-transform hover:scale-110 bg-transparent"
+              className="p-0 w-7 h-7 flex items-center justify-center bg-transparent focus:outline-none focus:ring-0"
           >
             {liked === "down" ? (
-              <ThumbsDown className="w-5 h-5" stroke="red" fill="#f87171" strokeWidth={2} />
+              <ThumbsDown className="p-0 w-6 h-6" stroke="red" fill="#f87171" strokeWidth={2} />
             ) : (
-              <ThumbsUp className="w-5 h-5" stroke="green" fill="#4ade80" strokeWidth={2} />
+              <ThumbsUp className="p-0 w-6 h-6" stroke="green" fill="#4ade80" strokeWidth={2} />
             )}
           </button>
           <button
             onClick={onRemove}
-            className="p-1 hover:scale-110 transition-transform bg-transparent"
+            className="p-0 w-7 h-7 flex items-center justify-center bg-transparent focus:outline-none focus:ring-0"
             aria-label="Remove movie"
           >
-            <Trash2 className="w-5 h-5" stroke="red" fill="#f87171" strokeWidth={2} />
+            <Trash2 className="w-7 h-7" stroke="red" fill="#f87171" strokeWidth={2} />
           </button>
         </div>
         <CardTitle className="text-base text-center mt-2 mb-3 w-full">
