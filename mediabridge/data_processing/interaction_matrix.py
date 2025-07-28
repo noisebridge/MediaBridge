@@ -16,14 +16,15 @@ NUM_MOVIES = 17_770
 app = typer.Typer()
 
 
-def create_matrix() -> coo_matrix:
-    query = """
+def create_matrix(max_user_id: int) -> coo_matrix:
+    query = f"""
     SELECT
         user_id,
         CAST(movie_id AS INTEGER),
         rating
     FROM rating
     WHERE rating != 3
+      AND user_id <= {max_user_id}
     ORDER BY user_id DESC
     """
 
@@ -40,13 +41,21 @@ def create_matrix() -> coo_matrix:
     return m
 
 
+FINAL_USER = 2_649_375
+
+
 @app.command()
-def save_matrix(ctx: typer.Context, debug: bool = True) -> None:
+def save_matrix(
+    ctx: typer.Context, max_user_id: int = FINAL_USER, *, debug: bool = True
+) -> None:
     """Create and save the interaction matrix from the user."""
-    output_file = OUTPUT_DIR / "interaction_matrix.pkl"
+    fname = "interaction_matrix.pkl"
+    if max_user_id < FINAL_USER:
+        fname = f"short_{fname}"
+    output_file = OUTPUT_DIR / fname
     output_file.parent.mkdir(exist_ok=True)
 
-    matrix = create_matrix()
+    matrix = create_matrix(max_user_id)
     with open(output_file, "wb") as f:
         pickle.dump(matrix, f)
     print(f"Interaction matrix saved to {output_file}")
