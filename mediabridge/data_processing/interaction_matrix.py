@@ -1,4 +1,5 @@
 import pickle
+from pathlib import Path
 
 import numpy as np
 import typer
@@ -46,7 +47,7 @@ def create_matrix() -> coo_matrix:
 def save_matrix(
     ctx: typer.Context,
     debug: bool = True,
-    output_file=OUTPUT_DIR / "interaction_matrix.pkl",
+    output_file: Path = OUTPUT_DIR / "interaction_matrix.pkl",
 ) -> None:
     """Create and save the interaction matrix from the user."""
     output_file.parent.mkdir(exist_ok=True)

@@ -1,8 +1,9 @@
 import pickle
 import shutil
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+from scipy.sparse import coo_matrix
 from sqlalchemy import create_engine, text
 
 from mediabridge.data_processing.interaction_matrix import (
@@ -18,7 +19,7 @@ TEST_DB_FILE = TEST_OUT / "test.db"
 
 
 class InteractionMatrixTest(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         TEST_OUT.mkdir(parents=True, exist_ok=True)
 
         self.test_engine = create_engine(f"sqlite:///{TEST_DB_FILE}")
@@ -32,10 +33,10 @@ class InteractionMatrixTest(unittest.TestCase):
             )
             conn.commit()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         shutil.rmtree(TEST_OUT, ignore_errors=True)
 
-    def _assert_matrix(self, matrix):
+    def _assert_matrix(self, matrix: coo_matrix) -> None:
         matrix = matrix.todok()
         self.assertIsNotNone(matrix)
         self.assertEqual(matrix.shape, (MAX_USER_ID + 1, NUM_MOVIES + 1))
@@ -47,7 +48,7 @@ class InteractionMatrixTest(unittest.TestCase):
         self.assertEqual(0, matrix[0, 0])
 
     @patch("mediabridge.data_processing.interaction_matrix.get_engine")
-    def test_create_matrix(self, mock_get_engine):
+    def test_create_matrix(self, mock_get_engine: MagicMock) -> None:
         mock_get_engine.return_value = self.test_engine
 
         actual = create_matrix()
@@ -55,7 +56,7 @@ class InteractionMatrixTest(unittest.TestCase):
         self._assert_matrix(actual)
 
     @patch("mediabridge.data_processing.interaction_matrix.get_engine")
-    def test_save_matrix(self, mock_get_engine):
+    def test_save_matrix(self, mock_get_engine: MagicMock) -> None:
         mock_get_engine.return_value = self.test_engine
 
         output_file = TEST_OUT / "interaction_matrix.pkl"
