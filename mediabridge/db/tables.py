@@ -1,6 +1,6 @@
 from functools import cache
 
-from sqlalchemy import REAL, ForeignKey, Integer, String, create_engine
+from sqlalchemy import REAL, ForeignKey, Integer, String, create_engine, inspect
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -82,3 +82,8 @@ def get_engine() -> Engine:
 
 def create_tables() -> None:
     Base.metadata.create_all(get_engine())
+
+
+def table_exists(table_name: str) -> bool:
+    inspector = inspect(get_engine())
+    return inspector.has_table(table_name)

@@ -46,10 +46,7 @@ FINAL_USER = 2_649_375
 
 @app.command()
 def save_matrix(
-    ctx: typer.Context,
-    max_user_id: int = FINAL_USER,
-    *,
-    debug: bool = True,
+    ctx: typer.Context, max_user_id: int = FINAL_USER, *, debug: bool = True
 ) -> None:
     """Create and save the interaction matrix from the user."""
     fname = "interaction_matrix.pkl"
