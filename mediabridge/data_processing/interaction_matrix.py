@@ -35,7 +35,9 @@ def create_matrix() -> coo_matrix:
         for u, m, r in tqdm(conn.execute(text(query)), total=71669260):
             matrix[u, m] = normalize_rating(r)
 
-    return matrix.tocoo()
+    m = matrix.tocoo()
+    assert isinstance(m, coo_matrix)
+    return m
 
 
 @app.command()
